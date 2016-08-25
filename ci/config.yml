@@ -22,7 +22,7 @@ tests:
     regions:
     - us-east-1
   bb-NFS:
-    template_file: BitbucketDataCenter-EC2NFS.template
+    template_file: quickstart-bitbucket-nfs-master.template
     parameter_input: quickstart-bitbucket-nfs-master.json
     regions:
     - us-east-1
