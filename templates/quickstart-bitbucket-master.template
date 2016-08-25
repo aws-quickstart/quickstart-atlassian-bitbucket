@@ -169,14 +169,6 @@
       "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.",
       "Type": "List<AWS::EC2::AvailabilityZone::Name>"
     },
-    "DomainDNSName": {
-      "AllowedPattern": "[a-zA-Z0-9]+\\..+",
-      "Default": "example.com",
-      "Description": "Fully qualified domain name (FQDN) of the forest root domain e.g. example.com",
-      "MaxLength": "25",
-      "MinLength": "3",
-      "Type": "String"
-    },
     "KeyPairName": {
       "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
       "Type": "AWS::EC2::KeyPair::KeyName"
@@ -591,7 +583,7 @@
               }, {
                 "Ref": "QSS3KeyPrefix"
               },
-              "templates/BitBucketDataCenter.template"
+              "templates/BitbucketDataCenter.template"
             ]
           ]
         },
