@@ -155,9 +155,6 @@
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
         },
-        "KeyPairName": {
-          "default": "Key Name"
-        },
         "SSLCertificateName": {
           "default": "SSL Certificate Name"
         }
@@ -587,7 +584,7 @@
             ]
           ]
         },
-        "Parameters": {           
+        "Parameters": {
           "AvailabilityZones": {
             "Fn::Join": [
               ",", {
@@ -598,22 +595,22 @@
           "Subnets": {
                     "Fn::Join": [
                         ",",
-                        [   
-                            {   
+                        [
+                            {
                                "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet1ID"]
-                            },  
-                            {   
+                            },
+                            {
                                "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet2ID"]
-                            }   
-                        ]   
-                    ]   
-                },  
+                            }
+                        ]
+                    ]
+                },
                 "VPC": {
                         "Fn::GetAtt": [
                         "VPCStack",
                         "Outputs.VPCID"
-                        ]   
-                }, 
+                        ]
+                },
           "AssociatePublicIpAddress": {
             "Ref": "AssociatePublicIpAddress"
           },
@@ -622,9 +619,6 @@
           },
           "BitbucketVersion": {
             "Ref": "BitbucketVersion"
-          },
-          "CidrBlock": {
-            "Ref": "AccessCIDR"
           },
           "ClusterNodeMax": {
             "Ref": "ClusterNodeMax"
