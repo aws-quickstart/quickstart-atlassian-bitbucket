@@ -21,8 +21,8 @@ tests:
     parameter_input: quickstart-bitbucket-master.json
     regions:
     - us-east-1
-#  bb-NFS:
-#    template_file: BitbucketDataCenter-EC2NFS.template
-#    parameter_input: quickstart-bitbucket-nfs-master.json
-#    regions:
-#    - us-east-1
+  bb-NFS:
+    template_file: BitbucketDataCenter-EC2NFS.template
+    parameter_input: quickstart-bitbucket-nfs-master.json
+    regions:
+    - us-east-1
