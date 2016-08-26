@@ -52,8 +52,7 @@
         },
         "Parameters": [
           "KeyPairName",
-          "NATInstanceType",
-          "RDGW2PrivateIP"
+          "NATInstanceType"
         ]
       }, {
         "Label": {
