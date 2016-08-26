@@ -641,6 +641,11 @@
               "Ref": "AWS::StackName"
             },
             "PropagateAtLaunch": true
+          },
+          {
+            "Key": "Name",
+            "Value": "BBDC-ClusterNode",
+            "PropagateAtLaunch": true
           }
         ]
       }
@@ -1400,6 +1405,10 @@
             "Value": {
               "Ref": "AWS::StackId"
             }
+          },
+          {
+            "Key": "Name",
+            "Value": "BBDC-ElasticSearchNode"
           }
         ],
         "UserData": {
