@@ -23,7 +23,6 @@
             "ClusterNodeMin",
             "ClusterNodeInstanceType",
             "FileServerInstanceType",
-            "FileServerEbsOptimized",
             "HomeSize",
             "HomeIops",
             "HomeVolumeType"
@@ -35,9 +34,6 @@
           },
           "Parameters": [
             "DBInstanceClass",
-            "DBEngine",
-            "DBEngineVersion",
-            "DBMasterUser",
             "DBMasterUserPassword",
             "DBName",
             "DBPassword",
@@ -114,15 +110,6 @@
         "DBInstanceClass": {
           "default": "Database instance class"
         },
-        "DBEngine": {
-          "default": "Database engine"
-        },
-        "DBEngineVersion": {
-          "default": "Engine version"
-        },
-        "DBMasterUser": {
-          "default": "Master username"
-        },
         "DBMasterUserPassword": {
           "default": "Master password"
         },
@@ -146,9 +133,6 @@
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
-        },
-        "FileServerEbsOptimized": {
-          "default": "Enable EBS Optimizations for the NFS server"
         },
         "FileServerInstanceType": {
           "default": "NFS server instance type"
@@ -205,7 +189,7 @@
       "Default": ""
     },
     "BitbucketVersion": {
-      "Description": "Version of Bitbucket to install. Find valid versions at https://www.atlassian.com/software/bitbucket/download-archives.html",
+      "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at https://confluence.atlassian.com/bitbucketserver/releases-776640503.html",
       "Type": "String",
       "MinLength": "5",
       "MaxLength": "27",
@@ -236,29 +220,17 @@
         "c3.2xlarge",
         "c3.4xlarge",
         "c3.8xlarge",
-        "c4.xlarge",
-        "c4.2xlarge",
-        "c4.4xlarge",
-        "c4.8xlarge",
-        "hs1.8xlarge",
         "i2.xlarge",
         "i2.2xlarge",
         "i2.4xlarge",
         "i2.8xlarge",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
-        "m4.large",
-        "m4.xlarge",
-        "m4.2xlarge",
-        "m4.4xlarge",
-        "m4.10xlarge",
         "r3.xlarge",
         "r3.2xlarge",
         "r3.4xlarge",
-        "r3.8xlarge"
+        "r3.8xlarge",
+        "x1.32xlarge"
       ],
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
+      "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     },
     "CatalinaOpts": {
       "Type": "String",
@@ -273,56 +245,27 @@
     "DBInstanceClass": {
       "Description": "RDS instance type",
       "Type": "String",
-      "Default": "db.m3.medium",
+      "Default": "db.m4.large",
       "AllowedValues": [
-        "db.m3.medium",
-        "db.m3.large",
-        "db.m3.xlarge",
-        "db.m3.2xlarge",
+        "db.m4.large",
+        "db.m4.xlarge",
+        "db.m4.2xlarge",
+        "db.m4.4xlarge",
+        "db.m4.10xlarge",
         "db.r3.large",
         "db.r3.xlarge",
         "db.r3.2xlarge",
         "db.r3.4xlarge",
         "db.r3.8xlarge",
-        "db.t2.medium"
+        "db.t2.medium",
+        "db.t2.large"
       ],
       "ConstraintDescription": "Must be a valid RDS instance class, 'db.t2.medium' or larger."
-    },
-    "DBEngine": {
-      "Description": "The name of the database engine to be used for the RDS instance",
-      "Type": "String",
-      "Default": "postgres",
-      "AllowedValues": [
-        "oracle-se1",
-        "oracle-se",
-        "oracle-ee",
-        "sqlserver-ee",
-        "sqlserver-se",
-        "sqlserver-ex",
-        "sqlserver-web",
-        "postgres"
-      ],
-      "ConstraintDescription": "Must be a valid RDS engine, not every database engine is available for every AWS region"
-    },
-    "DBEngineVersion": {
-      "Description": "The version number of the database engine to use",
-      "Type": "String",
-      "Default": " 9.5.2",
-      "ConstraintDescription": "Must be an AWS supported database version, not all versions are supported in all regions"
-    },
-    "DBMasterUser": {
-      "Description": "Database admin account username. Leave blank if you have specified a Database snapshot ID",
-      "Type": "String",
-      "Default": "postgres",
-      "MinLength": "1",
-      "MaxLength": "16",
-      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
-      "ConstraintDescription": "Must begin with a letter and contain only alphanumeric characters."
     },
     "DBMasterUserPassword": {
       "NoEcho": "true",
       "Default": "",
-      "Description": "Database admin account password. Leave blank if you have specified a Database snapshot ID",
+      "Description": "Database admin account password.",
       "Type": "String",
       "MaxLength": "41",
       "AllowedPattern": "[a-zA-Z0-9]*",
@@ -376,77 +319,44 @@
     "ElasticsearchInstanceType": {
       "Description": "A EC2 instance type for Elasticsearch to run on.",
       "Type": "String",
-      "Default": "m3.large",
+      "Default": "i2.xlarge",
       "AllowedValues": [
         "c3.xlarge",
         "c3.2xlarge",
         "c3.4xlarge",
         "c3.8xlarge",
-        "c4.xlarge",
-        "c4.2xlarge",
-        "c4.4xlarge",
-        "c4.8xlarge",
-        "hs1.8xlarge",
+        "d2.xlarge",
+        "d2.2xlarge",
+        "d2.4xlarge",
+        "d2.8xlarge",
         "i2.xlarge",
         "i2.2xlarge",
         "i2.4xlarge",
         "i2.8xlarge",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
-        "m4.large",
-        "m4.xlarge",
-        "m4.2xlarge",
-        "m4.4xlarge",
-        "m4.10xlarge",
         "r3.xlarge",
         "r3.2xlarge",
         "r3.4xlarge",
-        "r3.8xlarge"
+        "r3.8xlarge",
+        "x1.32xlarge"
       ],
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
-    },
-    "FileServerEbsOptimized": {
-      "Type": "String",
-      "Default": "true",
-      "AllowedValues": [
-        "true",
-        "false"
-      ],
-      "ConstraintDescription": "Must be 'true' or 'false'."
+      "ConstraintDescription": "Must be an EC2 instance type in the C3, D2, I2, R3, or X1 family, 'xlarge' or larger"
     },
     "FileServerInstanceType": {
       "Description": "Instance type for the file server hosting the Bitbucket shared home directory",
       "Type": "String",
-      "Default": "m4.large",
+      "Default": "m4.xlarge",
       "AllowedValues": [
-        "c3.xlarge",
-        "c3.2xlarge",
-        "c3.4xlarge",
-        "c3.8xlarge",
         "c4.xlarge",
         "c4.2xlarge",
         "c4.4xlarge",
         "c4.8xlarge",
-        "hs1.8xlarge",
-        "i2.xlarge",
-        "i2.2xlarge",
-        "i2.4xlarge",
-        "i2.8xlarge",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
-        "m4.large",
         "m4.xlarge",
         "m4.2xlarge",
         "m4.4xlarge",
         "m4.10xlarge",
-        "r3.xlarge",
-        "r3.2xlarge",
-        "r3.4xlarge",
-        "r3.8xlarge"
+        "x1.32xlarge"
       ],
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
+      "ConstraintDescription": "Must be an EC2 instance type in the C4, M4, or X1 family, 'xlarge' or larger."
     },
     "HomeDeleteOnTermination": {
       "Description": "Delete home directory volume when the instance is terminated.  You must back up your data before terminating your instance if this option is set to 'true'",
@@ -558,6 +468,18 @@
         }
       ]
     },
+    "DoSetDBMasterUserPassword": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "DBMasterUserPassword"
+            },
+            ""
+          ]
+        }
+      ]
+    },
     "DoSSL": {
       "Fn::Not": [
         {
@@ -568,14 +490,6 @@
             ""
           ]
         }
-      ]
-    },
-    "IsEbsOptimized": {
-      "Fn::Equals": [
-        {
-          "Ref": "FileServerEbsOptimized"
-        },
-        "true"
       ]
     },
     "IsHomeProvisionedIops": {
@@ -589,30 +503,6 @@
   },
   "Mappings": {
     "AWSInstanceType2Arch": {
-      "m3.large": {
-        "Arch": "HVM64"
-      },
-      "m3.xlarge": {
-        "Arch": "HVM64"
-      },
-      "m3.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.large": {
-        "Arch": "HVM64"
-      },
-      "m4.xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.10xlarge": {
-        "Arch": "HVM64"
-      },
       "c3.large": {
         "Arch": "HVM64"
       },
@@ -643,8 +533,44 @@
       "c4.8xlarge": {
         "Arch": "HVM64"
       },
-      "g2.2xlarge": {
-        "Arch": "HVMG2"
+      "d2.xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.large": {
+        "Arch": "HVM64"
+      },
+      "m4.xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.10xlarge": {
+        "Arch": "HVM64"
       },
       "r3.large": {
         "Arch": "HVM64"
@@ -661,74 +587,99 @@
       "r3.8xlarge": {
         "Arch": "HVM64"
       },
-      "i2.xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "hi1.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "hs1.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "cr1.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "cc2.8xlarge": {
+      "x1.32xlarge": {
         "Arch": "HVM64"
       }
     },
     "AWSRegionArch2AMI": {
       "ap-southeast-2": {
-        "HVM64": "ami-7fe4d31c",
+        "HVM64": "ami-8ba899e8",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-south-1": {
-        "HVM64": "ami-b25c29dd",
+        "HVM64": "ami-49e79226",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-west-1": {
-        "HVM64": "ami-e6e89f95",
+        "HVM64": "ami-b34f36c0",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-southeast-1": {
-        "HVM64": "ami-819149e2",
+        "HVM64": "ami-0429f367",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-central-1": {
-        "HVM64": "ami-847584eb",
+        "HVM64": "ami-22699b4d",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-2": {
-        "HVM64": "ami-a3895ccd",
+        "HVM64": "ami-6c25f002",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-1": {
-        "HVM64": "ami-65925d04",
+        "HVM64": "ami-d98150b8",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-east-1": {
-        "HVM64": "ami-98d9bf8f",
+        "HVM64": "ami-a49defb3",
         "HVMG2": "NOT_SUPPORTED"
       },
       "sa-east-1": {
-        "HVM64": "ami-95fd6cf9",
+        "HVM64": "ami-8924b4e5",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-1": {
-        "HVM64": "ami-1ea8ea7e",
+        "HVM64": "ami-08470868",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-2": {
-        "HVM64": "ami-92d602f2",
+        "HVM64": "ami-6516c405",
+        "HVMG2": "NOT_SUPPORTED"
+      }
+    },
+    "AWSRegionArch2ElasticsearchAMI": {
+      "ap-southeast-2": {
+        "HVM64": "ami-dc361ebf",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-south-1": {
+        "HVM64": "ami-ffbdd790",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "eu-west-1": {
+        "HVM64": "ami-f9dd458a",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-southeast-1": {
+        "HVM64": "ami-a59b49c6",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "eu-central-1": {
+        "HVM64": "ami-ea26ce85",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-northeast-2": {
+        "HVM64": "ami-2b408b45",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-northeast-1": {
+        "HVM64": "ami-374db956",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "us-east-1": {
+        "HVM64": "ami-6869aa05",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "sa-east-1": {
+        "HVM64": "ami-6dd04501",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "us-west-1": {
+        "HVM64": "ami-31490d51",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "us-west-2": {
+        "HVM64": "ami-7172b611",
         "HVMG2": "NOT_SUPPORTED"
       }
     }
@@ -896,17 +847,9 @@
         "AWS::CloudFormation::Init": {
           "configSets": {
             "default": [
-              "0",
               "1",
               "2"
             ]
-          },
-          "0": {
-            "packages": {
-              "yum": {
-                "nfs-utils": []
-              }
-            }
           },
           "1": {
             "packages": {
@@ -931,11 +874,6 @@
                     "",
                     [
                       "ATL_APP_DATA_MOUNT_ENABLED=false\n",
-                      "ATL_DB_USER=",
-                      {
-                        "Ref": "DBMasterUser"
-                      },
-                      "\n",
                       "ATL_DB_PASSWORD=",
                       {
                         "Ref": "DBMasterUserPassword"
@@ -1187,7 +1125,7 @@
                 "ignoreErrors": "false"
               },
               "030_chown_shared_home_dir": {
-                "command": "chown -R atlbitbucket:atlbitbucket /media/atl/bitbucket",
+                "command": "chown atlbitbucket:atlbitbucket /media/atl/bitbucket /media/atl/bitbucket/shared",
                 "ignoreErrors": "false"
               }
             },
@@ -1409,12 +1347,15 @@
               "import_key",
               "add_repo",
               "install_es",
+              "stop_es",
+              "mount_instance_store",
               "configure_and_start"
             ],
             "update": [
               "uninstall_es_aws_plugin",
               "install_es",
-              "restart_es"
+              "stop_es",
+              "start_es"
             ]
           },
           "import_key": {
@@ -1461,10 +1402,42 @@
               }
             }
           },
-          "restart_es": {
+          "stop_es": {
             "commands": {
-              "010_restart_elasticsearch_service": {
-                "command": "sudo service elasticsearch restart",
+              "010_stop_elasticsearch_service": {
+                "command": "sudo service elasticsearch stop",
+                "ignoreErrors": "false"
+              }
+            }
+          },
+          "mount_instance_store": {
+            "commands": {
+              "010_mkfs": {
+                "command": "mkfs.ext4 -E nodiscard /dev/xvdb",
+                "ignoreErrors": "true"
+              },
+              "020_mkdir": {
+                "command": "mkdir -p /media/ephemeral0",
+                "ignoreErrors": "false"
+              },
+              "030_mount": {
+                "command": "mount -o discard /dev/xvdb /media/ephemeral0",
+                "ignoreErrors": "true"
+              },
+              "040_mv": {
+                "command": "mv /var/lib/elasticsearch /media/ephemeral0/",
+                "ignoreErrors": "false"
+              },
+              "050_ln": {
+                "command": "ln -sf /media/ephemeral0/elasticsearch /var/lib/elasticsearch",
+                "ignoreErrors": "false"
+              }
+            }
+          },
+          "start_es": {
+            "commands": {
+              "010_start_elasticsearch_service": {
+                "command": "sudo service elasticsearch start",
                 "ignoreErrors": "false"
               }
             }
@@ -1591,9 +1564,15 @@
         }
       },
       "Properties": {
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/xvdb",
+            "VirtualName": "ephemeral0"
+          }
+        ],
         "ImageId": {
           "Fn::FindInMap": [
-            "AWSRegionArch2AMI",
+            "AWSRegionArch2ElasticsearchAMI",
             {
               "Ref": "AWS::Region"
             },
@@ -1686,17 +1665,9 @@
         "AWS::CloudFormation::Init": {
           "configSets": {
             "default": [
-              "0",
               "1",
               "2"
             ]
-          },
-          "0": {
-            "packages": {
-              "yum": {
-                "nfs-utils": []
-              }
-            }
           },
           "1": {
             "packages": {
@@ -1724,14 +1695,6 @@
                       "ATL_ENABLED_SHARED_HOMES=Bitbucket\n",
                       "ATL_NGINX_ENABLED=false\n",
                       "ATL_POSTGRES_ENABLED=false\n",
-                      "ATL_PROXY_NAME=",
-                      {
-                        "Fn::GetAtt": [
-                          "LoadBalancer",
-                          "DNSName"
-                        ]
-                      },
-                      "\n",
                       "ATL_SSL_SELF_CERT_ENABLED=false\n",
                       "ATL_BITBUCKET_BUNDLED_ELASTICSEARCH_ENABLED=false\n"
                     ]
@@ -1810,32 +1773,6 @@
                     ]
                   ]
                 }
-              },
-              "/tmp/init.sql": {
-                "Fn::If": [
-                  "DoRestoreFromRDSSnapshot",
-                  {
-                    "Ref": "AWS::NoValue"
-                  },
-                  {
-                    "content": {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "CREATE ROLE atlbitbucket WITH LOGIN PASSWORD '",
-                          {
-                            "Ref": "DBPassword"
-                          },
-                          "' VALID UNTIL 'infinity';\n",
-                          "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO atlbitbucket;\n"
-                        ]
-                      ]
-                    },
-                    "mode": "000600",
-                    "owner": "root",
-                    "group": "root"
-                  }
-                ]
               }
             },
             "commands": {
@@ -1846,57 +1783,6 @@
               "020_exportfs_all": {
                 "command": "exportfs -a",
                 "ignoreErrors": "false"
-              },
-              "030_create_db_user": {
-                "Fn::If": [
-                  "DoRestoreFromRDSSnapshot",
-                  {
-                    "Ref": "AWS::NoValue"
-                  },
-                  {
-                    "command": {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "psql -w -U '",
-                          {
-                            "Ref": "DBMasterUser"
-                          },
-                          "' -h '",
-                          {
-                            "Fn::GetAtt": [
-                              "DB",
-                              "Endpoint.Address"
-                            ]
-                          },
-                          "' ",
-                          {
-                            "Ref": "DBName"
-                          },
-                          " </tmp/init.sql"
-                        ]
-                      ]
-                    },
-                    "env": {
-                      "PGPASSWORD": {
-                        "Ref": "DBMasterUserPassword"
-                      }
-                    },
-                    "ignoreErrors": "false"
-                  }
-                ]
-              },
-              "040_rm_init_sql": {
-                "Fn::If": [
-                  "DoRestoreFromRDSSnapshot",
-                  {
-                    "Ref": "AWS::NoValue"
-                  },
-                  {
-                    "command": "rm -f /tmp/init.sql",
-                    "ignoreErrors": "false"
-                  }
-                ]
               }
             },
             "services": {
@@ -1991,13 +1877,6 @@
             "NoDevice": {}
           }
         ],
-        "EbsOptimized": {
-          "Fn::If": [
-            "IsEbsOptimized",
-            true,
-            false
-          ]
-        },
         "IamInstanceProfile": {
           "Ref": "BitbucketFileServerInstanceProfile"
         },
@@ -2123,31 +2002,17 @@
         "DBSubnetGroupName": {
           "Ref": "DBSubnetGroup"
         },
-        "Engine": {
-          "Ref": "DBEngine"
-        },
-        "EngineVersion": {
-          "Ref": "DBEngineVersion"
-        },
-        "MasterUsername": {
-          "Fn::If": [
-            "DoRestoreFromRDSSnapshot",
-            {
-              "Ref": "AWS::NoValue"
-            },
-            {
-              "Ref": "DBMasterUser"
-            }
-          ]
-        },
+        "Engine": "postgres",
+        "EngineVersion": "9.5.2",
+        "MasterUsername": "postgres",
         "MasterUserPassword": {
           "Fn::If": [
-            "DoRestoreFromRDSSnapshot",
-            {
-              "Ref": "AWS::NoValue"
-            },
+            "DoSetDBMasterUserPassword",
             {
               "Ref": "DBMasterUserPassword"
+            },
+            {
+              "Ref": "AWS::NoValue"
             }
           ]
         },
@@ -2242,8 +2107,8 @@
         ],
         "HealthCheck": {
           "Target": "HTTP:7990/status",
-          "Timeout": "4",
-          "Interval": "5",
+          "Timeout": "29",
+          "Interval": "30",
           "UnhealthyThreshold": "2",
           "HealthyThreshold": "2"
         },
