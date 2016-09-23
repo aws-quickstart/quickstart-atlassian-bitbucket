@@ -60,7 +60,6 @@
             "default": "Bitbucket Search"
           },
           "Parameters": [
-            "ElasticsearchVersion",
             "ElasticsearchInstanceType"
           ]
         },
@@ -72,7 +71,8 @@
             "BitbucketProperties",
             "CatalinaOpts",
             "CollectdConfigUrl",
-            "HomeDeleteOnTermination"
+            "HomeDeleteOnTermination",
+            "DBMaster"
           ]
         }
       ],
@@ -119,6 +119,9 @@
         "DBPassword": {
           "default": "Bitbucket database password"
         },
+        "DBMaster": {
+          "default": "Bitbucket primary database"
+        },
         "DBStorage": {
           "default": "Database storage"
         },
@@ -127,9 +130,6 @@
         },
         "DBSnapshotId": {
           "default": "Database snapshot ID"
-        },
-        "ElasticsearchVersion": {
-          "default": "Elasticsearch version"
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
@@ -191,9 +191,8 @@
     "BitbucketVersion": {
       "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at https://confluence.atlassian.com/bitbucketserver/releases-776640503.html",
       "Type": "String",
-      "MinLength": "5",
-      "MaxLength": "27",
-      "ConstraintDescription": "Must be a valid Bitbucket version number."
+      "AllowedPattern": "(\\d+\\.\\d+\\.\\d+(-?.*))",
+      "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.10.0 or higher"
     },
     "CidrBlock": {
       "Description": "The CIDR IP range that is permitted to access Bitbucket",
@@ -289,6 +288,12 @@
       "ConstraintDescription": "Must contain only alphanumeric characters.",
       "NoEcho": "true"
     },
+    "DBMaster": {
+      "Description": "Database ARN of the RDS instance to replicate. Setting this parameter will bring up this stack in standby mode.",
+      "Default": "",
+      "Type": "String",
+      "ConstraintDescription": "Must be a valid RDS ARN."
+    },
     "DBSnapshotId": {
       "Description": "Restore only. RDS snapshot ID of an existing backup to restore as the database. Leave blank for a new instance",
       "Type": "String",
@@ -310,36 +315,23 @@
       ],
       "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
     },
-    "ElasticsearchVersion": {
-      "Type": "String",
-      "AllowedPattern": "2\\.3\\.\\d+",
-      "Default": "2.3.3",
-      "ConstraintDescription": "Must be a version of Elasticsearch supported by Bitbucket."
-    },
     "ElasticsearchInstanceType": {
-      "Description": "A EC2 instance type for Elasticsearch to run on.",
+      "Description": "A instance type for Elasticsearch to run on.",
       "Type": "String",
-      "Default": "i2.xlarge",
+      "Default": "m3.xlarge.elasticsearch",
       "AllowedValues": [
-        "c3.xlarge",
-        "c3.2xlarge",
-        "c3.4xlarge",
-        "c3.8xlarge",
-        "d2.xlarge",
-        "d2.2xlarge",
-        "d2.4xlarge",
-        "d2.8xlarge",
-        "i2.xlarge",
-        "i2.2xlarge",
-        "i2.4xlarge",
-        "i2.8xlarge",
-        "r3.xlarge",
-        "r3.2xlarge",
-        "r3.4xlarge",
-        "r3.8xlarge",
-        "x1.32xlarge"
+        "m3.large.elasticsearch",
+        "m3.xlarge.elasticsearch",
+        "m3.2xlarge.elasticsearch",
+        "r3.large.elasticsearch",
+        "r3.xlarge.elasticsearch",
+        "r3.2xlarge.elasticsearch",
+        "r3.4xlarge.elasticsearch",
+        "r3.8xlarge.elasticsearch",
+        "i2.xlarge.elasticsearch",
+        "i2.2xlarge.elasticsearch"
       ],
-      "ConstraintDescription": "Must be an EC2 instance type in the C3, D2, I2, R3, or X1 family, 'xlarge' or larger"
+      "ConstraintDescription": "Must be an Elasticsearch instance type in the M3, R3 or I2 family"
     },
     "FileServerInstanceType": {
       "Description": "Instance type for the file server hosting the Bitbucket shared home directory",
@@ -468,6 +460,16 @@
         }
       ]
     },
+    "RestoreRDSOrStandby": {
+      "Fn::Or": [
+        {
+          "Condition": "DoRestoreFromRDSSnapshot"
+        },
+        {
+          "Condition": "StandbyMode"
+        }
+      ]
+    },
     "DoSetDBMasterUserPassword": {
       "Fn::Not": [
         {
@@ -490,6 +492,26 @@
             ""
           ]
         }
+      ]
+    },
+    "StandbyMode": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "DBMaster"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "NotStandbyMode": {
+      "Fn::Equals": [
+        {
+          "Ref": "DBMaster"
+        },
+        ""
       ]
     },
     "IsHomeProvisionedIops": {
@@ -592,48 +614,48 @@
       }
     },
     "AWSRegionArch2AMI": {
-      "ap-southeast-2": {
-        "HVM64": "ami-8ba899e8",
+      "us-east-1": {
+        "HVM64": "ami-9beb928c",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-south-1": {
-        "HVM64": "ami-49e79226",
+        "HVM64": "ami-21d0a54e",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-west-1": {
-        "HVM64": "ami-b34f36c0",
+        "HVM64": "ami-b4d0abc7",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-southeast-1": {
-        "HVM64": "ami-0429f367",
+        "HVM64": "ami-ab8124c8",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-southeast-2": {
+        "HVM64": "ami-6817270b",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-central-1": {
-        "HVM64": "ami-22699b4d",
+        "HVM64": "ami-0d1ee362",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-2": {
-        "HVM64": "ami-6c25f002",
+        "HVM64": "ami-995e8bf7",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-1": {
-        "HVM64": "ami-d98150b8",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "us-east-1": {
-        "HVM64": "ami-a49defb3",
+        "HVM64": "ami-8730e3e6",
         "HVMG2": "NOT_SUPPORTED"
       },
       "sa-east-1": {
-        "HVM64": "ami-8924b4e5",
+        "HVM64": "ami-25bc2f49",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-1": {
-        "HVM64": "ami-08470868",
+        "HVM64": "ami-aaf8b7ca",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-2": {
-        "HVM64": "ami-6516c405",
+        "HVM64": "ami-d2ad71b2",
         "HVMG2": "NOT_SUPPORTED"
       }
     },
@@ -726,6 +748,7 @@
                     "rds:DeleteDbSnapshot",
                     "rds:DescribeDBInstances",
                     "rds:DescribeDBSnapshots",
+                    "rds:PromoteReadReplica",
                     "rds:ModifyDBInstance",
                     "rds:RestoreDBInstanceFromDBSnapshot"
                   ],
@@ -819,7 +842,13 @@
           "Ref": "ClusterNodeMax"
         },
         "MinSize": {
-          "Ref": "ClusterNodeMin"
+          "Fn::If": [
+            "StandbyMode",
+            "0",
+            {
+              "Ref": "ClusterNodeMin"
+            }
+          ]
         },
         "LoadBalancerNames": [
           {
@@ -935,6 +964,11 @@
                               "Fn::Join": [
                                 "",
                                 [
+                                  "plugin.search.elasticsearch.aws.region=",
+                                  {
+                                    "Ref": "AWS::Region"
+                                  },
+                                  "\n",
                                   "hazelcast.network.multicast=false\n",
                                   "hazelcast.network.aws=true\n",
                                   "hazelcast.network.aws.iam.role=",
@@ -967,10 +1001,10 @@
                                   {
                                     "Fn::GetAtt": [
                                       "Elasticsearch",
-                                      "PrivateIp"
+                                      "DomainEndpoint"
                                     ]
                                   },
-                                  ":9200\n"
+                                  "\n"
                                 ]
                               ]
                             },
@@ -1165,8 +1199,8 @@
           },
           "2": {
             "commands": {
-              "040_mount_all": {
-                "command": "mount -a",
+              "040_mount_nfs": {
+                "command": "mount /media/atl/bitbucket/shared",
                 "ignoreErrors": "false"
               }
             },
@@ -1338,283 +1372,29 @@
       }
     },
     "Elasticsearch": {
-      "Type": "AWS::EC2::Instance",
-      "Metadata": {
-        "Comment": "Elasticsearch Server",
-        "AWS::CloudFormation::Init": {
-          "configSets": {
-            "default": [
-              "import_key",
-              "add_repo",
-              "install_es",
-              "stop_es",
-              "mount_instance_store",
-              "configure_and_start"
-            ],
-            "update": [
-              "uninstall_es_aws_plugin",
-              "install_es",
-              "stop_es",
-              "start_es"
-            ]
-          },
-          "import_key": {
-            "commands": {
-              "import_es_key": {
-                "command": "rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "add_repo": {
-            "files": {
-              "/etc/yum.repos.d/elasticsearch.repo": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "[elasticsearch-2.x]\n",
-                      "name=Elasticsearch repository for 2.x packages\n",
-                      "baseurl=https://packages.elastic.co/elasticsearch/2.x/centos\n",
-                      "gpgcheck=1\n",
-                      "gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch\n",
-                      "enabled=1\n"
-                    ]
-                  ]
-                }
-              }
-            }
-          },
-          "install_es": {
-            "packages": {
-              "yum": {
-                "elasticsearch": [
-                  {
-                    "Ref": "ElasticsearchVersion"
-                  }
-                ]
-              }
-            },
-            "commands": {
-              "010_install_elasticsearch_aws_plugin": {
-                "command": "sudo /usr/share/elasticsearch/bin/plugin install cloud-aws",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "stop_es": {
-            "commands": {
-              "010_stop_elasticsearch_service": {
-                "command": "sudo service elasticsearch stop",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "mount_instance_store": {
-            "commands": {
-              "010_mkfs": {
-                "command": "mkfs.ext4 -E nodiscard /dev/xvdb",
-                "ignoreErrors": "true"
-              },
-              "020_mkdir": {
-                "command": "mkdir -p /media/ephemeral0",
-                "ignoreErrors": "false"
-              },
-              "030_mount": {
-                "command": "mount -o discard /dev/xvdb /media/ephemeral0",
-                "ignoreErrors": "true"
-              },
-              "040_mv": {
-                "command": "mv /var/lib/elasticsearch /media/ephemeral0/",
-                "ignoreErrors": "false"
-              },
-              "050_ln": {
-                "command": "ln -sf /media/ephemeral0/elasticsearch /var/lib/elasticsearch",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "start_es": {
-            "commands": {
-              "010_start_elasticsearch_service": {
-                "command": "sudo service elasticsearch start",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "uninstall_es_aws_plugin": {
-            "commands": {
-              "uninstall_elasticsearch_aws_plugin": {
-                "command": "sudo /usr/share/elasticsearch/bin/plugin remove cloud-aws",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "configure_and_start": {
-            "files": {
-              "/etc/atl": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "ATL_ENABLED_PRODUCTS=\n",
-                      "ATL_NGINX_ENABLED=false\n",
-                      "ATL_POSTGRES_ENABLED=false\n",
-                      "ATL_SSL_SELF_CERT_ENABLED=false\n"
-                    ]
-                  ]
-                }
-              },
-              "/etc/elasticsearch/elasticsearch.yml": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "index.mapper.dynamic: false\n",
-                      "action.auto_create_index: false\n",
-                      "network.host: _ec2_\n"
-                    ]
-                  ]
-                },
-                "mode": "000400",
-                "owner": "elasticsearch",
-                "group": "elasticsearch"
-              },
-              "/etc/cfn/cfn-hup.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "[main]\n",
-                      "stack=",
-                      {
-                        "Ref": "AWS::StackId"
-                      },
-                      "\n",
-                      "region=",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "\n"
-                    ]
-                  ]
-                },
-                "mode": "000400",
-                "owner": "root",
-                "group": "root"
-              },
-              "/etc/cfn/hooks.d/cfn-update-elasticsearch.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "[cfn-update-elasticsearch]\n",
-                      "triggers=post.update\n",
-                      "path=Resources.Elasticsearch.Metadata.AWS::CloudFormation::Init\n",
-                      "action=/opt/aws/bin/cfn-init -v",
-                      "         -c update",
-                      "         --stack ",
-                      {
-                        "Ref": "AWS::StackName"
-                      },
-                      "         --resource Elasticsearch ",
-                      "         --region ",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      "\n",
-                      "runas=root\n"
-                    ]
-                  ]
-                }
-              }
-            },
-            "services": {
-              "sysvinit": {
-                "cfn-hup": {
-                  "enabled": "true",
-                  "ensureRunning": "true",
-                  "files": [
-                    "/etc/cfn/cfn-hup.conf",
-                    "/etc/cfn/hooks.d/cfn-update-elasticsearch.conf"
-                  ]
-                },
-                "elasticsearch": {
-                  "enabled": "true",
-                  "ensureRunning": "true"
-                }
-              }
-            },
-            "packages": {
-              "Fn::If": [
-                "DoCollectd",
-                {
-                  "yum": {
-                    "collectd": [],
-                    "collectd-java": [],
-                    "collectd-generic-jmx": []
-                  }
-                },
-                {
-                  "Ref": "AWS::NoValue"
-                }
-              ]
-            }
-          }
-        }
-      },
+      "Type": "AWS::Elasticsearch::Domain",
       "Properties": {
-        "BlockDeviceMappings": [
-          {
-            "DeviceName": "/dev/xvdb",
-            "VirtualName": "ephemeral0"
-          }
-        ],
-        "ImageId": {
-          "Fn::FindInMap": [
-            "AWSRegionArch2ElasticsearchAMI",
+        "AccessPolicies": {
+          "Version": "2012-10-17",
+          "Statement": [
             {
-              "Ref": "AWS::Region"
-            },
-            {
-              "Fn::FindInMap": [
-                "AWSInstanceType2Arch",
-                {
-                  "Ref": "ElasticsearchInstanceType"
-                },
-                "Arch"
-              ]
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [ "BitbucketClusterNodeRole", "Arn" ]
+                }
+              },
+              "Action": "es:*",
+              "Resource": "*"
             }
           ]
         },
-        "InstanceType": {
-          "Ref": "ElasticsearchInstanceType"
-        },
-        "KeyName": {
-          "Ref": "KeyName"
-        },
-        "NetworkInterfaces": [
-          {
-            "GroupSet": [
-              {
-                "Ref": "SecurityGroup"
-              }
-            ],
-            "AssociatePublicIpAddress": {
-              "Ref": "AssociatePublicIpAddress"
-            },
-            "DeviceIndex": "0",
-            "DeleteOnTermination": "true",
-            "SubnetId": {
-              "Fn::Select": [
-                "0",
-                {
-                  "Ref": "Subnets"
-                }
-              ]
-            }
+        "ElasticsearchVersion": "2.3",
+        "ElasticsearchClusterConfig": {
+          "InstanceType": {
+            "Ref": "ElasticsearchInstanceType"
           }
-        ],
+        },
         "Tags": [
           {
             "Key": "Application",
@@ -1622,40 +1402,7 @@
               "Ref": "AWS::StackId"
             }
           }
-        ],
-        "UserData": {
-          "Fn::Base64": {
-            "Fn::Join": [
-              "",
-              [
-                "#!/bin/bash -xe\n",
-                "yum update -y aws-cfn-bootstrap\n",
-                "/opt/aws/bin/cfn-init -v ",
-                "         --stack ",
-                {
-                  "Ref": "AWS::StackName"
-                },
-                "         --resource Elasticsearch ",
-                "         --region ",
-                {
-                  "Ref": "AWS::Region"
-                },
-                "\n",
-                "/opt/aws/bin/cfn-signal -e $? ",
-                "         --stack ",
-                {
-                  "Ref": "AWS::StackName"
-                },
-                "         --resource Elasticsearch ",
-                "         --region ",
-                {
-                  "Ref": "AWS::Region"
-                },
-                "\n"
-              ]
-            ]
-          }
-        }
+        ]
       }
     },
     "FileServer": {
@@ -1696,7 +1443,8 @@
                       "ATL_NGINX_ENABLED=false\n",
                       "ATL_POSTGRES_ENABLED=false\n",
                       "ATL_SSL_SELF_CERT_ENABLED=false\n",
-                      "ATL_BITBUCKET_BUNDLED_ELASTICSEARCH_ENABLED=false\n"
+                      "ATL_BITBUCKET_BUNDLED_ELASTICSEARCH_ENABLED=false\n",
+                      "ATL_APP_NFS_SERVER=true\n"
                     ]
                   ]
                 }
@@ -1763,26 +1511,6 @@
                     "Ref": "AWS::NoValue"
                   }
                 ]
-              },
-              "/etc/exports": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "/media/atl/bitbucket/shared *(rw,sync,no_root_squash)\n"
-                    ]
-                  ]
-                }
-              }
-            },
-            "commands": {
-              "010_create_folders": {
-                "command": "mkdir -p /media/atl/bitbucket/shared",
-                "ignoreErrors": "false"
-              },
-              "020_exportfs_all": {
-                "command": "exportfs -a",
-                "ignoreErrors": "false"
               }
             },
             "services": {
@@ -1971,9 +1699,20 @@
     "DB": {
       "Type": "AWS::RDS::DBInstance",
       "Properties": {
+        "SourceDBInstanceIdentifier": {
+          "Fn::If": [
+            "StandbyMode",
+            {
+              "Ref": "DBMaster"
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
         "DBName": {
           "Fn::If": [
-            "DoRestoreFromRDSSnapshot",
+            "RestoreRDSOrStandby",
             {
               "Ref": "AWS::NoValue"
             },
@@ -2060,7 +1799,13 @@
           {
             "LoadBalancerPort": "80",
             "Protocol": "HTTP",
-            "InstancePort": "7990",
+            "InstancePort": {
+              "Fn::If": [
+                "DoSSL",
+                "7991",
+                "7990"
+              ]
+            },
             "InstanceProtocol": "HTTP",
             "PolicyNames": [
               "JSessionIdStickiness"
