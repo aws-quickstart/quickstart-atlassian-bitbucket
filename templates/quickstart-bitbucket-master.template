@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "QS(NOTASSIGNED) Atlassian BitBucket template master License: Apache 2.0 (Please do not remove)",
+  "Description": "QS(NOTASSIGNED) Atlassian Bitbucket template master License: Apache 2.0 (Please do not remove)",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [{
@@ -18,7 +18,7 @@
         ]
       }, {
         "Label": {
-          "default": "BitBucket Setup"
+          "default": "Bitbucket Setup"
         },
         "Parameters": [
           "BitbucketVersion",
@@ -565,7 +565,7 @@
         }
       }
     },
-    "BitBucketDCStack": {
+    "BitbucketDCStack": {
       "DependsOn": "VPCStack",
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
@@ -583,7 +583,7 @@
               }, {
                 "Ref": "QSS3KeyPrefix"
               },
-              "templates/BitbucketDataCenter.template"
+              "templates/BitbucketDataCenter-EC2NFS.template"
             ]
           ]
         },
