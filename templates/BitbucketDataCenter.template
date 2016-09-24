@@ -40,7 +40,7 @@
             "DBStorage",
             "DBStorageType",
             "DBIops",
-            "MultiAZ"
+            "DBMultiAZ"
           ]
         },
         {
@@ -72,9 +72,9 @@
           "Parameters": [
             "BitbucketProperties",
             "CatalinaOpts",
-            "CollectdConfigUrl",
             "HomeDeleteOnTermination",
-            "DBMaster"
+            "DBMaster",
+            "StartCollectd"
           ]
         }
       ],
@@ -94,11 +94,8 @@
         "CatalinaOpts": {
           "default": "Optional : Catalina Options"
         },
-        "CollectdConfigUrl": {
-          "default": "Optional : Collectd Config URL"
-        },
         "CidrBlock": {
-          "default": "Permitted IP range"
+          "default": "Permitted IP range. Use 0.0.0.0/0 if you want public access from the internet."
         },
         "ClusterNodeMax": {
           "default": "Maximum number of cluster nodes"
@@ -127,7 +124,7 @@
         "DBStorage": {
           "default": "Database storage"
         },
-        "MultiAZ": {
+        "DBMultiAZ": {
           "default": "HA Database across Availability Zones"
         },
         "DBStorageType": {
@@ -166,6 +163,9 @@
         "SSLCertificateName": {
           "default": "Optional : SSL Certificate Name"
         },
+        "StartCollectd": {
+          "default": "Start the collectd service"
+        },
         "Subnets": {
           "default": "Subnets"
         },
@@ -199,12 +199,11 @@
     "BitbucketVersion": {
       "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at https://confluence.atlassian.com/bitbucketserver/releases-776640503.html",
       "Type": "String",
-      "Default": "4.9.0-rc1",
       "AllowedPattern": "(\\d+\\.\\d+\\.\\d+(-?.*))",
       "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.10.0 or higher"
     },
     "CidrBlock": {
-      "Description": "The CIDR IP range that is permitted to access Bitbucket URL",
+      "Description": "The CIDR IP range that is permitted to access the Bitbucket URL. . Use 0.0.0.0/0 if you want public access from the internet.",
       "Type": "String",
       "MinLength": "9",
       "MaxLength": "18",
@@ -243,12 +242,6 @@
       "Type": "String",
       "Default": ""
     },
-    "CollectdConfigUrl": {
-      "Description": "URL of collectd.conf file. Leave blank to disable collectd monitoring",
-      "Type": "String",
-      "Default": "",
-      "ConstraintDescription": "Must be a valid URL to a collectd.conf file, or blank"
-    },
     "DBInstanceClass": {
       "Description": "RDS instance type",
       "Type": "String",
@@ -271,9 +264,9 @@
     },
     "DBMasterUserPassword": {
       "NoEcho": "true",
-      "Default": "",
       "Description": "Database admin account password. Must be minimum 8 characters.",
       "Type": "String",
+      "MinLength": "8",
       "MaxLength": "41",
       "AllowedPattern": "[a-zA-Z0-9]*",
       "ConstraintDescription": "Must be at least 8 alphanumeric characters."
@@ -288,9 +281,9 @@
       "ConstraintDescription": "Must not be blank, and may contain only alphanumeric characters, underscore ('_'), and hyphen ('-')."
     },
     "DBPassword": {
-      "Default": "",
-      "Description": "Database user account password. Must be minimum 8 characters. Leave blank if you have specified a Database snapshot ID. ",
+      "Description": "Database user account password. Must be minimum 8 characters. Leave blank if you have specified a Database snapshot ID.",
       "Type": "String",
+      "MinLength": "8",
       "MaxLength": "41",
       "AllowedPattern": "[a-zA-Z0-9]*",
       "ConstraintDescription": "Must contain only alphanumeric characters.",
@@ -309,11 +302,11 @@
       "ConstraintDescription": "Must be a valid RDS snapshot ID, or blank."
     },
     "DBStorage": {
-      "Description": "Database allocated storage size, in gigabytes (GB). Should be between 100 and 6144, if you are choosing Provisioned IOPS",
+      "Description": "Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage shoudl be between 100 and 6144",
       "Type": "Number",
-      "Default": "100"
+      "Default": "10"
     },
-    "MultiAZ": {
+    "DBMultiAZ": {
       "Description": "Database High availability across Availability Zones",
       "Type": "String",
       "Default": "true",
@@ -326,7 +319,7 @@
     "DBStorageType": {
       "Description": "Database storage type",
       "Type": "String",
-      "Default": "Provisioned IOPS",
+      "Default": "General Purpose (SSD)",
       "AllowedValues": [
         "General Purpose (SSD)",
         "Provisioned IOPS"
@@ -334,7 +327,7 @@
       "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
     },
     "DBIops": {
-      "Description": "Should be in the range of 1000 - 20000, and only used with Provisioned IOPS.  Note: The ratio of iops per allocated-storage must be between 3.00 and 10.00.",
+      "Description": "Should be in the range of 1000 - 20000, and only used with Provisioned IOPS.  Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.",
       "Type": "Number",
       "Default": "1000",
       "MinValue": "1000",
@@ -430,6 +423,15 @@
       "MaxLength": "32",
       "Default": ""
     },
+    "StartCollectd": {
+      "Type": "String",
+      "Default": "false",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "ConstraintDescription": "Must be 'true' or 'false'"
+    },
     "Subnets": {
       "Description": "Subnets (two or more) within the selected VPC",
       "Type": "List<AWS::EC2::Subnet::Id>",
@@ -451,15 +453,11 @@
       ]
     },
     "DoCollectd": {
-      "Fn::Not": [
+      "Fn::Equals": [
         {
-          "Fn::Equals": [
-            {
-              "Ref": "CollectdConfigUrl"
-            },
-            ""
-          ]
-        }
+          "Ref": "StartCollectd"
+        },
+        "true"
       ]
     },
     "DoRestoreFromEBSSnapshot": {
@@ -641,47 +639,47 @@
     },
     "AWSRegionArch2AMI": {
       "us-east-1": {
-        "HVM64": "ami-9beb928c",
+        "HVM64": "ami-f9a1daee",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-south-1": {
-        "HVM64": "ami-21d0a54e",
+        "HVM64": "ami-cdc9bca2",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-west-1": {
-        "HVM64": "ami-b4d0abc7",
+        "HVM64": "ami-65024716",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-southeast-1": {
-        "HVM64": "ami-ab8124c8",
+        "HVM64": "ami-1047e273",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-southeast-2": {
-        "HVM64": "ami-6817270b",
+        "HVM64": "ami-e5d2e286",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-central-1": {
-        "HVM64": "ami-0d1ee362",
+        "HVM64": "ami-994eb3f6",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-2": {
-        "HVM64": "ami-995e8bf7",
+        "HVM64": "ami-6e4b9e00",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-1": {
-        "HVM64": "ami-8730e3e6",
+        "HVM64": "ami-9aed3ffb",
         "HVMG2": "NOT_SUPPORTED"
       },
       "sa-east-1": {
-        "HVM64": "ami-25bc2f49",
+        "HVM64": "ami-3971e255",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-1": {
-        "HVM64": "ami-aaf8b7ca",
+        "HVM64": "ami-943b75f4",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-2": {
-        "HVM64": "ami-d2ad71b2",
+        "HVM64": "ami-76578b16",
         "HVMG2": "NOT_SUPPORTED"
       }
     },
@@ -895,11 +893,6 @@
             "Value": {
               "Ref": "AWS::StackName"
             },
-            "PropagateAtLaunch": true
-          },
-          {
-            "Key": "Name",
-            "Value": "BBDC-ClusterNode",
             "PropagateAtLaunch": true
           }
         ]
@@ -1133,22 +1126,6 @@
                     ]
                   ]
                 }
-              },
-              "/etc/collectd.conf": {
-                "Fn::If": [
-                  "DoCollectd",
-                  {
-                    "source": {
-                      "Ref": "CollectdConfigUrl"
-                    },
-                    "mode": "000600",
-                    "owner": "root",
-                    "group": "root"
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
               },
               "/home/atlbitbucket/.bash_profile": {
                 "content": {
@@ -1417,7 +1394,10 @@
               "Effect": "Allow",
               "Principal": {
                 "AWS": {
-                  "Fn::GetAtt": [ "BitbucketClusterNodeRole", "Arn" ]
+                  "Fn::GetAtt": [
+                    "BitbucketClusterNodeRole",
+                    "Arn"
+                  ]
                 }
               },
               "Action": "es:*",
@@ -1536,22 +1516,6 @@
                   ]
                 }
               },
-              "/etc/collectd.conf": {
-                "Fn::If": [
-                  "DoCollectd",
-                  {
-                    "source": {
-                      "Ref": "CollectdConfigUrl"
-                    },
-                    "mode": "000600",
-                    "owner": "root",
-                    "group": "root"
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              },
               "/opt/atlassian/bitbucket-diy-backup/bitbucket.diy-backup.vars.sh": {
                 "content": {
                   "Fn::Join": [
@@ -1564,7 +1528,7 @@
                           [
                             "INSTANCE_NAME=",
                             {
-                              "Ref" : "AWS::StackName"
+                              "Ref": "AWS::StackName"
                             },
                             "\n"
                           ]
@@ -1653,7 +1617,7 @@
                           [
                             "RDS_INSTANCE_ID=",
                             {
-                              "Ref" : "DB"
+                              "Ref": "DB"
                             },
                             "\n"
                           ]
@@ -1873,10 +1837,6 @@
             "Value": {
               "Ref": "AWS::StackId"
             }
-          },
-          {
-            "Key": "Name",
-            "Value": "BBDC-ElasticSearchNode"
           }
         ],
         "UserData": {
@@ -1992,7 +1952,7 @@
           ]
         },
         "MultiAZ": {
-          "Ref": "MultiAZ"
+          "Ref": "DBMultiAZ"
         },
         "VPCSecurityGroups": [
           {
@@ -2002,7 +1962,7 @@
         "Tags" : [ 
           { 
             "Key" : "Name", 
-            "Value" : "Bitbucket PostGres Database" 
+            "Value" : "Bitbucket PostgreSQL Database" 
           } 
         ]
       }
