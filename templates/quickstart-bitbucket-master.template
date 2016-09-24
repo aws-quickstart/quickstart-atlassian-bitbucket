@@ -267,7 +267,7 @@
     "AssociatePublicIpAddress": {
       "Description": "Controls if the EC2 instances are assigned a public IP address",
       "Type": "String",
-      "Default": "false",
+      "Default": "true",
       "AllowedValues": [
         "true",
         "false"

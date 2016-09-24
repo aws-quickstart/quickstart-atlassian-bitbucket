@@ -179,7 +179,7 @@
     "AssociatePublicIpAddress": {
       "Description": "Controls if the EC2 instances are assigned a public IP address",
       "Type": "String",
-      "Default": "false",
+      "Default": "true",
       "AllowedValues": [
         "true",
         "false"
@@ -639,7 +639,7 @@
     },
     "AWSRegionArch2AMI": {
       "us-east-1": {
-        "HVM64": "ami-f9a1daee",
+        "HVM64": "ami-9beb928c",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-south-1": {
