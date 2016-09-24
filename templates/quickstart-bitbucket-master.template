@@ -843,5 +843,16 @@
         }
       }
     }
+  },
+  "Outputs": {
+    "BitbucketURL": {
+      "Description": "The URL of the Bitbucket deployment",
+      "Value": {
+                  "Fn::GetAtt": [
+                  "BitbucketDCStack",
+                  "Outputs.URL"
+                  ]
+                }
+    }
   }
 }
