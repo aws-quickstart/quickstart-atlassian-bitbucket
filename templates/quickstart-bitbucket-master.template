@@ -58,7 +58,7 @@
           "default": "Amazon EC2 Configuration"
         },
         "Parameters": [
-          "KeyPairName",
+          "KeyName",
           "NATInstanceType"
         ]
       }, {
@@ -74,7 +74,7 @@
         "AvailabilityZones": {
           "default": "Availability Zones"
         },
-        "KeyPairName": {
+        "KeyName": {
           "default": "Key Name"
         },
         "NATInstanceType": {
@@ -150,7 +150,7 @@
           "default": "Database storage type"
         },
         "DBMultiAZ": {
-          "default": "HA Database across Availability Zones"
+          "default": "Highly Available Database across Availability Zones"
         },
         "DBIops": {
           "default": "RDS Provisioned IOPS"
@@ -181,7 +181,7 @@
           "default": "Home volume type"
         },
 
-        "KeyPairName": {
+        "KeyName": {
           "default": "Key Name"
         },
         "SSLCertificateName": {
@@ -195,7 +195,7 @@
       "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.",
       "Type": "List<AWS::EC2::AvailabilityZone::Name>"
     },
-    "KeyPairName": {
+    "KeyName": {
       "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
       "Type": "AWS::EC2::KeyPair::KeyName"
     },
@@ -280,12 +280,10 @@
       "Default": ""
     },
     "BitbucketVersion": {
-      "Description": "Version of Bitbucket to install. Find valid versions at https://www.atlassian.com/software/bitbucket/download-archives.html",
+      "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at https://confluence.atlassian.com/bitbucketserver/releases-776640503.html",
       "Type": "String",
-      "Default": "4.9.0-rc1",
-      "MinLength": "5",
-      "MaxLength": "27",
-      "ConstraintDescription": "Must be a valid Bitbucket version number."
+      "AllowedPattern": "(\\d+\\.\\d+\\.\\d+(-?.*))",
+      "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.10.0 or higher"
     },
     "ClusterNodeMax": {
       "Type": "Number",
@@ -303,27 +301,15 @@
         "c3.2xlarge",
         "c3.4xlarge",
         "c3.8xlarge",
-        "c4.xlarge",
-        "c4.2xlarge",
-        "c4.4xlarge",
-        "c4.8xlarge",
-        "hs1.8xlarge",
         "i2.xlarge",
         "i2.2xlarge",
         "i2.4xlarge",
         "i2.8xlarge",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
-        "m4.large",
-        "m4.xlarge",
-        "m4.2xlarge",
-        "m4.4xlarge",
-        "m4.10xlarge",
         "r3.xlarge",
         "r3.2xlarge",
         "r3.4xlarge",
-        "r3.8xlarge"
+        "r3.8xlarge",
+        "x1.32xlarge"
       ],
       "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
     },
@@ -360,7 +346,7 @@
 
     "DBMasterUserPassword": {
       "NoEcho": "true",
-      "Description": "Database admin account password. Must be minimum 8 characters.",
+      "Description": "Database admin account password. Must be 8 - 41 characters.",
       "Type": "String",
       "MinLength": "8",
       "MaxLength": "41",
@@ -368,7 +354,7 @@
       "ConstraintDescription": "Must be at least 8 alphanumeric characters."
     },
     "DBName": {
-      "Description": "Database name",
+      "Description": "Database name. Must be 1 - 41 characters.",
       "Type": "String",
       "Default": "bitbucket",
       "MinLength": "1",
@@ -377,7 +363,7 @@
       "ConstraintDescription": "Must not be blank, and may contain only alphanumeric characters, underscore ('_'), and hyphen ('-')."
     },
     "DBPassword": {
-      "Description": "Database user account password. Must be minimum 8 characters.",
+      "Description": "Database user account password. Must be 8 - 41 characters. Leave blank if you have specified a Database snapshot ID.",
       "Type": "String",
       "MinLength": "8",
       "MaxLength": "41",
@@ -394,7 +380,8 @@
     "DBStorage": {
       "Description": "Database allocated storage size, in gigabytes (GB). Should be between 100 and 6144, if you are choosing Provisioned IOPS",
       "Type": "Number",
-      "Default": "10"
+      "Default": "10",
+      "MaxValue" : "6144"
     },
     "DBStorageType": {
       "Description": "Database storage type",
@@ -421,8 +408,8 @@
       "Type": "Number",
       "Default": "1000",
       "MinValue": "1000",
-      "MaxValue": "20000",
-      "ConstraintDescription": "Must be in the range 1000 - 20000."
+      "MaxValue": "30000",
+      "ConstraintDescription": "Must be in the range 1000 - 30000."
     },    
     "ElasticsearchInstanceType": {
       "Description": "A instance type for Elasticsearch to run on.",
@@ -699,8 +686,8 @@
               }
             ]
           },
-          "KeyPairName": {
-            "Ref": "KeyPairName"
+          "KeyName": {
+            "Ref": "KeyName"
           },
           "NATInstanceType": {
             "Ref": "NATInstanceType"
@@ -838,7 +825,7 @@
             "Ref": "SSLCertificateName"
           },
           "KeyName": {
-            "Ref": "KeyPairName"
+            "Ref": "KeyName"
           }
         }
       }
