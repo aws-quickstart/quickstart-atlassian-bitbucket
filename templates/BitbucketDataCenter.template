@@ -9,7 +9,9 @@
             "default": "Bitbucket Setup"
           },
           "Parameters": [
-            "BitbucketVersion"
+            "BitbucketVersion",
+            "DBSnapshotId",
+            "HomeVolumeSnapshotId"
           ]
         },
         {
@@ -19,7 +21,11 @@
           "Parameters": [
             "ClusterNodeMax",
             "ClusterNodeMin",
-            "ClusterNodeInstanceType"
+            "ClusterNodeInstanceType",
+            "FileServerInstanceType",
+            "HomeSize",
+            "HomeIops",
+            "HomeVolumeType"
           ]
         },
         {
@@ -28,14 +34,13 @@
           },
           "Parameters": [
             "DBInstanceClass",
-            "DBEngine",
-            "DBEngineVersion",
-            "DBMasterUser",
             "DBMasterUserPassword",
             "DBName",
             "DBPassword",
             "DBStorage",
-            "DBStorageType"
+            "DBStorageType",
+            "DBIops",
+            "DBMultiAZ"
           ]
         },
         {
@@ -57,18 +62,19 @@
             "default": "Bitbucket Search"
           },
           "Parameters": [
-            "ElasticsearchVersion",
             "ElasticsearchInstanceType"
           ]
         },
         {
           "Label": {
-            "default": "(Optional) Advanced Options"
+            "default": "Bitbucket Advanced Configuration (Optional)"
           },
           "Parameters": [
             "BitbucketProperties",
             "CatalinaOpts",
-            "CollectdConfigUrl"
+            "HomeDeleteOnTermination",
+            "DBMaster",
+            "StartCollectd"
           ]
         }
       ],
@@ -86,13 +92,10 @@
           "default": "Version"
         },
         "CatalinaOpts": {
-          "default": "Catalina Options"
-        },
-        "CollectdConfigUrl": {
-          "default": "Collectd Config URL"
+          "default": "Optional : Catalina Options"
         },
         "CidrBlock": {
-          "default": "Permitted IP range"
+          "default": "Permitted IP range. Use 0.0.0.0/0 if you want public access from the internet."
         },
         "ClusterNodeMax": {
           "default": "Maximum number of cluster nodes"
@@ -106,15 +109,6 @@
         "DBInstanceClass": {
           "default": "Database instance class"
         },
-        "DBEngine": {
-          "default": "Database engine"
-        },
-        "DBEngineVersion": {
-          "default": "Engine version"
-        },
-        "DBMasterUser": {
-          "default": "Master username"
-        },
         "DBMasterUserPassword": {
           "default": "Master password"
         },
@@ -124,23 +118,53 @@
         "DBPassword": {
           "default": "Bitbucket database password"
         },
+        "DBMaster": {
+          "default": "Bitbucket primary database"
+        },
         "DBStorage": {
           "default": "Database storage"
+        },
+        "DBMultiAZ": {
+          "default": "Highly Available Database across Availability Zones"
         },
         "DBStorageType": {
           "default": "Database storage type"
         },
-        "ElasticsearchVersion": {
-          "default": "Elasticsearch version"
+        "DBIops": {
+          "default": "RDS Provisioned IOPS"
+        },
+        "DBSnapshotId": {
+          "default": "Optional : Database snapshot ID"
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
+        },
+        "FileServerInstanceType": {
+          "default": "NFS server instance type"
+        },
+        "HomeDeleteOnTermination": {
+          "default": "Delete Home on termination"
+        },
+        "HomeIops": {
+          "default": "Home directory IOPS"
+        },
+        "HomeSize": {
+          "default": "Home directory size"
+        },
+        "HomeVolumeSnapshotId": {
+          "default": "Optional : Home volume snapshot ID"
+        },
+        "HomeVolumeType": {
+          "default": "Home volume type"
         },
         "KeyName": {
           "default": "Key Name"
         },
         "SSLCertificateName": {
-          "default": "SSL Certificate Name"
+          "default": "Optional : SSL Certificate Name"
+        },
+        "StartCollectd": {
+          "default": "Start the collectd service"
         },
         "Subnets": {
           "default": "Subnets"
@@ -168,29 +192,27 @@
       "ConstraintDescription": "Must be the names of two or more Availability Zones in the specified Region, and must match the Subnets"
     },
     "BitbucketProperties": {
-      "Description": "A comma-separated list of bitbucket properties in the form key1=value1, key2=value2, ...",
+      "Description": "A comma-separated list of bitbucket properties in the form key1=value1, key2=value2, ... Find documentation at https://confluence.atlassian.com/x/m5ZKLg",
       "Type": "CommaDelimitedList",
       "Default": ""
     },
     "BitbucketVersion": {
-      "Description": "Version of Bitbucket to install. Find valid versions at https://www.atlassian.com/software/bitbucket/download-archives.html",
+      "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases",
       "Type": "String",
-      "MinLength": "5",
-      "MaxLength": "27",
-      "ConstraintDescription": "Must be a valid Bitbucket version number."
+      "AllowedPattern": "(\\d+\\.\\d+\\.\\d+(-?.*))",
+      "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.10.0 or higher"
     },
     "CidrBlock": {
-      "Description": "The CIDR IP range that is permitted to access Bitbucket",
+      "Description": "The CIDR IP range that is permitted to access the Bitbucket URL. Use 0.0.0.0/0 if you want public access from the internet.",
       "Type": "String",
       "MinLength": "9",
       "MaxLength": "18",
-      "Default": "0.0.0.0/0",
       "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x."
     },
     "ClusterNodeMax": {
       "Type": "Number",
-      "Default": "4"
+      "Default": "1"
     },
     "ClusterNodeMin": {
       "Type": "Number",
@@ -204,104 +226,97 @@
         "c3.2xlarge",
         "c3.4xlarge",
         "c3.8xlarge",
-        "c4.xlarge",
-        "c4.2xlarge",
-        "c4.4xlarge",
-        "c4.8xlarge",
-        "hs1.8xlarge",
         "i2.xlarge",
         "i2.2xlarge",
         "i2.4xlarge",
         "i2.8xlarge",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
-        "m4.large",
-        "m4.xlarge",
-        "m4.2xlarge",
-        "m4.4xlarge",
-        "m4.10xlarge",
         "r3.xlarge",
         "r3.2xlarge",
         "r3.4xlarge",
-        "r3.8xlarge"
+        "r3.8xlarge",
+        "x1.32xlarge"
       ],
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
+      "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     },
     "CatalinaOpts": {
+      "Description": "Java options passed to the JVM that runs Bitbucket.",      
       "Type": "String",
       "Default": ""
-    },
-    "CollectdConfigUrl": {
-      "Description": "URL of collectd.conf file. Leave blank to disable collectd monitoring",
-      "Type": "String",
-      "Default": "",
-      "ConstraintDescription": "Must be a valid URL to a collectd.conf file, or blank"
     },
     "DBInstanceClass": {
       "Description": "RDS instance type",
       "Type": "String",
-      "Default": "db.m3.medium",
+      "Default": "db.m4.large",
       "AllowedValues": [
-        "db.m3.medium",
-        "db.m3.large",
-        "db.m3.xlarge",
-        "db.m3.2xlarge",
+        "db.m4.large",
+        "db.m4.xlarge",
+        "db.m4.2xlarge",
+        "db.m4.4xlarge",
+        "db.m4.10xlarge",
         "db.r3.large",
         "db.r3.xlarge",
         "db.r3.2xlarge",
         "db.r3.4xlarge",
         "db.r3.8xlarge",
-        "db.t2.medium"
+        "db.t2.medium",
+        "db.t2.large"
       ],
       "ConstraintDescription": "Must be a valid RDS instance class, 'db.t2.medium' or larger."
     },
-    "DBEngineVersion": {
-      "Description": "The version number of the database engine to use",
-      "Type": "String",
-      "Default": " 9.5.2",
-      "ConstraintDescription": "Must be an AWS supported database version, not all versions are supported in all regions"
-    },
-    "DBMasterUser": {
-      "Description": "Database admin account username.",
-      "Type": "String",
-      "Default": "postgres",
-      "MinLength": "1",
-      "MaxLength": "16",
-      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
-      "ConstraintDescription": "Must begin with a letter and contain only alphanumeric characters."
-    },
     "DBMasterUserPassword": {
       "NoEcho": "true",
-      "Default": "",
-      "Description": "Database admin account password.",
+      "Description": "Database admin account password. Must be 8 - 41 characters.",
       "Type": "String",
+      "MinLength": "8",
       "MaxLength": "41",
       "AllowedPattern": "[a-zA-Z0-9]*",
       "ConstraintDescription": "Must be at least 8 alphanumeric characters."
     },
     "DBName": {
-      "Description": "Database name",
+      "Description": "Database name. Must be 5 - 41 characters.",
       "Type": "String",
       "Default": "bitbucket",
-      "MinLength": "1",
+      "MinLength": "5",
       "MaxLength": "41",
       "AllowedPattern": "[a-zA-Z0-9_-]*",
       "ConstraintDescription": "Must not be blank, and may contain only alphanumeric characters, underscore ('_'), and hyphen ('-')."
     },
     "DBPassword": {
-      "Default": "",
-      "Description": "Database user account password.",
+      "Description": "Database user account password. Must be 8 - 41 characters. Leave blank if you have specified a Database snapshot ID.",
       "Type": "String",
+      "MinLength": "8",
       "MaxLength": "41",
       "AllowedPattern": "[a-zA-Z0-9]*",
       "ConstraintDescription": "Must contain only alphanumeric characters.",
       "NoEcho": "true"
     },
+    "DBMaster": {
+      "Description": "Database ARN of the RDS instance to replicate. Setting this parameter will bring up this stack in standby mode.",
+      "Default": "",
+      "Type": "String",
+      "ConstraintDescription": "Must be a valid RDS ARN."
+    },
+    "DBSnapshotId": {
+      "Description": "Restore only. RDS snapshot ID of an existing backup to restore as the database. Leave blank for a new instance",
+      "Type": "String",
+      "Default": "",
+      "ConstraintDescription": "Must be a valid RDS snapshot ID, or blank."
+    },
     "DBStorage": {
-      "Description": "Database allocated storage size, in gigabytes (GB)",
+      "Description": "Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144",
       "Type": "Number",
-      "Default": "10"
+      "Default": "10",
+      "MaxValue" : "6144"
+    },
+    "DBMultiAZ": {
+      "Description": "Database High availability across Availability Zones",
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "ConstraintDescription": "Must be 'true' or 'false'."
     },
     "DBStorageType": {
       "Description": "Database storage type",
@@ -313,44 +328,90 @@
       ],
       "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
     },
-    "ElasticsearchVersion": {
-      "Type": "String",
-      "AllowedPattern": "2\\.3\\.\\d+",
-      "Default": "2.3.3",
-      "ConstraintDescription": "Must be a version of Elasticsearch supported by Bitbucket."
+    "DBIops": {
+      "Description": "Should be in the range of 1000 - 30000, and only used with Provisioned IOPS.  Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.",
+      "Type": "Number",
+      "Default": "1000",
+      "MinValue": "1000",
+      "MaxValue": "30000",
+      "ConstraintDescription": "Must be in the range 1000 - 30000."
     },
     "ElasticsearchInstanceType": {
-      "Description": "A EC2 instance type for Elasticsearch to run on.",
+      "Description": "A instance type for Elasticsearch to run on.",
       "Type": "String",
-      "Default": "m3.large",
+      "Default": "m3.xlarge.elasticsearch",
       "AllowedValues": [
-        "c3.xlarge",
-        "c3.2xlarge",
-        "c3.4xlarge",
-        "c3.8xlarge",
+        "m3.large.elasticsearch",
+        "m3.xlarge.elasticsearch",
+        "m3.2xlarge.elasticsearch",
+        "r3.large.elasticsearch",
+        "r3.xlarge.elasticsearch",
+        "r3.2xlarge.elasticsearch",
+        "r3.4xlarge.elasticsearch",
+        "r3.8xlarge.elasticsearch",
+        "i2.xlarge.elasticsearch",
+        "i2.2xlarge.elasticsearch"
+      ],
+      "ConstraintDescription": "Must be an Elasticsearch instance type in the M3, R3 or I2 family"
+    },
+    "FileServerInstanceType": {
+      "Description": "Instance type for the file server hosting the Bitbucket shared home directory",
+      "Type": "String",
+      "Default": "m4.xlarge",
+      "AllowedValues": [
         "c4.xlarge",
         "c4.2xlarge",
         "c4.4xlarge",
         "c4.8xlarge",
-        "hs1.8xlarge",
-        "i2.xlarge",
-        "i2.2xlarge",
-        "i2.4xlarge",
-        "i2.8xlarge",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
-        "m4.large",
         "m4.xlarge",
         "m4.2xlarge",
         "m4.4xlarge",
         "m4.10xlarge",
-        "r3.xlarge",
-        "r3.2xlarge",
-        "r3.4xlarge",
-        "r3.8xlarge"
+        "x1.32xlarge"
       ],
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
+      "ConstraintDescription": "Must be an EC2 instance type in the C4, M4, or X1 family, 'xlarge' or larger."
+    },
+    "HomeDeleteOnTermination": {
+      "Description": "Delete home directory volume when the instance is terminated.  You must back up your data before terminating your instance if this option is set to 'true'",
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "ConstraintDescription": "Must be 'true' or 'false'."
+    },
+    "HomeIops": {
+      "Description": "Home directory IOPS (100 - 20000, only used with Provisioned IOPS).  Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 50; for example, a volume with 5000 IOPS must be at least 100 GiB",
+      "Type": "Number",
+      "Default": "1000",
+      "MinValue": "100",
+      "MaxValue": "20000",
+      "ConstraintDescription": "Must be in the range 100 - 20000."
+    },
+    "HomeSize": {
+      "Description": "Home directory storage size, in gibibytes (GiB) (100 - 16384)",
+      "Type": "Number",
+      "Default": "100",
+      "MinValue": "100",
+      "MaxValue": "16384",
+      "ConstraintDescription": "Must be in the range 100 - 16384."
+    },
+    "HomeVolumeSnapshotId": {
+      "Description": "Restore only. EBS snapshot ID of an existing backup to restore as the home directory. Leave blank for a new instance",
+      "Type": "String",
+      "Default": "",
+      "ConstraintDescription": "Must be a valid EBS snapshot ID"
+    },
+    "HomeVolumeType": {
+      "Description": "Home directory volume type",
+      "Type": "String",
+      "Default": "Provisioned IOPS",
+      "AllowedValues": [
+        "General Purpose (SSD)",
+        "Provisioned IOPS"
+      ],
+      "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
     },
     "KeyName": {
       "Description": "The EC2 Key Pair to allow SSH access to the instances",
@@ -363,6 +424,15 @@
       "MinLength": "0",
       "MaxLength": "32",
       "Default": ""
+    },
+    "StartCollectd": {
+      "Type": "String",
+      "Default": "false",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "ConstraintDescription": "Must be 'true' or 'false'"
     },
     "Subnets": {
       "Description": "Subnets (two or more) within the selected VPC",
@@ -385,11 +455,53 @@
       ]
     },
     "DoCollectd": {
+      "Fn::Equals": [
+        {
+          "Ref": "StartCollectd"
+        },
+        "true"
+      ]
+    },
+    "DoRestoreFromEBSSnapshot": {
       "Fn::Not": [
         {
           "Fn::Equals": [
             {
-              "Ref": "CollectdConfigUrl"
+              "Ref": "HomeVolumeSnapshotId"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "DoRestoreFromRDSSnapshot": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "DBSnapshotId"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "RestoreRDSOrStandby": {
+      "Fn::Or": [
+        {
+          "Condition": "DoRestoreFromRDSSnapshot"
+        },
+        {
+          "Condition": "StandbyMode"
+        }
+      ]
+    },
+    "DoSetDBMasterUserPassword": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "DBMasterUserPassword"
             },
             ""
           ]
@@ -407,34 +519,38 @@
           ]
         }
       ]
+    },
+    "StandbyMode": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "DBMaster"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "NotStandbyMode": {
+      "Fn::Equals": [
+        {
+          "Ref": "DBMaster"
+        },
+        ""
+      ]
+    },
+    "IsHomeProvisionedIops": {
+      "Fn::Equals": [
+        {
+          "Ref": "HomeVolumeType"
+        },
+        "Provisioned IOPS"
+      ]
     }
   },
   "Mappings": {
     "AWSInstanceType2Arch": {
-      "m3.large": {
-        "Arch": "HVM64"
-      },
-      "m3.xlarge": {
-        "Arch": "HVM64"
-      },
-      "m3.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.large": {
-        "Arch": "HVM64"
-      },
-      "m4.xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.10xlarge": {
-        "Arch": "HVM64"
-      },
       "c3.large": {
         "Arch": "HVM64"
       },
@@ -465,8 +581,44 @@
       "c4.8xlarge": {
         "Arch": "HVM64"
       },
-      "g2.2xlarge": {
-        "Arch": "HVMG2"
+      "d2.xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.large": {
+        "Arch": "HVM64"
+      },
+      "m4.xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.10xlarge": {
+        "Arch": "HVM64"
       },
       "r3.large": {
         "Arch": "HVM64"
@@ -483,79 +635,160 @@
       "r3.8xlarge": {
         "Arch": "HVM64"
       },
-      "i2.xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "hi1.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "hs1.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "cr1.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "cc2.8xlarge": {
+      "x1.32xlarge": {
         "Arch": "HVM64"
       }
     },
     "AWSRegionArch2AMI": {
-      "ap-southeast-2": {
-        "HVM64": "ami-7fe4d31c",
+      "us-east-1": {
+        "HVM64": "ami-f9a1daee",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-south-1": {
-        "HVM64": "ami-b25c29dd",
+        "HVM64": "ami-cdc9bca2",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-west-1": {
-        "HVM64": "ami-e6e89f95",
+        "HVM64": "ami-65024716",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-southeast-1": {
-        "HVM64": "ami-819149e2",
+        "HVM64": "ami-1047e273",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-southeast-2": {
+        "HVM64": "ami-e5d2e286",
         "HVMG2": "NOT_SUPPORTED"
       },
       "eu-central-1": {
-        "HVM64": "ami-847584eb",
+        "HVM64": "ami-994eb3f6",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-2": {
-        "HVM64": "ami-a3895ccd",
+        "HVM64": "ami-6e4b9e00",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-northeast-1": {
-        "HVM64": "ami-65925d04",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "us-east-1": {
-        "HVM64": "ami-98d9bf8f",
+        "HVM64": "ami-9aed3ffb",
         "HVMG2": "NOT_SUPPORTED"
       },
       "sa-east-1": {
-        "HVM64": "ami-95fd6cf9",
+        "HVM64": "ami-3971e255",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-1": {
-        "HVM64": "ami-1ea8ea7e",
+        "HVM64": "ami-943b75f4",
         "HVMG2": "NOT_SUPPORTED"
       },
       "us-west-2": {
-        "HVM64": "ami-92d602f2",
+        "HVM64": "ami-76578b16",
+        "HVMG2": "NOT_SUPPORTED"
+      }
+    },
+    "AWSRegionArch2ElasticsearchAMI": {
+      "ap-southeast-2": {
+        "HVM64": "ami-dc361ebf",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-south-1": {
+        "HVM64": "ami-ffbdd790",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "eu-west-1": {
+        "HVM64": "ami-f9dd458a",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-southeast-1": {
+        "HVM64": "ami-a59b49c6",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "eu-central-1": {
+        "HVM64": "ami-ea26ce85",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-northeast-2": {
+        "HVM64": "ami-2b408b45",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-northeast-1": {
+        "HVM64": "ami-374db956",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "us-east-1": {
+        "HVM64": "ami-6869aa05",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "sa-east-1": {
+        "HVM64": "ami-6dd04501",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "us-west-1": {
+        "HVM64": "ami-31490d51",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "us-west-2": {
+        "HVM64": "ami-7172b611",
         "HVMG2": "NOT_SUPPORTED"
       }
     }
   },
   "Resources": {
+    "BitbucketFileServerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "BitbucketFileServerPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:AttachVolume",
+                    "ec2:CreateSnapshot",
+                    "ec2:CreateTags",
+                    "ec2:CreateVolume",
+                    "ec2:DeleteSnapshot",
+                    "ec2:DescribeInstances",
+                    "ec2:DescribeSnapshots",
+                    "ec2:DescribeVolumes",
+                    "ec2:DetachVolume",
+                    "rds:CreateDBSnapshot",
+                    "rds:DeleteDbSnapshot",
+                    "rds:DescribeDBInstances",
+                    "rds:DescribeDBSnapshots",
+                    "rds:PromoteReadReplica",
+                    "rds:ModifyDBInstance",
+                    "rds:RestoreDBInstanceFromDBSnapshot"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "BitbucketClusterNodeRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -597,6 +830,17 @@
         ]
       }
     },
+    "BitbucketFileServerInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "BitbucketFileServerRole"
+          }
+        ]
+      }
+    },
     "BitbucketClusterNodeInstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
@@ -624,7 +868,13 @@
           "Ref": "ClusterNodeMax"
         },
         "MinSize": {
-          "Ref": "ClusterNodeMin"
+          "Fn::If": [
+            "StandbyMode",
+            "0",
+            {
+              "Ref": "ClusterNodeMin"
+            }
+          ]
         },
         "LoadBalancerNames": [
           {
@@ -635,6 +885,11 @@
           "Ref": "Subnets"
         },
         "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Bitbucket Node",
+            "PropagateAtLaunch": true
+          },
           {
             "Key": "Cluster",
             "Value": {
@@ -647,20 +902,16 @@
     },
     "ClusterNodeLaunchConfig": {
       "Type": "AWS::AutoScaling::LaunchConfiguration",
-      "DependsOn": [
-        "EFSMountAz1",
-        "EFSMountAz2",
-        "DB"
-      ],
       "Metadata": {
         "Comment": "",
         "AWS::CloudFormation::Init": {
           "configSets": {
             "default": [
-              "0"
+              "1",
+              "2"
             ]
           },
-          "0": {
+          "1": {
             "packages": {
               "Fn::If": [
                 "DoCollectd",
@@ -683,11 +934,6 @@
                     "",
                     [
                       "ATL_APP_DATA_MOUNT_ENABLED=false\n",
-                      "ATL_DB_USER=",
-                      {
-                        "Ref": "DBMasterUser"
-                      },
-                      "\n",
                       "ATL_DB_PASSWORD=",
                       {
                         "Ref": "DBMasterUserPassword"
@@ -749,6 +995,11 @@
                               "Fn::Join": [
                                 "",
                                 [
+                                  "plugin.search.elasticsearch.aws.region=",
+                                  {
+                                    "Ref": "AWS::Region"
+                                  },
+                                  "\n",
                                   "hazelcast.network.multicast=false\n",
                                   "hazelcast.network.aws=true\n",
                                   "hazelcast.network.aws.iam.role=",
@@ -781,10 +1032,10 @@
                                   {
                                     "Fn::GetAtt": [
                                       "Elasticsearch",
-                                      "PrivateIp"
+                                      "DomainEndpoint"
                                     ]
                                   },
-                                  ":9200\n"
+                                  "\n"
                                 ]
                               ]
                             },
@@ -878,22 +1129,6 @@
                   ]
                 }
               },
-              "/etc/collectd.conf": {
-                "Fn::If": [
-                  "DoCollectd",
-                  {
-                    "source": {
-                      "Ref": "CollectdConfigUrl"
-                    },
-                    "mode": "000600",
-                    "owner": "root",
-                    "group": "root"
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              },
               "/home/atlbitbucket/.bash_profile": {
                 "content": {
                   "Fn::Join": [
@@ -916,48 +1151,30 @@
               }
             },
             "commands": {
-              "010_make_mount_point": {
-                "command": "mkdir -p /media/atl",
-                "ignoreErrors": "false"
-              },
-              "020_add_nfs_mount": {
+              "010_add_nfs_mount": {
                 "command": {
                   "Fn::Join": [
                     "",
                     [
                       "echo ",
                       {
-                        "Fn::Join": [
-                          "",
-                          [
-                            "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).",
-                            {
-                              "Ref": "ElasticFileSystem"
-                            },
-                            ".efs.",
-                            {
-                              "Ref": "AWS::Region"
-                            },
-                            ".amazonaws.com"
-                          ]
+                        "Fn::GetAtt": [
+                          "FileServer",
+                          "PrivateIp"
                         ]
                       },
-                      ":/ /media/atl nfs4 lookupcache=pos,noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
+                      ":/media/atl/bitbucket/shared /media/atl/bitbucket/shared nfs lookupcache=pos,noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
                     ]
                   ]
                 },
                 "ignoreErrors": "false"
               },
-              "030_mount_all": {
-                "command": "mount -a",
-                "ignoreErrors": "false"
-              },
-              "040_make_shared_home_dir": {
+              "020_make_shared_home_dir": {
                 "command": "mkdir -p /media/atl/bitbucket/shared",
                 "ignoreErrors": "false"
               },
-              "050_chown_shared_home_dir": {
-                "command": "chown -R atlbitbucket:atlbitbucket /media/atl/bitbucket",
+              "030_chown_shared_home_dir": {
+                "command": "chown atlbitbucket:atlbitbucket /media/atl/bitbucket /media/atl/bitbucket/shared",
                 "ignoreErrors": "false"
               }
             },
@@ -983,7 +1200,7 @@
                     }
                   ]
                 },
-                "nfslock": {
+                "rpcbind": {
                   "enabled": "true",
                   "ensureRunning": "true",
                   "packages": {
@@ -991,8 +1208,20 @@
                       "nfs-utils"
                     ]
                   }
-                },
-                "rpcbind": {
+                }
+              }
+            }
+          },
+          "2": {
+            "commands": {
+              "040_mount_nfs": {
+                "command": "mount /media/atl/bitbucket/shared",
+                "ignoreErrors": "false"
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "nfslock": {
                   "enabled": "true",
                   "ensureRunning": "true",
                   "packages": {
@@ -1158,84 +1387,73 @@
       }
     },
     "Elasticsearch": {
+      "Type": "AWS::Elasticsearch::Domain",
+      "Properties": {
+        "AccessPolicies": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "BitbucketClusterNodeRole",
+                    "Arn"
+                  ]
+                }
+              },
+              "Action": "es:*",
+              "Resource": "*"
+            }
+          ]
+        },
+        "ElasticsearchVersion": "2.3",
+        "ElasticsearchClusterConfig": {
+          "InstanceType": {
+            "Ref": "ElasticsearchInstanceType"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Bitbucket Elasticsearch cluster"
+          },
+          {
+            "Key": "Application",
+            "Value": {
+              "Ref": "AWS::StackId"
+            }
+          }
+        ]
+      }
+    },
+    "FileServer": {
       "Type": "AWS::EC2::Instance",
       "Metadata": {
-        "Comment": "Elasticsearch Server",
+        "Comment": "Set up NFS Server and initial bitbucket.properties",
         "AWS::CloudFormation::Init": {
           "configSets": {
             "default": [
-              "import_key",
-              "add_repo",
-              "install_es",
-              "configure_and_start"
-            ],
-            "update": [
-              "uninstall_es_aws_plugin",
-              "install_es",
-              "restart_es"
+              "1",
+              "2"
             ]
           },
-          "import_key": {
-            "commands": {
-              "import_es_key": {
-                "command": "rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "add_repo": {
-            "files": {
-              "/etc/yum.repos.d/elasticsearch.repo": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "[elasticsearch-2.x]\n",
-                      "name=Elasticsearch repository for 2.x packages\n",
-                      "baseurl=https://packages.elastic.co/elasticsearch/2.x/centos\n",
-                      "gpgcheck=1\n",
-                      "gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch\n",
-                      "enabled=1\n"
-                    ]
-                  ]
-                }
-              }
-            }
-          },
-          "install_es": {
+          "1": {
             "packages": {
-              "yum": {
-                "elasticsearch": [
-                  {
-                    "Ref": "ElasticsearchVersion"
+              "Fn::If": [
+                "DoCollectd",
+                {
+                  "yum": {
+                    "collectd": [],
+                    "collectd-java": [],
+                    "collectd-generic-jmx": []
                   }
-                ]
-              }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
             },
-            "commands": {
-              "010_install_elasticsearch_aws_plugin": {
-                "command": "sudo /usr/share/elasticsearch/bin/plugin install cloud-aws",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "restart_es": {
-            "commands": {
-              "010_restart_elasticsearch_service": {
-                "command": "sudo service elasticsearch restart",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "uninstall_es_aws_plugin": {
-            "commands": {
-              "uninstall_elasticsearch_aws_plugin": {
-                "command": "sudo /usr/share/elasticsearch/bin/plugin remove cloud-aws",
-                "ignoreErrors": "false"
-              }
-            }
-          },
-          "configure_and_start": {
             "files": {
               "/etc/atl": {
                 "content": {
@@ -1243,27 +1461,15 @@
                     "",
                     [
                       "ATL_ENABLED_PRODUCTS=\n",
+                      "ATL_ENABLED_SHARED_HOMES=Bitbucket\n",
                       "ATL_NGINX_ENABLED=false\n",
                       "ATL_POSTGRES_ENABLED=false\n",
-                      "ATL_SSL_SELF_CERT_ENABLED=false\n"
+                      "ATL_SSL_SELF_CERT_ENABLED=false\n",
+                      "ATL_BITBUCKET_BUNDLED_ELASTICSEARCH_ENABLED=false\n",
+                      "ATL_APP_NFS_SERVER=true\n"
                     ]
                   ]
                 }
-              },
-              "/etc/elasticsearch/elasticsearch.yml": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "index.mapper.dynamic: false\n",
-                      "action.auto_create_index: false\n",
-                      "network.host: _ec2_\n"
-                    ]
-                  ]
-                },
-                "mode": "000400",
-                "owner": "elasticsearch",
-                "group": "elasticsearch"
               },
               "/etc/cfn/cfn-hup.conf": {
                 "content": {
@@ -1288,21 +1494,20 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/etc/cfn/hooks.d/cfn-update-elasticsearch.conf": {
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
                     [
-                      "[cfn-update-elasticsearch]\n",
+                      "[cfn-auto-reloader-hook]\n",
                       "triggers=post.update\n",
-                      "path=Resources.Elasticsearch.Metadata.AWS::CloudFormation::Init\n",
-                      "action=/opt/aws/bin/cfn-init -v",
-                      "         -c update",
+                      "path=Resources.FileServer.Metadata.AWS::CloudFormation::Init\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
                       "         --stack ",
                       {
                         "Ref": "AWS::StackName"
                       },
-                      "         --resource Elasticsearch ",
+                      "         --resource FileServer ",
                       "         --region ",
                       {
                         "Ref": "AWS::Region"
@@ -1312,6 +1517,176 @@
                     ]
                   ]
                 }
+              },
+              "/opt/atlassian/bitbucket-diy-backup/bitbucket.diy-backup.vars.sh": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "# This file was generated from the BitbucketDataCenter-EC2-NFS CloudFormation template\n",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "INSTANCE_NAME=",
+                            {
+                              "Ref": "AWS::StackName"
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "BITBUCKET_URL=",
+                            {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  {
+                                    "Fn::If": [
+                                      "DoSSL",
+                                      "https",
+                                      "http"
+                                    ]
+                                  },
+                                  "://",
+                                  {
+                                    "Fn::GetAtt": [
+                                      "LoadBalancer",
+                                      "DNSName"
+                                    ]
+                                  }
+                                ]
+                              ]
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      "BITBUCKET_HOME=/media/atl/bitbucket\n",
+                      "BITBUCKET_UID=atlbitbucket\n",
+                      "BITBUCKET_GID=atlbitbucket\n",
+                      "BACKUP_HOME_TYPE=amazon-ebs\n",
+                      "BACKUP_DATABASE_TYPE=amazon-rds\n",
+                      "BACKUP_ARCHIVE_TYPE=\n",
+                      "BACKUP_ZERO_DOWNTIME=true\n",
+                      "HOME_DIRECTORY_MOUNT_POINT=/media/atl\n",
+                      "HOME_DIRECTORY_DEVICE_NAME=/dev/sdf\n",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "RESTORE_HOME_DIRECTORY_VOLUME_TYPE=",
+                            {
+                              "Fn::If": [
+                                "IsHomeProvisionedIops",
+                                "io1",
+                                "gp2"
+                              ]
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::If": [
+                          "IsHomeProvisionedIops",
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "RESTORE_HOME_DIRECTORY_IOPS=",
+                                {
+                                  "Ref": "HomeIops"
+                                },
+                                "\n"
+                              ]
+                            ]
+                          },
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      },
+                      "FILESYSTEM_TYPE=zfs\n",
+                      "ZFS_HOME_TANK_NAME=$(run sudo zfs list -H -o name,mountpoint | grep \"${HOME_DIRECTORY_MOUNT_POINT}\" | cut -f1)\n",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "RDS_INSTANCE_ID=",
+                            {
+                              "Ref": "DB"
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "RESTORE_RDS_INSTANCE_CLASS=",
+                            {
+                              "Ref": "DBInstanceClass"
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "RESTORE_RDS_SUBNET_GROUP_NAME=",
+                            {
+                              "Ref": "DBSubnetGroup"
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "RESTORE_RDS_SECURITY_GROUP=",
+                            {
+                              "Ref": "SecurityGroup"
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      "CURL_OPTIONS=\"-L -s -f\"\n",
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "AWS_REGION=",
+                            {
+                              "Ref": "AWS::Region"
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      "AWS_INFO=$(curl ${CURL_OPTIONS} http://169.254.169.254/latest/dynamic/instance-identity/document)\n",
+                      "AWS_AVAILABILITY_ZONE=$(echo \"${AWS_INFO}\" | jq -r .availabilityZone)\n",
+                      "AWS_REGION=$(echo \"${AWS_INFO}\" | jq -r .region)\n",
+                      "AWS_EC2_INSTANCE_ID=$(echo \"${AWS_INFO}\" | jq -r .instanceId)\n",
+                      "AWS_ADDITIONAL_TAGS=\n",
+                      "BITBUCKET_VERBOSE_BACKUP=${BITBUCKET_VERBOSE_BACKUP:-true}\n",
+                      "KEEP_BACKUPS=2"
+                    ]
+                  ]
+                },
+                "mode": "000644",
+                "owner": "ec2-user",
+                "group": "ec2-user"
               }
             },
             "services": {
@@ -1321,34 +1696,94 @@
                   "ensureRunning": "true",
                   "files": [
                     "/etc/cfn/cfn-hup.conf",
-                    "/etc/cfn/hooks.d/cfn-update-elasticsearch.conf"
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
                   ]
                 },
-                "elasticsearch": {
+                "collectd": {
+                  "Fn::If": [
+                    "DoCollectd",
+                    {
+                      "enabled": "true",
+                      "ensureRunning": "true"
+                    },
+                    {
+                      "Ref": "AWS::NoValue"
+                    }
+                  ]
+                },
+                "rpcbind": {
                   "enabled": "true",
                   "ensureRunning": "true"
                 }
               }
-            },
-            "packages": {
-              "Fn::If": [
-                "DoCollectd",
-                {
-                  "yum": {
-                    "collectd": [],
-                    "collectd-java": [],
-                    "collectd-generic-jmx": []
-                  }
+            }
+          },
+          "2": {
+            "services": {
+              "sysvinit": {
+                "nfs": {
+                  "enabled": "true",
+                  "ensureRunning": "true"
                 },
-                {
-                  "Ref": "AWS::NoValue"
+                "nfslock": {
+                  "enabled": "true",
+                  "ensureRunning": "true"
                 }
-              ]
+              }
             }
           }
         }
       },
       "Properties": {
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sdf",
+            "Ebs": {
+              "VolumeType": {
+                "Fn::If": [
+                  "IsHomeProvisionedIops",
+                  "io1",
+                  "gp2"
+                ]
+              },
+              "Iops": {
+                "Fn::If": [
+                  "IsHomeProvisionedIops",
+                  {
+                    "Ref": "HomeIops"
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              },
+              "DeleteOnTermination": {
+                "Ref": "HomeDeleteOnTermination"
+              },
+              "SnapshotId": {
+                "Fn::If": [
+                  "DoRestoreFromEBSSnapshot",
+                  {
+                    "Ref": "HomeVolumeSnapshotId"
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              },
+              "VolumeSize": {
+                "Ref": "HomeSize"
+              }
+            }
+          },
+          {
+            "DeviceName": "/dev/xvdf",
+            "NoDevice": {}
+          }
+        ],
+        "IamInstanceProfile": {
+          "Ref": "BitbucketFileServerInstanceProfile"
+        },
         "ImageId": {
           "Fn::FindInMap": [
             "AWSRegionArch2AMI",
@@ -1359,7 +1794,7 @@
               "Fn::FindInMap": [
                 "AWSInstanceType2Arch",
                 {
-                  "Ref": "ElasticsearchInstanceType"
+                  "Ref": "FileServerInstanceType"
                 },
                 "Arch"
               ]
@@ -1367,7 +1802,7 @@
           ]
         },
         "InstanceType": {
-          "Ref": "ElasticsearchInstanceType"
+          "Ref": "FileServerInstanceType"
         },
         "KeyName": {
           "Ref": "KeyName"
@@ -1395,6 +1830,10 @@
           }
         ],
         "Tags": [
+         {
+            "Key": "Name",
+            "Value": "Bitbucket NFS Server"
+          },
           {
             "Key": "Application",
             "Value": {
@@ -1414,7 +1853,7 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource Elasticsearch ",
+                "         --resource FileServer ",
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
@@ -1425,7 +1864,7 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource Elasticsearch ",
+                "         --resource FileServer ",
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
@@ -1437,66 +1876,30 @@
         }
       }
     },
-    "ElasticFileSystem": {
-      "Type": "AWS::EFS::FileSystem",
-      "Properties": {
-        "FileSystemTags": [
-          {
-            "Key": "Application",
-            "Value": {
-              "Ref": "AWS::StackId"
-            }
-          }
-        ]
-      }
-    },
-    "EFSMountAz1": {
-      "Type": "AWS::EFS::MountTarget",
-      "Properties": {
-        "FileSystemId": {
-          "Ref": "ElasticFileSystem"
-        },
-        "SecurityGroups": [
-          {
-            "Ref": "SecurityGroup"
-          }
-        ],
-        "SubnetId": {
-          "Fn::Select": [
-            "0",
-            {
-              "Ref": "Subnets"
-            }
-          ]
-        }
-      }
-    },
-    "EFSMountAz2": {
-      "Type": "AWS::EFS::MountTarget",
-      "Properties": {
-        "FileSystemId": {
-          "Ref": "ElasticFileSystem"
-        },
-        "SecurityGroups": [
-          {
-            "Ref": "SecurityGroup"
-          }
-        ],
-        "SubnetId": {
-          "Fn::Select": [
-            "1",
-            {
-              "Ref": "Subnets"
-            }
-          ]
-        }
-      }
-    },
     "DB": {
       "Type": "AWS::RDS::DBInstance",
       "Properties": {
+        "SourceDBInstanceIdentifier": {
+          "Fn::If": [
+            "StandbyMode",
+            {
+              "Ref": "DBMaster"
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
         "DBName": {
-          "Ref": "DBName"
+          "Fn::If": [
+            "RestoreRDSOrStandby",
+            {
+              "Ref": "AWS::NoValue"
+            },
+            {
+              "Ref": "DBName"
+            }
+          ]
         },
         "AllocatedStorage": {
           "Ref": "DBStorage"
@@ -1504,18 +1907,33 @@
         "DBInstanceClass": {
           "Ref": "DBInstanceClass"
         },
+        "DBSnapshotIdentifier": {
+          "Fn::If": [
+            "DoRestoreFromRDSSnapshot",
+            {
+              "Ref": "DBSnapshotId"
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
         "DBSubnetGroupName": {
           "Ref": "DBSubnetGroup"
         },
         "Engine": "postgres",
-        "EngineVersion": {
-          "Ref": "DBEngineVersion"
-        },
-        "MasterUsername": {
-          "Ref": "DBMasterUser"
-        },
+        "EngineVersion": "9.5.2",
+        "MasterUsername": "postgres",
         "MasterUserPassword": {
-          "Ref": "DBMasterUserPassword"
+          "Fn::If": [
+            "DoSetDBMasterUserPassword",
+            {
+              "Ref": "DBMasterUserPassword"
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
         },
         "StorageType": {
           "Fn::If": [
@@ -1524,10 +1942,30 @@
             "gp2"
           ]
         },
+        "Iops": {
+          "Fn::If": [
+            "DBProvisionedIops",
+            {
+              "Ref": "DBIops"
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "MultiAZ": {
+          "Ref": "DBMultiAZ"
+        },
         "VPCSecurityGroups": [
           {
             "Ref": "SecurityGroup"
           }
+        ],
+        "Tags" : [ 
+          { 
+            "Key" : "Name", 
+            "Value" : "Bitbucket PostgreSQL Database" 
+          } 
         ]
       }
     },
@@ -1561,7 +1999,13 @@
           {
             "LoadBalancerPort": "80",
             "Protocol": "HTTP",
-            "InstancePort": "7990",
+            "InstancePort": {
+              "Fn::If": [
+                "DoSSL",
+                "7991",
+                "7990"
+              ]
+            },
             "InstanceProtocol": "HTTP",
             "PolicyNames": [
               "JSessionIdStickiness"
@@ -1608,8 +2052,8 @@
         ],
         "HealthCheck": {
           "Target": "HTTP:7990/status",
-          "Timeout": "4",
-          "Interval": "5",
+          "Timeout": "29",
+          "Interval": "30",
           "UnhealthyThreshold": "2",
           "HealthyThreshold": "2"
         },
@@ -1687,6 +2131,15 @@
       "Description": "The name of the auto scaling group of cluster nodes",
       "Value": {
         "Ref": "ClusterNodeGroup"
+      }
+    },
+    "FileServer": {
+      "Description": "The public DNS name of the FileServer node",
+      "Value": {
+        "Fn::GetAtt": [
+          "FileServer",
+          "PublicDnsName"
+        ]
       }
     },
     "URL": {
