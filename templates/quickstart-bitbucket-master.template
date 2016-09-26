@@ -311,10 +311,10 @@
         "r3.8xlarge",
         "x1.32xlarge"
       ],
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
+      "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     },
     "CatalinaOpts": {
-      "Description": "JAVA_OPTIONS passed to the JVM that runs Bitbucket.",
+      "Description": "Java options passed to the JVM that runs Bitbucket.",
       "Type": "String",
       "Default": ""
     },
