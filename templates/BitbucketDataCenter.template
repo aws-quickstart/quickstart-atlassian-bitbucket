@@ -239,6 +239,7 @@
       "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     },
     "CatalinaOpts": {
+      "Description": "JAVA_OPTIONS passed to the JVM that runs Catalina/Tomcat.",      
       "Type": "String",
       "Default": ""
     },

@@ -314,6 +314,7 @@
       "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
     },
     "CatalinaOpts": {
+      "Description": "JAVA_OPTIONS passed to the JVM that runs Catalina/Tomcat.",
       "Type": "String",
       "Default": ""
     },
