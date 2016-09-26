@@ -314,7 +314,7 @@
       "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
     },
     "CatalinaOpts": {
-      "Description": "JAVA_OPTIONS passed to the JVM that runs Catalina/Tomcat.",
+      "Description": "JAVA_OPTIONS passed to the JVM that runs Bitbucket.",
       "Type": "String",
       "Default": ""
     },
@@ -405,7 +405,7 @@
       "ConstraintDescription": "Must be 'true' or 'false'."
     },    
     "DBIops": {
-      "Description": "Should be in the range of 1000 - 20000, and only used with Provisioned IOPS.  Note: The ratio of iops per allocated-storage must be between 3.00 and 10.00.",
+      "Description": "Should be in the range of 1000 - 30000, and only used with Provisioned IOPS.  Note: The ratio of iops per allocated-storage must be between 3.00 and 10.00.",
       "Type": "Number",
       "Default": "1000",
       "MinValue": "1000",
@@ -458,12 +458,12 @@
       "ConstraintDescription": "Must be 'true' or 'false'."
     },
     "HomeIops": {
-      "Description": "Home directory IOPS (3000 - 20000, only used with Provisioned IOPS).  Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 30; for example, a volume with 3000 IOPS must be at least 100 GiB",
+      "Description": "Home directory IOPS (100 - 20000, only used with Provisioned IOPS).  Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 50; for example, a volume with 5000 IOPS must be at least 100 GiB",
       "Type": "Number",
-      "Default": "3000",
-      "MinValue": "3000",
+      "Default": "1000",
+      "MinValue": "100",
       "MaxValue": "20000",
-      "ConstraintDescription": "Must be in the range 3000 - 20000."
+      "ConstraintDescription": "Must be in the range 100 - 20000."
     },
     "HomeSize": {
       "Description": "Home directory storage size, in gibibytes (GiB) (100 - 16384)",

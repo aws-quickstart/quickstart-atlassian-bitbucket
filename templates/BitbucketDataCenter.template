@@ -203,7 +203,7 @@
       "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.10.0 or higher"
     },
     "CidrBlock": {
-      "Description": "The CIDR IP range that is permitted to access the Bitbucket URL. . Use 0.0.0.0/0 if you want public access from the internet.",
+      "Description": "The CIDR IP range that is permitted to access the Bitbucket URL. Use 0.0.0.0/0 if you want public access from the internet.",
       "Type": "String",
       "MinLength": "9",
       "MaxLength": "18",
@@ -239,7 +239,7 @@
       "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     },
     "CatalinaOpts": {
-      "Description": "JAVA_OPTIONS passed to the JVM that runs Catalina/Tomcat.",      
+      "Description": "JAVA_OPTIONS passed to the JVM that runs Bitbucket.",      
       "Type": "String",
       "Default": ""
     },
@@ -329,7 +329,7 @@
       "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
     },
     "DBIops": {
-      "Description": "Should be in the range of 1000 - 20000, and only used with Provisioned IOPS.  Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.",
+      "Description": "Should be in the range of 1000 - 30000, and only used with Provisioned IOPS.  Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.",
       "Type": "Number",
       "Default": "1000",
       "MinValue": "1000",
@@ -382,12 +382,12 @@
       "ConstraintDescription": "Must be 'true' or 'false'."
     },
     "HomeIops": {
-      "Description": "Home directory IOPS (3000 - 20000, only used with Provisioned IOPS).  Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 30; for example, a volume with 3000 IOPS must be at least 100 GiB",
+      "Description": "Home directory IOPS (100 - 20000, only used with Provisioned IOPS).  Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 50; for example, a volume with 5000 IOPS must be at least 100 GiB",
       "Type": "Number",
-      "Default": "3000",
-      "MinValue": "3000",
+      "Default": "1000",
+      "MinValue": "100",
       "MaxValue": "20000",
-      "ConstraintDescription": "Must be in the range 3000 - 20000."
+      "ConstraintDescription": "Must be in the range 100 - 20000."
     },
     "HomeSize": {
       "Description": "Home directory storage size, in gibibytes (GiB) (100 - 16384)",
@@ -641,7 +641,7 @@
     },
     "AWSRegionArch2AMI": {
       "us-east-1": {
-        "HVM64": "ami-9beb928c",
+        "HVM64": "ami-f9a1daee",
         "HVMG2": "NOT_SUPPORTED"
       },
       "ap-south-1": {
