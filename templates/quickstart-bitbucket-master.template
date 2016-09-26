@@ -275,12 +275,12 @@
       "ConstraintDescription": "Must be 'true' or 'false'."
     },
     "BitbucketProperties": {
-      "Description": "A comma-separated list of bitbucket properties in the form key1=value1, key2=value2, ...",
+      "Description": "A comma-separated list of bitbucket properties in the form key1=value1, key2=value2, ... Find documentation at https://confluence.atlassian.com/x/m5ZKLg",
       "Type": "String",
       "Default": ""
     },
     "BitbucketVersion": {
-      "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at https://confluence.atlassian.com/bitbucketserver/releases-776640503.html",
+      "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at https://confluence.atlassian.com/x/95dKLg",
       "Type": "String",
       "AllowedPattern": "(\\d+\\.\\d+\\.\\d+(-?.*))",
       "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.10.0 or higher"
@@ -355,10 +355,10 @@
       "ConstraintDescription": "Must be at least 8 alphanumeric characters."
     },
     "DBName": {
-      "Description": "Database name. Must be 1 - 41 characters.",
+      "Description": "Database name. Must be 5 - 41 characters.",
       "Type": "String",
       "Default": "bitbucket",
-      "MinLength": "1",
+      "MinLength": "5",
       "MaxLength": "41",
       "AllowedPattern": "[a-zA-Z0-9_-]*",
       "ConstraintDescription": "Must not be blank, and may contain only alphanumeric characters, underscore ('_'), and hyphen ('-')."
