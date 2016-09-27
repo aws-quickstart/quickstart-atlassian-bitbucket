@@ -312,15 +312,6 @@
       "Default": " 9.5.2",
       "ConstraintDescription": "Must be an AWS supported database version, not all versions are supported in all regions"
     },
-    "DBMasterUser": {
-      "Description": "Database admin account username.",
-      "Type": "String",
-      "Default": "postgres",
-      "MinLength": "1",
-      "MaxLength": "16",
-      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
-      "ConstraintDescription": "Must begin with a letter and contain only alphanumeric characters."
-    },
     "DBMasterUserPassword": {
       "NoEcho": "true",
       "Default": "",
@@ -549,7 +540,7 @@
             ]
           ]
         },
-        "Parameters": {           
+        "Parameters": {
           "AvailabilityZones": {
             "Fn::Join": [
               ",", {
@@ -560,22 +551,22 @@
           "Subnets": {
                     "Fn::Join": [
                         ",",
-                        [   
-                            {   
+                        [
+                            {
                                "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet1ID"]
-                            },  
-                            {   
+                            },
+                            {
                                "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet2ID"]
-                            }   
-                        ]   
-                    ]   
-                },  
+                            }
+                        ]
+                    ]
+                },
                 "VPC": {
                         "Fn::GetAtt": [
                         "VPCStack",
                         "Outputs.VPCID"
-                        ]   
-                }, 
+                        ]
+                },
           "AssociatePublicIpAddress": {
             "Ref": "AssociatePublicIpAddress"
           },
@@ -602,9 +593,6 @@
           },
           "DBInstanceClass": {
             "Ref": "DBInstanceClass"
-          },
-          "DBMasterUser": {
-            "Ref": "DBMasterUser"
           },
           "DBMasterUserPassword": {
             "Ref": "DBMasterUserPassword"
