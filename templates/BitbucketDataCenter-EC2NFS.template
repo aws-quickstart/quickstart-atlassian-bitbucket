@@ -239,7 +239,7 @@
       "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
     },
     "CatalinaOpts": {
-      "Description": "Java options passed to the JVM that runs Bitbucket.",      
+      "Description": "Java options passed to the JVM that runs Bitbucket.",
       "Type": "String",
       "Default": ""
     },
@@ -1961,11 +1961,11 @@
             "Ref": "SecurityGroup"
           }
         ],
-        "Tags" : [ 
-          { 
-            "Key" : "Name", 
-            "Value" : "Bitbucket PostgreSQL Database" 
-          } 
+        "Tags" : [
+          {
+            "Key" : "Name",
+            "Value" : "Bitbucket PostgreSQL Database"
+          }
         ]
       }
     },
