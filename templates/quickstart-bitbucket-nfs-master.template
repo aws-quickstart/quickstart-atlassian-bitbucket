@@ -28,7 +28,6 @@
           "DBInstanceClass",
           "DBEngine",
           "DBEngineVersion",
-          "DBMasterUser",
           "DBMasterUserPassword",
           "DBName",
           "DBPassword",
@@ -129,9 +128,6 @@
         },
         "DBEngineVersion": {
           "default": "Engine version"
-        },
-        "DBMasterUser": {
-          "default": "Master username"
         },
         "DBMasterUserPassword": {
           "default": "Master password"
@@ -303,12 +299,6 @@
       "Type": "String",
       "Default": ""
     },
-    "CollectdConfigUrl": {
-      "Description": "URL of collectd.conf file. Leave blank to disable collectd monitoring",
-      "Type": "String",
-      "Default": "",
-      "ConstraintDescription": "Must be a valid URL to a collectd.conf file, or blank"
-    },
     "DBInstanceClass": {
       "Description": "RDS instance type",
       "Type": "String",
@@ -383,12 +373,6 @@
         "Provisioned IOPS"
       ],
       "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
-    },
-    "ElasticsearchVersion": {
-      "Type": "String",
-      "AllowedPattern": "2\\.3\\.\\d+",
-      "Default": "2.3.3",
-      "ConstraintDescription": "Must be a version of Elasticsearch supported by Bitbucket."
     },
     "ElasticsearchInstanceType": {
       "Description": "A EC2 instance type for Elasticsearch to run on.",
@@ -641,9 +625,6 @@
           },
           "DBInstanceClass": {
             "Ref": "DBInstanceClass"
-          },
-          "DBEngineVersion": {
-            "Ref": "DBEngineVersion"
           },
           "DBMasterUser": {
             "Ref": "DBMasterUser"
