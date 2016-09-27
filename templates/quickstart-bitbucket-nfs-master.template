@@ -372,8 +372,6 @@
       ],
       "ConstraintDescription": "Must be an Elasticsearch instance type in the M3, R3 or I2 family"
     },
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
-    },
     "SSLCertificateName": {
       "Description": "The name of your Server Certificate to use for HTTPS.  Leave blank if you don't want to set up HTTPS at this time",
       "Type": "String",
