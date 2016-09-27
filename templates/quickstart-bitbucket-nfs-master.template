@@ -291,18 +291,20 @@
     "DBInstanceClass": {
       "Description": "RDS instance type",
       "Type": "String",
-      "Default": "db.m3.medium",
+      "Default": "db.m4.large",
       "AllowedValues": [
-        "db.m3.medium",
-        "db.m3.large",
-        "db.m3.xlarge",
-        "db.m3.2xlarge",
+        "db.m4.large",
+        "db.m4.xlarge",
+        "db.m4.2xlarge",
+        "db.m4.4xlarge",
+        "db.m4.10xlarge",
         "db.r3.large",
         "db.r3.xlarge",
         "db.r3.2xlarge",
         "db.r3.4xlarge",
         "db.r3.8xlarge",
-        "db.t2.medium"
+        "db.t2.medium",
+        "db.t2.large"
       ],
       "ConstraintDescription": "Must be a valid RDS instance class, 'db.t2.medium' or larger."
     },
