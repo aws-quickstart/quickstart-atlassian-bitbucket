@@ -28,13 +28,11 @@
           "DBInstanceClass",
           "DBEngine",
           "DBEngineVersion",
-          "DBMasterUser",
           "DBMasterUserPassword",
           "DBName",
           "DBPassword",
           "DBStorage",
           "DBStorageType",
-          "ElasticsearchVersion",
           "ElasticsearchInstanceType"
         ]
       }, {
@@ -43,8 +41,7 @@
         },
         "Parameters": [
           "BitbucketProperties",
-          "CatalinaOpts",
-          "CollectdConfigUrl"
+          "CatalinaOpts"
         ]
       }, {
         "Label": {
@@ -109,9 +106,6 @@
         "CatalinaOpts": {
           "default": "Catalina Options"
         },
-        "CollectdConfigUrl": {
-          "default": "Collectd Config URL"
-        },
         "ClusterNodeMax": {
           "default": "Maximum number of cluster nodes"
         },
@@ -130,9 +124,6 @@
         "DBEngineVersion": {
           "default": "Engine version"
         },
-        "DBMasterUser": {
-          "default": "Master username"
-        },
         "DBMasterUserPassword": {
           "default": "Master password"
         },
@@ -148,14 +139,8 @@
         "DBStorageType": {
           "default": "Database storage type"
         },
-        "ElasticsearchVersion": {
-          "default": "Elasticsearch version"
-        },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
-        },
-        "KeyPairName": {
-          "default": "Key Name"
         },
         "SSLCertificateName": {
           "default": "SSL Certificate Name"
@@ -303,27 +288,23 @@
       "Type": "String",
       "Default": ""
     },
-    "CollectdConfigUrl": {
-      "Description": "URL of collectd.conf file. Leave blank to disable collectd monitoring",
-      "Type": "String",
-      "Default": "",
-      "ConstraintDescription": "Must be a valid URL to a collectd.conf file, or blank"
-    },
     "DBInstanceClass": {
       "Description": "RDS instance type",
       "Type": "String",
-      "Default": "db.m3.medium",
+      "Default": "db.m4.large",
       "AllowedValues": [
-        "db.m3.medium",
-        "db.m3.large",
-        "db.m3.xlarge",
-        "db.m3.2xlarge",
+        "db.m4.large",
+        "db.m4.xlarge",
+        "db.m4.2xlarge",
+        "db.m4.4xlarge",
+        "db.m4.10xlarge",
         "db.r3.large",
         "db.r3.xlarge",
         "db.r3.2xlarge",
         "db.r3.4xlarge",
         "db.r3.8xlarge",
-        "db.t2.medium"
+        "db.t2.medium",
+        "db.t2.large"
       ],
       "ConstraintDescription": "Must be a valid RDS instance class, 'db.t2.medium' or larger."
     },
@@ -332,15 +313,6 @@
       "Type": "String",
       "Default": " 9.5.2",
       "ConstraintDescription": "Must be an AWS supported database version, not all versions are supported in all regions"
-    },
-    "DBMasterUser": {
-      "Description": "Database admin account username.",
-      "Type": "String",
-      "Default": "postgres",
-      "MinLength": "1",
-      "MaxLength": "16",
-      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
-      "ConstraintDescription": "Must begin with a letter and contain only alphanumeric characters."
     },
     "DBMasterUserPassword": {
       "NoEcho": "true",
@@ -384,44 +356,23 @@
       ],
       "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
     },
-    "ElasticsearchVersion": {
-      "Type": "String",
-      "AllowedPattern": "2\\.3\\.\\d+",
-      "Default": "2.3.3",
-      "ConstraintDescription": "Must be a version of Elasticsearch supported by Bitbucket."
-    },
     "ElasticsearchInstanceType": {
-      "Description": "A EC2 instance type for Elasticsearch to run on.",
+      "Description": "A instance type for Elasticsearch to run on.",
       "Type": "String",
-      "Default": "m3.large",
+      "Default": "m3.xlarge.elasticsearch",
       "AllowedValues": [
-        "c3.xlarge",
-        "c3.2xlarge",
-        "c3.4xlarge",
-        "c3.8xlarge",
-        "c4.xlarge",
-        "c4.2xlarge",
-        "c4.4xlarge",
-        "c4.8xlarge",
-        "hs1.8xlarge",
-        "i2.xlarge",
-        "i2.2xlarge",
-        "i2.4xlarge",
-        "i2.8xlarge",
-        "m3.large",
-        "m3.xlarge",
-        "m3.2xlarge",
-        "m4.large",
-        "m4.xlarge",
-        "m4.2xlarge",
-        "m4.4xlarge",
-        "m4.10xlarge",
-        "r3.xlarge",
-        "r3.2xlarge",
-        "r3.4xlarge",
-        "r3.8xlarge"
+        "m3.large.elasticsearch",
+        "m3.xlarge.elasticsearch",
+        "m3.2xlarge.elasticsearch",
+        "r3.large.elasticsearch",
+        "r3.xlarge.elasticsearch",
+        "r3.2xlarge.elasticsearch",
+        "r3.4xlarge.elasticsearch",
+        "r3.8xlarge.elasticsearch",
+        "i2.xlarge.elasticsearch",
+        "i2.2xlarge.elasticsearch"
       ],
-      "ConstraintDescription": "Must be a valid EC2 HVM instance type. 'xlarge' or larger. 'm'-type instances may be of type 'large'"
+      "ConstraintDescription": "Must be an Elasticsearch instance type in the M3, R3 or I2 family"
     },
     "SSLCertificateName": {
       "Description": "The name of your Server Certificate to use for HTTPS.  Leave blank if you don't want to set up HTTPS at this time",
@@ -438,15 +389,6 @@
         },
         "Provisioned IOPS"
       ]
-    },
-    "DoCollectd": {
-      "Fn::Not": [{
-        "Fn::Equals": [{
-            "Ref": "CollectdConfigUrl"
-          },
-          ""
-        ]
-      }]
     },
     "DoSSL": {
       "Fn::Not": [{
@@ -585,7 +527,7 @@
             ]
           ]
         },
-        "Parameters": {           
+        "Parameters": {
           "AvailabilityZones": {
             "Fn::Join": [
               ",", {
@@ -596,22 +538,22 @@
           "Subnets": {
                     "Fn::Join": [
                         ",",
-                        [   
-                            {   
+                        [
+                            {
                                "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet1ID"]
-                            },  
-                            {   
+                            },
+                            {
                                "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet2ID"]
-                            }   
-                        ]   
-                    ]   
-                },  
+                            }
+                        ]
+                    ]
+                },
                 "VPC": {
                         "Fn::GetAtt": [
                         "VPCStack",
                         "Outputs.VPCID"
-                        ]   
-                }, 
+                        ]
+                },
           "AssociatePublicIpAddress": {
             "Ref": "AssociatePublicIpAddress"
           },
@@ -636,17 +578,8 @@
           "CatalinaOpts": {
             "Ref": "CatalinaOpts"
           },
-          "CollectdConfigUrl": {
-            "Ref": "CollectdConfigUrl"
-          },
           "DBInstanceClass": {
             "Ref": "DBInstanceClass"
-          },
-          "DBEngineVersion": {
-            "Ref": "DBEngineVersion"
-          },
-          "DBMasterUser": {
-            "Ref": "DBMasterUser"
           },
           "DBMasterUserPassword": {
             "Ref": "DBMasterUserPassword"
@@ -663,20 +596,14 @@
           "DBStorageType": {
             "Ref": "DBStorageType"
           },
-          "ElasticsearchVersion": {
-            "Ref": "ElasticsearchVersion"
-          },
           "ElasticsearchInstanceType": {
             "Ref": "ElasticsearchInstanceType"
-          },
-          "SSLCertificateName": {
-            "Ref": "SSLCertificateName"
           },
           "KeyName": {
             "Ref": "KeyPairName"
           },
-          "CidrBlock": {
-            "Ref": "AccessCIDR"
+          "SSLCertificateName": {
+            "Ref": "SSLCertificateName"
           }
         }
       }

@@ -1,11 +1,11 @@
 [
     {
         "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "us-east-1b, us-east-1a"
+        "ParameterValue": "$[alfred_genaz_2]"
     },
     {
         "ParameterKey": "BitbucketVersion",
-        "ParameterValue": "4.7.2"
+        "ParameterValue": "4.9.1"
     },
     {
         "ParameterKey": "DBMasterUserPassword",
