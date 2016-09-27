@@ -33,7 +33,6 @@
           "DBPassword",
           "DBStorage",
           "DBStorageType",
-          "ElasticsearchVersion",
           "ElasticsearchInstanceType"
         ]
       }, {
@@ -43,7 +42,6 @@
         "Parameters": [
           "BitbucketProperties",
           "CatalinaOpts",
-          "CollectdConfigUrl"
         ]
       }, {
         "Label": {
@@ -108,9 +106,6 @@
         "CatalinaOpts": {
           "default": "Catalina Options"
         },
-        "CollectdConfigUrl": {
-          "default": "Collectd Config URL"
-        },
         "ClusterNodeMax": {
           "default": "Maximum number of cluster nodes"
         },
@@ -143,9 +138,6 @@
         },
         "DBStorageType": {
           "default": "Database storage type"
-        },
-        "ElasticsearchVersion": {
-          "default": "Elasticsearch version"
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
@@ -423,15 +415,6 @@
         "Provisioned IOPS"
       ]
     },
-    "DoCollectd": {
-      "Fn::Not": [{
-        "Fn::Equals": [{
-            "Ref": "CollectdConfigUrl"
-          },
-          ""
-        ]
-      }]
-    },
     "DoSSL": {
       "Fn::Not": [{
         "Fn::Equals": [{
@@ -620,9 +603,6 @@
           "CatalinaOpts": {
             "Ref": "CatalinaOpts"
           },
-          "CollectdConfigUrl": {
-            "Ref": "CollectdConfigUrl"
-          },
           "DBInstanceClass": {
             "Ref": "DBInstanceClass"
           },
@@ -643,9 +623,6 @@
           },
           "DBStorageType": {
             "Ref": "DBStorageType"
-          },
-          "ElasticsearchVersion": {
-            "Ref": "ElasticsearchVersion"
           },
           "ElasticsearchInstanceType": {
             "Ref": "ElasticsearchInstanceType"
