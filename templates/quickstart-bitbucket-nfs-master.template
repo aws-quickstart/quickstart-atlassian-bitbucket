@@ -41,7 +41,7 @@
         },
         "Parameters": [
           "BitbucketProperties",
-          "CatalinaOpts",
+          "CatalinaOpts"
         ]
       }, {
         "Label": {
@@ -141,9 +141,6 @@
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
-        },
-        "KeyPairName": {
-          "default": "Key Name"
         },
         "SSLCertificateName": {
           "default": "SSL Certificate Name"
@@ -627,14 +624,11 @@
           "ElasticsearchInstanceType": {
             "Ref": "ElasticsearchInstanceType"
           },
-          "SSLCertificateName": {
-            "Ref": "SSLCertificateName"
-          },
           "KeyName": {
             "Ref": "KeyPairName"
           },
-          "CidrBlock": {
-            "Ref": "AccessCIDR"
+          "SSLCertificateName": {
+            "Ref": "SSLCertificateName"
           }
         }
       }
