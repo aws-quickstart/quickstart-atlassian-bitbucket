@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "QS(NOTASSIGNED) Atlassian Bitbucket template master License: Apache 2.0 (Please do not remove)",
+  "Description": "Atlassian Bitbucket Data Center in new VPC License: Apache 2.0 (Please do not remove)",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [{
