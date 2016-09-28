@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Atlassian Bitbucket Data Center",
+  "Description": "QS(0034) Atlassian Bitbucket Data Center",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [
