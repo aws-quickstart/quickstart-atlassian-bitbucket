@@ -22,6 +22,6 @@ tests:
 #    parameter_input: quickstart-bitbucket-master.json
 #    regions:
 #    - us-east-1
-  bb-NFS:
-    template_file: quickstart-bitbucket-nfs-master.template
-    parameter_input: quickstart-bitbucket-nfs-master.json
+  bb:
+    template_file: quickstart-bitbucket-master.template
+    parameter_input: quickstart-bitbucket-master.json
