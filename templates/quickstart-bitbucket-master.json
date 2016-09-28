@@ -20,7 +20,7 @@
         "ParameterValue": "$[alfred_genpass_8]"
     },
     {
-        "ParameterKey": "KeyPairName",
+        "ParameterKey": "KeyName",
         "ParameterValue": "cikey"
     }
 ]
