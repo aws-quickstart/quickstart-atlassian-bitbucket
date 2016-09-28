@@ -686,7 +686,7 @@
               }
             ]
           },
-          "KeyName": {
+          "KeyPairName": {
             "Ref": "KeyName"
           },
           "NATInstanceType": {
