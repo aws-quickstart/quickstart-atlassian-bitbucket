@@ -9,7 +9,6 @@ global:
     - ap-southeast-1
     - ap-southeast-2
     - eu-central-1
-    - ap-south-1
     - eu-west-1
     - sa-east-1
     - us-east-1
@@ -25,3 +24,8 @@ tests:
   bb:
     template_file: quickstart-bitbucket-master.template
     parameter_input: quickstart-bitbucket-master.json
+  bb-ap-south-1:
+    template_file: quickstart-bitbucket-master.template
+    parameter_input: quickstart-bitbucket-master-ap-south.json
+    regions:
+      - ap-south-1

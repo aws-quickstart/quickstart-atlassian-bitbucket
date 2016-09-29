@@ -20,6 +20,10 @@
         "ParameterValue": "db.t2.large"
     },
     {
+        "ParameterKey": "ElasticsearchInstanceType",
+        "ParameterValue": "r3.large.elasticsearch"
+    },
+    {
         "ParameterKey": "DBPassword",
         "ParameterValue": "$[alfred_genpass_8]"
     },
