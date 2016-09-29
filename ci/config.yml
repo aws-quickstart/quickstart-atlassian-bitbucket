@@ -5,7 +5,6 @@ global:
   reporting: true
   regions:
     - ap-northeast-1
-    - ap-northeast-2
     - ap-southeast-1
     - ap-southeast-2
     - eu-central-1
@@ -21,7 +20,7 @@ tests:
 #    parameter_input: quickstart-bitbucket-master.json
 #    regions:
 #    - us-east-1
-  bb:
+  bb-all-global:
     template_file: quickstart-bitbucket-master.template
     parameter_input: quickstart-bitbucket-master.json
   bb-ap-south-1:
