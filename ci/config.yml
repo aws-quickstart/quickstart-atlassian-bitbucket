@@ -20,9 +20,9 @@ tests:
 #    parameter_input: quickstart-bitbucket-master.json
 #    regions:
 #    - us-east-1
-  bb-all-global:
-    template_file: quickstart-bitbucket-master.template
-    parameter_input: quickstart-bitbucket-master.json
+#  bb-all-global:
+#   template_file: quickstart-bitbucket-master.template
+#   parameter_input: quickstart-bitbucket-master.json
   bb-ap-south-1:
     template_file: quickstart-bitbucket-master.template
     parameter_input: quickstart-bitbucket-master-ap-south.json
