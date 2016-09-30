@@ -99,7 +99,7 @@
           "default": "Quick Start S3 Key Prefix"
         },
         "AccessCIDR": {
-          "default": "Permitted IP range. Use 0.0.0.0/0 if you want public access from the internet."
+          "default": "Permitted IP range"
         },
         "VPCCIDR": {
           "default": "VPC CIDR"
