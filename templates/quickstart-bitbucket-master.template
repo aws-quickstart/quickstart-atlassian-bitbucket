@@ -156,7 +156,7 @@
           "default": "RDS Provisioned IOPS"
         },
         "DBSnapshotId": {
-          "default": "Optional : Database snapshot ID"
+          "default": "Database snapshot ID (Optional)"
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
@@ -175,7 +175,7 @@
           "default": "Home directory size"
         },
         "HomeVolumeSnapshotId": {
-          "default": "Optional : Home volume snapshot ID"
+          "default": "Home volume snapshot ID (Optional)"
         },
         "HomeVolumeType": {
           "default": "Home volume type"
