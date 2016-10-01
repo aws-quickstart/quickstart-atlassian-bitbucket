@@ -1,41 +1,45 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "QS(0034) Atlassian Bitbucket Data Center",
+  "Description": "Atlassian Bitbucket Data Center",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
       "ParameterGroups": [
         {
           "Label": {
-            "default": "Bitbucket Setup"
+            "default": "Bitbucket setup"
           },
           "Parameters": [
-            "BitbucketVersion",
-            "DBSnapshotId",
-            "HomeVolumeSnapshotId"
+            "BitbucketVersion"
           ]
         },
         {
           "Label": {
-            "default": "Scaling"
+            "default": "Cluster nodes"
           },
           "Parameters": [
-            "ClusterNodeMax",
-            "ClusterNodeMin",
             "ClusterNodeInstanceType",
+            "ClusterNodeMin",
+            "ClusterNodeMax"
+          ]
+        },
+        {
+          "Label": {
+            "default": "File server"
+          },
+          "Parameters": [
             "FileServerInstanceType",
             "HomeSize",
-            "HomeIops",
-            "HomeVolumeType"
+            "HomeVolumeType",
+            "HomeIops"
           ]
         },
         {
           "Label": {
-            "default": "Bitbucket Database"
+            "default": "Database"
           },
           "Parameters": [
             "DBInstanceClass",
             "DBMasterUserPassword",
-            "DBName",
             "DBPassword",
             "DBStorage",
             "DBStorageType",
@@ -45,20 +49,7 @@
         },
         {
           "Label": {
-            "default": "Networking"
-          },
-          "Parameters": [
-            "AssociatePublicIpAddress",
-            "CidrBlock",
-            "KeyName",
-            "SSLCertificateName",
-            "VPC",
-            "Subnets"
-          ]
-        },
-        {
-          "Label": {
-            "default": "Bitbucket Search"
+            "default": "Elasticsearch"
           },
           "Parameters": [
             "ElasticsearchInstanceType"
@@ -66,9 +57,24 @@
         },
         {
           "Label": {
-            "default": "Bitbucket Advanced Configuration (Optional)"
+            "default": "Networking"
           },
           "Parameters": [
+            "VPC",
+            "Subnets",
+            "AssociatePublicIpAddress",
+            "CidrBlock",
+            "KeyName",
+            "SSLCertificateName"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Advanced (Optional)"
+          },
+          "Parameters": [
+            "DBSnapshotId",
+            "HomeVolumeSnapshotId",
             "BitbucketProperties",
             "CatalinaOpts",
             "HomeDeleteOnTermination",
@@ -85,13 +91,13 @@
           "default": "Bitbucket properties"
         },
         "BitbucketVersion": {
-          "default": "Version"
+          "default": "Version *"
         },
         "CatalinaOpts": {
-          "default": "Optional: Catalina Options"
+          "default": "Catalina options"
         },
         "CidrBlock": {
-          "default": "Permitted IP range"
+          "default": "Permitted IP range *"
         },
         "ClusterNodeMax": {
           "default": "Maximum number of cluster nodes"
@@ -103,16 +109,13 @@
           "default": "Bitbucket cluster node instance type"
         },
         "DBInstanceClass": {
-          "default": "Database instance class"
+          "default": "RDS instance class"
         },
         "DBMasterUserPassword": {
-          "default": "Master password"
-        },
-        "DBName": {
-          "default": "Bitbucket database name"
+          "default": "Master password *"
         },
         "DBPassword": {
-          "default": "Bitbucket database password"
+          "default": "Bitbucket database password *"
         },
         "DBMaster": {
           "default": "Bitbucket primary database"
@@ -121,7 +124,7 @@
           "default": "Database storage"
         },
         "DBMultiAZ": {
-          "default": "Highly Available Database across Availability Zones"
+          "default": "Enable RDS Multi-AZ deployment"
         },
         "DBStorageType": {
           "default": "Database storage type"
@@ -130,13 +133,13 @@
           "default": "RDS Provisioned IOPS"
         },
         "DBSnapshotId": {
-          "default": "Optional: Database snapshot ID"
+          "default": "Database snapshot ID to restore"
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
         },
         "FileServerInstanceType": {
-          "default": "NFS server instance type"
+          "default": "File server instance type"
         },
         "HomeDeleteOnTermination": {
           "default": "Delete Home on termination"
@@ -144,29 +147,29 @@
         "HomeIops": {
           "default": "Home directory IOPS"
         },
+        "HomeVolumeType": {
+          "default": "Home directory volume type"
+        },
         "HomeSize": {
           "default": "Home directory size"
         },
         "HomeVolumeSnapshotId": {
-          "default": "Optional: Home volume snapshot ID"
-        },
-        "HomeVolumeType": {
-          "default": "Home volume type"
+          "default": "Home volume snapshot ID to restore"
         },
         "KeyName": {
-          "default": "Key Name"
+          "default": "Key Name *"
         },
         "SSLCertificateName": {
-          "default": "Optional: SSL Certificate Name"
+          "default": "SSL Certificate Name"
         },
         "StartCollectd": {
           "default": "Start the collectd service"
         },
         "Subnets": {
-          "default": "Subnets"
+          "default": "Subnets *"
         },
         "VPC": {
-          "default": "VPC"
+          "default": "VPC *"
         }
       }
     }
@@ -201,13 +204,14 @@
       "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x."
     },
-    "ClusterNodeMax": {
-      "Type": "Number",
-      "Default": "1"
-    },
     "ClusterNodeMin": {
       "Type": "Number",
-      "Default": "1"
+      "Default": "1",
+      "Description": "Set to 1 for new instances. Can be updated post launch."
+    },
+    "ClusterNodeMax": {
+      "Type": "Number",
+      "Default": "2"
     },
     "ClusterNodeInstanceType": {
       "Type": "String",
@@ -227,7 +231,8 @@
         "r3.8xlarge",
         "x1.32xlarge"
       ],
-      "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger"
+      "ConstraintDescription": "Must be an EC2 instance type in the C3, I2, R3, or X1 family, 'xlarge' or larger",
+      "Description": "Instance type for the cluster nodes. See https://confluence.atlassian.com/x/GpdKLg for guidance"
     },
     "CatalinaOpts": {
       "Description": "Java options passed to the JVM that runs Bitbucket.",
@@ -235,7 +240,6 @@
       "Default": ""
     },
     "DBInstanceClass": {
-      "Description": "RDS instance type",
       "Type": "String",
       "Default": "db.m4.large",
       "AllowedValues": [
@@ -256,38 +260,29 @@
     },
     "DBMasterUserPassword": {
       "NoEcho": "true",
-      "Description": "Database admin account password. Must be 8 - 41 characters.",
+      "Description": "Password for the master ('postgres') account. Must be 8 - 128 characters.",
       "Type": "String",
       "MinLength": "8",
-      "MaxLength": "41",
+      "MaxLength": "128",
       "AllowedPattern": "[a-zA-Z0-9]*",
       "ConstraintDescription": "Must be at least 8 alphanumeric characters."
     },
-    "DBName": {
-      "Description": "Database name. Must be 5 - 41 characters.",
-      "Type": "String",
-      "Default": "bitbucket",
-      "MinLength": "5",
-      "MaxLength": "41",
-      "AllowedPattern": "[a-zA-Z0-9_-]*",
-      "ConstraintDescription": "Must not be blank, and may contain only alphanumeric characters, underscore ('_'), and hyphen ('-')."
-    },
     "DBPassword": {
-      "Description": "Database user account password. Must be 8 - 41 characters. Leave blank if you have specified a Database snapshot ID.",
+      "Description": "Password for the Bitbucket user ('atlbitbucket') account. Max length of 128 characters. Not used if you have specified a Database snapshot ID.",
       "Type": "String",
-      "MaxLength": "41",
+      "MaxLength": "128",
       "AllowedPattern": "[a-zA-Z0-9]*",
-      "ConstraintDescription": "Must contain only alphanumeric characters.",
+      "ConstraintDescription": "If specified, must contain 8 to 128 alphanumeric characters",
       "NoEcho": "true"
     },
     "DBMaster": {
-      "Description": "Database ARN of the RDS instance to replicate. Setting this parameter will bring up this stack in standby mode.",
+      "Description": "Database ARN of the RDS instance to replicate. Setting this parameter will bring up Bitbucket as a Disaster recovery standby, with an RDS read replica database.",
       "Default": "",
       "Type": "String",
       "ConstraintDescription": "Must be a valid RDS ARN."
     },
     "DBSnapshotId": {
-      "Description": "Restore only. RDS snapshot ID of an existing backup to restore as the database. Leave blank for a new instance",
+      "Description": "RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance",
       "Type": "String",
       "Default": "",
       "ConstraintDescription": "Must be a valid RDS snapshot ID, or blank."
@@ -296,10 +291,9 @@
       "Description": "Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144",
       "Type": "Number",
       "Default": "10",
-      "MaxValue" : "6144"
+      "MaxValue": "6144"
     },
     "DBMultiAZ": {
-      "Description": "Database High availability across Availability Zones",
       "Type": "String",
       "Default": "true",
       "AllowedValues": [
@@ -309,7 +303,6 @@
       "ConstraintDescription": "Must be 'true' or 'false'."
     },
     "DBStorageType": {
-      "Description": "Database storage type",
       "Type": "String",
       "Default": "General Purpose (SSD)",
       "AllowedValues": [
@@ -321,13 +314,11 @@
     "DBIops": {
       "Description": "Should be in the range of 1000 - 30000, and only used with Provisioned IOPS.  Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.",
       "Type": "Number",
-      "Default": "1000",
       "MinValue": "1000",
       "MaxValue": "30000",
       "ConstraintDescription": "Must be in the range 1000 - 30000."
     },
     "ElasticsearchInstanceType": {
-      "Description": "A instance type for Elasticsearch to run on.",
       "Type": "String",
       "Default": "m3.xlarge.elasticsearch",
       "AllowedValues": [
@@ -345,7 +336,7 @@
       "ConstraintDescription": "Must be an Elasticsearch instance type in the M3, R3 or I2 family"
     },
     "FileServerInstanceType": {
-      "Description": "Instance type for the file server hosting the Bitbucket shared home directory",
+      "Description": "Instance type for the file server hosting the Bitbucket shared home directory. See https://confluence.atlassian.com/x/GpdKLg for guidance",
       "Type": "String",
       "Default": "m4.xlarge",
       "AllowedValues": [
@@ -362,7 +353,7 @@
       "ConstraintDescription": "Must be an EC2 instance type in the C4, M4, or X1 family, 'xlarge' or larger."
     },
     "HomeDeleteOnTermination": {
-      "Description": "Delete home directory volume when the instance is terminated.  You must back up your data before terminating your instance if this option is set to 'true'",
+      "Description": "Delete Bitbucket home directory volume when the file server instance is terminated.  You must back up your data before terminating your file server instance if this option is set to 'true'",
       "Type": "String",
       "Default": "true",
       "AllowedValues": [
@@ -388,13 +379,12 @@
       "ConstraintDescription": "Must be in the range 100 - 16384."
     },
     "HomeVolumeSnapshotId": {
-      "Description": "Restore only. EBS snapshot ID of an existing backup to restore as the home directory. Leave blank for a new instance",
+      "Description": "EBS snapshot ID of an existing backup to restore as the home directory volume. Must be used in conjunction with DBSnapshotId. Leave blank for a new instance",
       "Type": "String",
       "Default": "",
       "ConstraintDescription": "Must be a valid EBS snapshot ID"
     },
     "HomeVolumeType": {
-      "Description": "Home directory volume type",
       "Type": "String",
       "Default": "Provisioned IOPS",
       "AllowedValues": [
@@ -409,7 +399,7 @@
       "ConstraintDescription": "Must be the name of an existing EC2 Key Pair."
     },
     "SSLCertificateName": {
-      "Description": "The name of your Server Certificate to use for HTTPS.  Leave blank if you don't want to set up HTTPS at this time",
+      "Description": "The name of your Server Certificate to use for HTTPS. Refer to Amazon documentation for managing your server certificates. Leave blank if you don't want to set up HTTPS at this time",
       "Type": "String",
       "MinLength": "0",
       "MaxLength": "32",
@@ -425,7 +415,7 @@
       "ConstraintDescription": "Must be 'true' or 'false'"
     },
     "Subnets": {
-      "Description": "Subnets (two or more) within the selected VPC",
+      "Description": "Subnets (two or more). MUST be within the selected VPC",
       "Type": "List<AWS::EC2::Subnet::Id>",
       "ConstraintDescription": "Must be a list of two or more Subnet ID's within the selected VPC."
     },
@@ -487,14 +477,21 @@
       ]
     },
     "DoSetDBMasterUserPassword": {
-      "Fn::Not": [
+      "Fn::And": [
         {
-          "Fn::Equals": [
+          "Fn::Not": [
             {
-              "Ref": "DBMasterUserPassword"
-            },
-            ""
+              "Fn::Equals": [
+                {
+                  "Ref": "DBMasterUserPassword"
+                },
+                ""
+              ]
+            }
           ]
+        },
+        {
+          "Condition": "NotStandbyMode"
         }
       ]
     },
@@ -846,7 +843,13 @@
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
         "DesiredCapacity": {
-          "Ref": "ClusterNodeMin"
+          "Fn::If": [
+            "StandbyMode",
+            "0",
+            {
+              "Ref": "ClusterNodeMin"
+            }
+          ]
         },
         "LaunchConfigurationName": {
           "Ref": "ClusterNodeLaunchConfig"
@@ -926,11 +929,7 @@
                         "Ref": "DBMasterUserPassword"
                       },
                       "\n",
-                      "ATL_DB_NAME=",
-                      {
-                        "Ref": "DBName"
-                      },
-                      "\n",
+                      "ATL_DB_NAME=bitbucket\n",
                       "ATL_DB_HOST=",
                       {
                         "Fn::GetAtt": [
@@ -962,11 +961,7 @@
                           "Endpoint.Port"
                         ]
                       },
-                      "/",
-                      {
-                        "Ref": "DBName"
-                      },
-                      "\n",
+                      "/bitbucket\n",
                       "ATL_JDBC_USER=atlbitbucket\n",
                       "ATL_JDBC_PASSWORD=",
                       {
@@ -1306,7 +1301,7 @@
         "AutoScalingGroupName": {
           "Ref": "ClusterNodeGroup"
         },
-        "Cooldown": "3600",
+        "Cooldown": "600",
         "ScalingAdjustment": "1"
       }
     },
@@ -1317,20 +1312,20 @@
         "AutoScalingGroupName": {
           "Ref": "ClusterNodeGroup"
         },
-        "Cooldown": "3600",
+        "Cooldown": "600",
         "ScalingAdjustment": "-1"
       }
     },
     "CPUAlarmHigh": {
       "Type": "AWS::CloudWatch::Alarm",
       "Properties": {
-        "AlarmDescription": "Scale-up if CPU > 90% for 10 minutes",
+        "AlarmDescription": "Scale up if CPU > 60% for 5 minutes",
         "MetricName": "CPUUtilization",
         "Namespace": "AWS/EC2",
         "Statistic": "Average",
-        "Period": "300",
-        "EvaluationPeriods": "2",
-        "Threshold": "90",
+        "Period": "60",
+        "EvaluationPeriods": "5",
+        "Threshold": "60",
         "AlarmActions": [
           {
             "Ref": "ClusterNodeScaleUpPolicy"
@@ -1350,13 +1345,13 @@
     "CPUAlarmLow": {
       "Type": "AWS::CloudWatch::Alarm",
       "Properties": {
-        "AlarmDescription": "Scale-down if CPU < 70% for 10 minutes",
+        "AlarmDescription": "Scale down if CPU < 40% for 30 minutes",
         "MetricName": "CPUUtilization",
         "Namespace": "AWS/EC2",
         "Statistic": "Average",
-        "Period": "300",
-        "EvaluationPeriods": "2",
-        "Threshold": "70",
+        "Period": "60",
+        "EvaluationPeriods": "30",
+        "Threshold": "40",
         "AlarmActions": [
           {
             "Ref": "ClusterNodeScaleDownPolicy"
@@ -1510,7 +1505,7 @@
                   "Fn::Join": [
                     "",
                     [
-                      "# This file was generated from the BitbucketDataCenter-EC2-NFS CloudFormation template\n",
+                      "# This file was generated from the BitbucketDataCenter CloudFormation template\n",
                       {
                         "Fn::Join": [
                           "",
@@ -1628,6 +1623,18 @@
                         "Fn::Join": [
                           "",
                           [
+                            "RESTORE_RDS_MULTI_AZ=",
+                            {
+                              "Ref": "DBMultiAZ"
+                            },
+                            "\n"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
                             "RESTORE_RDS_SUBNET_GROUP_NAME=",
                             {
                               "Ref": "DBSubnetGroup"
@@ -1667,7 +1674,7 @@
                       "AWS_EC2_INSTANCE_ID=$(echo \"${AWS_INFO}\" | jq -r .instanceId)\n",
                       "AWS_ADDITIONAL_TAGS=\n",
                       "BITBUCKET_VERBOSE_BACKUP=${BITBUCKET_VERBOSE_BACKUP:-true}\n",
-                      "KEEP_BACKUPS=2"
+                      "KEEP_BACKUPS=5"
                     ]
                   ]
                 },
@@ -1817,7 +1824,7 @@
           }
         ],
         "Tags": [
-         {
+          {
             "Key": "Name",
             "Value": "Bitbucket NFS Server"
           },
@@ -1883,9 +1890,7 @@
             {
               "Ref": "AWS::NoValue"
             },
-            {
-              "Ref": "DBName"
-            }
+            "bitbucket"
           ]
         },
         "AllocatedStorage": {
@@ -1941,18 +1946,26 @@
           ]
         },
         "MultiAZ": {
-          "Ref": "DBMultiAZ"
+          "Fn::If": [
+            "StandbyMode",
+            {
+              "Ref": "AWS::NoValue"
+            },
+            {
+              "Ref": "DBMultiAZ"
+            }
+          ]
         },
         "VPCSecurityGroups": [
           {
             "Ref": "SecurityGroup"
           }
         ],
-        "Tags" : [ 
-          { 
-            "Key" : "Name", 
-            "Value" : "Bitbucket PostgreSQL Database" 
-          } 
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Bitbucket PostgreSQL Database"
+          }
         ]
       }
     },
@@ -2150,6 +2163,36 @@
               ]
             }
           ]
+        ]
+      }
+    },
+    "DBMaster": {
+      "Description": "The RDS ARN to use when creating a Data Center standby stack",
+      "Value": {
+        "Fn::If": [
+          "NotStandbyMode",
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:aws:rds:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":",
+                {
+                  "Ref": "AWS::AccountId"
+                },
+                ":db:",
+                {
+                  "Ref": "DB"
+                }
+              ]
+            ]
+          },
+          {
+            "Ref": "AWS::NoValue"
+          }
         ]
       }
     }
