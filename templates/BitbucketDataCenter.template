@@ -61,7 +61,8 @@
           },
           "Parameters": [
             "VPC",
-            "Subnets",
+            "ExternalSubnets",
+            "InternalSubnets",
             "AssociatePublicIpAddress",
             "CidrBlock",
             "KeyName",
@@ -165,8 +166,11 @@
         "StartCollectd": {
           "default": "Start the collectd service"
         },
-        "Subnets": {
-          "default": "Subnets *"
+        "ExternalSubnets": {
+          "default": "External subnets *"
+        },
+        "InternalSubnets": {
+          "default": "Internal subnets *"
         },
         "VPC": {
           "default": "VPC *"
@@ -415,8 +419,13 @@
       ],
       "ConstraintDescription": "Must be 'true' or 'false'"
     },
-    "Subnets": {
-      "Description": "Subnets (two or more). MUST be within the selected VPC",
+    "ExternalSubnets": {
+      "Description": "Subnets (two or more) where your user-facing load balancer will be deployed. MUST be within the selected VPC.",
+      "Type": "List<AWS::EC2::Subnet::Id>",
+      "ConstraintDescription": "Must be a list of two or more Subnet ID's within the selected VPC."
+    },
+    "InternalSubnets": {
+      "Description": "Subnets (two or more) where your cluster nodes and other internal infrastructure will be deployed. MUST be within the selected VPC. Specify the ExternalSubnets again here if you wish to deploy the whole stack into the same subnets.",
       "Type": "List<AWS::EC2::Subnet::Id>",
       "ConstraintDescription": "Must be a list of two or more Subnet ID's within the selected VPC."
     },
@@ -873,7 +882,7 @@
           }
         ],
         "VPCZoneIdentifier": {
-          "Ref": "Subnets"
+          "Ref": "InternalSubnets"
         },
         "Tags": [
           {
@@ -1818,7 +1827,7 @@
               "Fn::Select": [
                 "0",
                 {
-                  "Ref": "Subnets"
+                  "Ref": "InternalSubnets"
                 }
               ]
             }
@@ -1975,7 +1984,7 @@
       "Properties": {
         "DBSubnetGroupDescription": "DBSubnetGroup",
         "SubnetIds": {
-          "Ref": "Subnets"
+          "Ref": "InternalSubnets"
         }
       }
     },
@@ -2065,7 +2074,7 @@
           }
         ],
         "Subnets": {
-          "Ref": "Subnets"
+          "Ref": "ExternalSubnets"
         }
       }
     },

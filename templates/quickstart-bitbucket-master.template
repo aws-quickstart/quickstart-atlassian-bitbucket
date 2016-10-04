@@ -644,20 +644,39 @@
           ]
         },
         "Parameters": {
-          "Subnets": {
+          "ExternalSubnets": {
             "Fn::Join": [
               ",",
               [
                 {
                   "Fn::GetAtt": [
                     "VPCStack",
-                    "Outputs.PrivateSubnet1ID"
+                    "Outputs.PublicSubnet1ID"
                   ]
                 },
                 {
                   "Fn::GetAtt": [
                     "VPCStack",
-                    "Outputs.PrivateSubnet2ID"
+                    "Outputs.PublicSubnet2ID"
+                  ]
+                }
+              ]
+            ]
+          },
+          "InternalSubnets": {
+            "Fn::Join": [
+              ",",
+              [
+                {
+                  "Fn::GetAtt": [
+                    "VPCStack",
+                    "Outputs.PrivateSubnet1AID"
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "VPCStack",
+                    "Outputs.PrivateSubnet2AID"
                   ]
                 }
               ]
