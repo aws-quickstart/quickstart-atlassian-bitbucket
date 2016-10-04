@@ -3,78 +3,112 @@
   "Description": "Atlassian Bitbucket Data Center in new VPC License: Apache 2.0 (Please do not remove) Oct,3,2016",
   "Metadata": {
     "AWS::CloudFormation::Interface": {
-      "ParameterGroups": [{
-        "Label": {
-          "default": " VPC Network Configuration"
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "VPC Network Configuration"
+          },
+          "Parameters": [
+            "AvailabilityZones",
+            "VPCCIDR",
+            "PrivateSubnet1CIDR",
+            "PrivateSubnet2CIDR",
+            "PublicSubnet1CIDR",
+            "PublicSubnet2CIDR",
+            "AccessCIDR",
+            "SSLCertificateName"
+          ]
         },
-        "Parameters": [
-          "AvailabilityZones",
-          "VPCCIDR",
-          "PrivateSubnet1CIDR",
-          "PrivateSubnet2CIDR",
-          "PublicSubnet1CIDR",
-          "PublicSubnet2CIDR",
-          "AccessCIDR",
-          "AssociatePublicIpAddress"
-        ]
-      }, {
-        "Label": {
-          "default": "Bitbucket Setup"
+        {
+          "Label": {
+            "default": "Amazon EC2 Configuration"
+          },
+          "Parameters": [
+            "KeyName",
+            "NATInstanceType"
+          ]
         },
-        "Parameters": [
-          "BitbucketVersion",
-          "ClusterNodeMax",
-          "ClusterNodeMin",
-          "ClusterNodeInstanceType",
-          "FileServerInstanceType",
-          "HomeSize",
-          "HomeIops",
-          "HomeVolumeType",
-          "DBInstanceClass",
-          "DBMasterUserPassword",
-          "DBPassword",
-          "DBStorage",
-          "DBStorageType",
-          "DBIops",
-          "DBMultiAZ",
-          "ElasticsearchInstanceType"
-        ]
-      }, {
-        "Label": {
-          "default": "Bitbucket Advanced Configuration (Optional)"
+        {
+          "Label": {
+            "default": "Bitbucket setup"
+          },
+          "Parameters": [
+            "BitbucketVersion"
+          ]
         },
-        "Parameters": [
-          "DBSnapshotId",
-          "HomeVolumeSnapshotId",
-          "BitbucketProperties",
-          "CatalinaOpts",
-          "HomeDeleteOnTermination",
-          "DBMaster",
-          "StartCollectd"
-        ]
-      }, {
-        "Label": {
-          "default": "Amazon EC2 Configuration"
+        {
+          "Label": {
+            "default": "Cluster nodes"
+          },
+          "Parameters": [
+            "ClusterNodeInstanceType",
+            "ClusterNodeMin",
+            "ClusterNodeMax"
+          ]
         },
-        "Parameters": [
-          "KeyName",
-          "NATInstanceType"
-        ]
-      }, {
-        "Label": {
-          "default": "AWS Quick Start Configuration"
+        {
+          "Label": {
+            "default": "File server"
+          },
+          "Parameters": [
+            "FileServerInstanceType",
+            "HomeSize",
+            "HomeVolumeType",
+            "HomeIops"
+          ]
         },
-        "Parameters": [
-          "QSS3BucketName",
-          "QSS3KeyPrefix"
-        ]
-      }],
+        {
+          "Label": {
+            "default": "Database"
+          },
+          "Parameters": [
+            "DBInstanceClass",
+            "DBMasterUserPassword",
+            "DBPassword",
+            "DBStorage",
+            "DBStorageType",
+            "DBIops",
+            "DBMultiAZ"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Elasticsearch"
+          },
+          "Parameters": [
+            "ElasticsearchInstanceType"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Advanced (Optional)"
+          },
+          "Parameters": [
+            "DBSnapshotId",
+            "HomeVolumeSnapshotId",
+            "BitbucketProperties",
+            "CatalinaOpts",
+            "HomeDeleteOnTermination",
+            "DBMaster",
+            "StartCollectd"
+          ]
+        },
+        {
+          "Label": {
+            "default": "AWS Quick Start Configuration"
+          },
+          "Parameters": [
+            "QSS3BucketName",
+            "QSS3KeyPrefix"
+          ]
+        }
+      ],
       "ParameterLabels": {
         "AvailabilityZones": {
-          "default": "Availability Zones"
+          "default": "Availability Zones *"
         },
         "KeyName": {
-          "default": "Key Name"
+          "default": "Key Name *"
         },
         "NATInstanceType": {
           "default": "NAT Instance Type"
@@ -98,19 +132,16 @@
           "default": "Quick Start S3 Key Prefix"
         },
         "AccessCIDR": {
-          "default": "Permitted IP range"
+          "default": "Permitted IP range *"
         },
         "VPCCIDR": {
           "default": "VPC CIDR"
-        },
-        "AssociatePublicIpAddress": {
-          "default": "Assign public IP"
         },
         "BitbucketProperties": {
           "default": "Bitbucket properties"
         },
         "BitbucketVersion": {
-          "default": "Version"
+          "default": "Version *"
         },
         "CatalinaOpts": {
           "default": "Catalina options"
@@ -134,10 +165,10 @@
           "default": "Bitbucket primary database"
         },
         "DBMasterUserPassword": {
-          "default": "Master password"
+          "default": "Master password *"
         },
         "DBPassword": {
-          "default": "Bitbucket database password"
+          "default": "Bitbucket database password *"
         },
         "DBStorage": {
           "default": "Database storage"
@@ -157,7 +188,6 @@
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
         },
-
         "FileServerInstanceType": {
           "default": "File server instance type"
         },
@@ -175,10 +205,6 @@
         },
         "HomeVolumeType": {
           "default": "Home volume type"
-        },
-
-        "KeyName": {
-          "default": "Key Name"
         },
         "SSLCertificateName": {
           "default": "SSL Certificate Name"
@@ -259,17 +285,6 @@
       "Description": "The CIDR IP range that is permitted to access Bitbucket. Use 0.0.0.0/0 if you want public access from the internet.",
       "Type": "String"
     },
-
-    "AssociatePublicIpAddress": {
-      "Description": "Controls if the EC2 instances are assigned a public IP address",
-      "Type": "String",
-      "Default": "true",
-      "AllowedValues": [
-        "true",
-        "false"
-      ],
-      "ConstraintDescription": "Must be 'true' or 'false'."
-    },
     "BitbucketProperties": {
       "Description": "A comma-separated list of bitbucket properties in the form key1=value1, key2=value2, ... Find documentation at https://confluence.atlassian.com/x/m5ZKLg",
       "Type": "String",
@@ -320,7 +335,7 @@
       "Type": "String",
       "Default": "",
       "ConstraintDescription": "Must be a valid RDS snapshot ID, or blank."
-    },    
+    },
     "DBInstanceClass": {
       "Description": "RDS instance type",
       "Type": "String",
@@ -341,7 +356,6 @@
       ],
       "ConstraintDescription": "Must be a valid RDS instance class, 'db.t2.medium' or larger."
     },
-
     "DBMasterUserPassword": {
       "NoEcho": "true",
       "Description": "Password for the master ('postgres') account. Must be 8 - 128 characters.",
@@ -364,12 +378,12 @@
       "Default": "",
       "Type": "String",
       "ConstraintDescription": "Must be a valid RDS ARN."
-    },    
+    },
     "DBStorage": {
       "Description": "Database allocated storage size, in gigabytes (GB). Should be between 100 and 6144, if you are choosing Provisioned IOPS",
       "Type": "Number",
       "Default": "10",
-      "MaxValue" : "6144"
+      "MaxValue": "6144"
     },
     "DBStorageType": {
       "Description": "Database storage type",
@@ -389,14 +403,15 @@
         "false"
       ],
       "ConstraintDescription": "Must be 'true' or 'false'."
-    },    
+    },
     "DBIops": {
       "Description": "Should be in the range of 1000 - 30000, and only used with Provisioned IOPS.  Note: The ratio of iops per allocated-storage must be between 3.00 and 10.00.",
       "Type": "Number",
+      "Default": "1000",
       "MinValue": "1000",
       "MaxValue": "30000",
       "ConstraintDescription": "Must be in the range 1000 - 30000."
-    },    
+    },
     "ElasticsearchInstanceType": {
       "Description": "A instance type for Elasticsearch to run on.",
       "Type": "String",
@@ -431,7 +446,7 @@
         "x1.32xlarge"
       ],
       "ConstraintDescription": "Must be an EC2 instance type in the C4, M4, or X1 family, 'xlarge' or larger."
-    },    
+    },
     "HomeDeleteOnTermination": {
       "Description": "Delete Bitbucket home directory volume when the file server instance is terminated.  You must back up your data before terminating your file server instance if this option is set to 'true'",
       "Type": "String",
@@ -457,7 +472,7 @@
       "MinValue": "100",
       "MaxValue": "16384",
       "ConstraintDescription": "Must be in the range 100 - 16384."
-    },    
+    },
     "HomeVolumeSnapshotId": {
       "Description": "EBS snapshot ID of an existing backup to restore as the home directory volume. Must be used in conjunction with DBSnapshotId. Leave blank for a new instance",
       "Type": "String",
@@ -490,107 +505,6 @@
       "MaxLength": "32",
       "Default": ""
     }
-  },
-  "Conditions": {
-    "DBProvisionedIops": {
-      "Fn::Equals": [{
-          "Ref": "DBStorageType"
-        },
-        "Provisioned IOPS"
-      ]
-    },
-    "DoCollectd": {
-      "Fn::Not": [{
-        "Fn::Equals": [{
-            "Ref": "StartCollectd"
-          },
-          ""
-        ]
-      }]
-    },
-    "DoRestoreFromEBSSnapshot": {
-      "Fn::Not": [
-        {
-          "Fn::Equals": [
-            {
-              "Ref": "HomeVolumeSnapshotId"
-            },
-            ""
-          ]
-        }
-      ]
-    },
-    "DoRestoreFromRDSSnapshot": {
-      "Fn::Not": [
-        {
-          "Fn::Equals": [
-            {
-              "Ref": "DBSnapshotId"
-            },
-            ""
-          ]
-        }
-      ]
-    },
-    "RestoreRDSOrStandby": {
-      "Fn::Or": [
-        {
-          "Condition": "DoRestoreFromRDSSnapshot"
-        },
-        {
-          "Condition": "StandbyMode"
-        }
-      ]
-    },
-    "DoSetDBMasterUserPassword": {
-      "Fn::Not": [
-        {
-          "Fn::Equals": [
-            {
-              "Ref": "DBMasterUserPassword"
-            },
-            ""
-          ]
-        }
-      ]
-    },    
-    "DoSSL": {
-      "Fn::Not": [{
-        "Fn::Equals": [{
-            "Ref": "SSLCertificateName"
-          },
-          ""
-        ]
-      }]
-    },
-    "StandbyMode": {
-      "Fn::Not": [
-        {
-          "Fn::Equals": [
-            {
-              "Ref": "DBMaster"
-            },
-            ""
-          ]
-        }
-      ]
-    },
-    "NotStandbyMode": {
-      "Fn::Equals": [
-        {
-          "Ref": "DBMaster"
-        },
-        ""
-      ]
-    },
-    "IsHomeProvisionedIops": {
-      "Fn::Equals": [
-        {
-          "Ref": "HomeVolumeType"
-        },
-        "Provisioned IOPS"
-      ]
-    }    
   },
   "Mappings": {
     "AWSInfoRegionMap": {
@@ -650,14 +564,18 @@
       "Properties": {
         "TemplateURL": {
           "Fn::Join": [
-            "/", [{
+            "/",
+            [
+              {
                 "Fn::FindInMap": [
-                  "AWSInfoRegionMap", {
+                  "AWSInfoRegionMap",
+                  {
                     "Ref": "AWS::Region"
                   },
                   "QuickStartS3URL"
                 ]
-              }, {
+              },
+              {
                 "Ref": "QSS3BucketName"
               },
               "aws/vpc/latest/templates/aws-vpc.template"
@@ -667,7 +585,8 @@
         "Parameters": {
           "AvailabilityZones": {
             "Fn::Join": [
-              ",", {
+              ",",
+              {
                 "Ref": "AvailabilityZones"
               }
             ]
@@ -701,47 +620,75 @@
       "DependsOn": "VPCStack",
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
-          "TemplateURL": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Fn::FindInMap": [
+                  "AWSInfoRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "QuickStartS3URL"
+                ]
+              },
+              {
+                "Ref": "QSS3BucketName"
+              },
+              {
+                "Ref": "QSS3KeyPrefix"
+              },
+              "templates/BitbucketDataCenter.template"
+            ]
+          ]
+        },
+        "Parameters": {
+          "ExternalSubnets": {
             "Fn::Join": [
-              "/", [{
-                  "Fn::FindInMap": [
-                    "AWSInfoRegionMap", {
-                      "Ref": "AWS::Region"
-                    },
-                    "QuickStartS3URL"
+              ",",
+              [
+                {
+                  "Fn::GetAtt": [
+                    "VPCStack",
+                    "Outputs.PublicSubnet1ID"
                   ]
-                }, {
-                  "Ref": "QSS3BucketName"
-                }, {
-                  "Ref": "QSS3KeyPrefix"
                 },
-                "templates/BitbucketDataCenter.template"
+                {
+                  "Fn::GetAtt": [
+                    "VPCStack",
+                    "Outputs.PublicSubnet2ID"
+                  ]
+                }
               ]
             ]
           },
-          "Parameters": {
-          "Subnets": {
-                    "Fn::Join": [
-                        ",",
-                        [   
-                            {   
-                               "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet1ID"]
-                            },  
-                            {   
-                               "Fn::GetAtt": [ "VPCStack", "Outputs.PublicSubnet2ID"]
-                            }   
-                        ]   
-                    ]   
-                },  
-          "VPC": {
+          "InternalSubnets": {
+            "Fn::Join": [
+              ",",
+              [
+                {
                   "Fn::GetAtt": [
-                  "VPCStack",
-                  "Outputs.VPCID"
-                  ]   
-          }, 
-          "AssociatePublicIpAddress": {
-            "Ref": "AssociatePublicIpAddress"
+                    "VPCStack",
+                    "Outputs.PrivateSubnet1AID"
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "VPCStack",
+                    "Outputs.PrivateSubnet2AID"
+                  ]
+                }
+              ]
+            ]
           },
+          "VPC": {
+            "Fn::GetAtt": [
+              "VPCStack",
+              "Outputs.VPCID"
+            ]
+          },
+          "AssociatePublicIpAddress": "false",
           "BitbucketProperties": {
             "Ref": "BitbucketProperties"
           },
@@ -774,7 +721,7 @@
           },
           "DBMultiAZ": {
             "Ref": "DBMultiAZ"
-          },          
+          },
           "DBMasterUserPassword": {
             "Ref": "DBMasterUserPassword"
           },
@@ -795,7 +742,7 @@
           },
           "FileServerInstanceType": {
             "Ref": "FileServerInstanceType"
-          },                    
+          },
           "HomeSize": {
             "Ref": "HomeSize"
           },
@@ -804,13 +751,13 @@
           },
           "HomeVolumeType": {
             "Ref": "HomeVolumeType"
-          },                    
+          },
           "HomeDeleteOnTermination": {
             "Ref": "HomeDeleteOnTermination"
           },
           "DBMaster": {
             "Ref": "DBMaster"
-          },           
+          },
           "ElasticsearchInstanceType": {
             "Ref": "ElasticsearchInstanceType"
           },
@@ -828,11 +775,11 @@
     "BitbucketURL": {
       "Description": "The URL of the Bitbucket deployment",
       "Value": {
-                  "Fn::GetAtt": [
-                  "BitbucketDCStack",
-                  "Outputs.URL"
-                  ]
-                }
+        "Fn::GetAtt": [
+          "BitbucketDCStack",
+          "Outputs.URL"
+        ]
+      }
     }
   }
 }
