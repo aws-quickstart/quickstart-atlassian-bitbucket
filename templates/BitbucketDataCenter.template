@@ -316,7 +316,7 @@
       "ConstraintDescription": "Must be 'General Purpose (SSD)' or 'Provisioned IOPS'."
     },
     "DBIops": {
-      "Description": "Should be in the range of 1000 - 30000, and only used with Provisioned IOPS.  Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.",
+      "Description": "Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.",
       "Type": "Number",
       "Default": "1000",
       "MinValue": "1000",
@@ -353,6 +353,7 @@
         "m4.2xlarge",
         "m4.4xlarge",
         "m4.10xlarge",
+        "m4.16xlarge",
         "x1.32xlarge"
       ],
       "ConstraintDescription": "Must be an EC2 instance type in the C4, M4, or X1 family, 'xlarge' or larger."
@@ -617,6 +618,9 @@
       "m4.10xlarge": {
         "Arch": "HVM64"
       },
+      "m4.16xlarge": {
+        "Arch": "HVM64"        
+      },
       "r3.large": {
         "Arch": "HVM64"
       },
@@ -679,52 +683,6 @@
       },
       "us-west-2": {
         "HVM64": "ami-82d10fe2",
-        "HVMG2": "NOT_SUPPORTED"
-      }
-    },
-    "AWSRegionArch2ElasticsearchAMI": {
-      "ap-southeast-2": {
-        "HVM64": "ami-dc361ebf",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "ap-south-1": {
-        "HVM64": "ami-ffbdd790",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "eu-west-1": {
-        "HVM64": "ami-f9dd458a",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "ap-southeast-1": {
-        "HVM64": "ami-a59b49c6",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "eu-central-1": {
-        "HVM64": "ami-ea26ce85",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "ap-northeast-2": {
-        "HVM64": "ami-2b408b45",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "ap-northeast-1": {
-        "HVM64": "ami-374db956",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "us-east-1": {
-        "HVM64": "ami-6869aa05",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "sa-east-1": {
-        "HVM64": "ami-6dd04501",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "us-west-1": {
-        "HVM64": "ami-31490d51",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "us-west-2": {
-        "HVM64": "ami-7172b611",
         "HVMG2": "NOT_SUPPORTED"
       }
     }
@@ -905,12 +863,6 @@
       "Metadata": {
         "Comment": "",
         "AWS::CloudFormation::Init": {
-          "configSets": {
-            "default": [
-              "1",
-              "2"
-            ]
-          },
           "1": {
             "packages": {
               "Fn::If": [
@@ -1224,6 +1176,12 @@
                 }
               }
             }
+          },
+          "configSets": {
+            "default": [
+              "1",
+              "2"
+            ]
           }
         }
       },
@@ -1396,6 +1354,19 @@
               },
               "Action": "es:*",
               "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "BitbucketFileServerRole",
+                    "Arn"
+                  ]
+                }
+              },
+              "Action": "es:*",
+              "Resource": "*"
             }
           ]
         },
@@ -1424,12 +1395,6 @@
       "Metadata": {
         "Comment": "Set up NFS Server and initial bitbucket.properties",
         "AWS::CloudFormation::Init": {
-          "configSets": {
-            "default": [
-              "1",
-              "2"
-            ]
-          },
           "1": {
             "packages": {
               "Fn::If": [
@@ -1735,6 +1700,12 @@
                 }
               }
             }
+          },
+          "configSets": {
+            "default": [
+              "1",
+              "2"
+            ]
           }
         }
       },
