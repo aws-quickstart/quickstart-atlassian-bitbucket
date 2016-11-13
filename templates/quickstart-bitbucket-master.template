@@ -291,10 +291,10 @@
       "Default": ""
     },
     "BitbucketVersion": {
-      "Description": "Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases",
+      "Description": "Version of Bitbucket to install, for example: 4.11.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases",
       "Type": "String",
       "AllowedPattern": "(\\d+\\.\\d+\\.\\d+(-?.*))",
-      "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.10.0 or higher"
+      "ConstraintDescription": "Must be a valid Bitbucket version number. For example: 4.11.0 or higher"
     },
     "ClusterNodeMax": {
       "Type": "Number",
@@ -644,6 +644,7 @@
           ]
         },
         "Parameters": {
+          "AMIOpts": "",
           "ExternalSubnets": {
             "Fn::Join": [
               ",",
