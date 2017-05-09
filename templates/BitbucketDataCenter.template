@@ -48,6 +48,7 @@ Metadata:
           - HomeDeleteOnTermination
           - DBMaster
           - StartCollectd
+          - CreateBucket
           - ESBucketName
     ParameterLabels:
       AMIOpts:
@@ -68,6 +69,8 @@ Metadata:
         default: Minimum number of cluster nodes
       ClusterNodeInstanceType:
         default: Bitbucket cluster node instance type
+      CreateBucket:
+        default: Create S3 bucket for Elasticsearch snapshots
       DBInstanceClass:
         default: RDS instance class
       DBMasterUserPassword:
@@ -173,6 +176,12 @@ Parameters:
     Description: Java options passed to the JVM that runs Bitbucket.
     Type: String
     Default: ""
+  CreateBucket:
+    Description: Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName
+    Type: String
+    Default: true
+    AllowedValues: [true, false]
+    ConstraintDescription: Must be 'true' or 'false'.
   DBInstanceClass:
     Type: String
     Default: db.m4.large
@@ -350,13 +359,15 @@ Conditions:
   RestoreFromESSnapshot:
     !And
       - !Not [!Equals [!Ref ESSnapshotId, ""]]
-      - !Not [Condition: ESBucketNameSet]
+      - Condition: ESBucketNameSet
   CreateESBucket:
     !And
-      - !Equals [!Ref ESSnapshotId, ""]
-      - !Not [Condition: ESBucketNameSet]
+      - !Equals [!Ref CreateBucket, "true"]
+      - !And
+        - !Not [Condition: RestoreFromESSnapshot]
+        - Condition: ESBucketNameSet
   ESBucketNameSet:
-    !Equals [!Ref ESBucketName, ""]
+    !Not [!Equals [!Ref ESBucketName, ""]]
   StandbyMode:
     !Not [!Equals [!Ref DBMaster, ""]]
   SetupSSL:
@@ -365,6 +376,8 @@ Conditions:
     !Equals [!Ref DBMaster, ""]
   IsHomeProvisionedIops:
     !Equals [!Ref HomeVolumeType, Provisioned IOPS]
+  IsVersion4X:
+    !Equals ["4", !Select [0, !Split [".", !Ref BitbucketVersion]]]
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
   SetDBMasterUserPassword:
@@ -433,40 +446,40 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-3652ff57
+      HVM64: ami-985378ff
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-ca2ffba4
+      HVM64: ami-55598b3b
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-04a0d46b
+      HVM64: ami-cd7a08a2
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-8dc464ee
+      HVM64: ami-a410a8c7
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-5a053939
+      HVM64: ami-777b7314
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-abed16c4
+      HVM64: ami-8f8955e0
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-172d7864
+      HVM64: ami-7b06071d
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-ef6ef283
+      HVM64: ami-d1b7dabd
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-609abf77
+      HVM64: ami-903fa686
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-ea5f058f
+      HVM64: ami-8c4265e9
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-ea440e8a
+      HVM64: ami-e7d6f287
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-81db7ae1
+      HVM64: ami-83be21e3
       HVMG2: NOT_SUPPORTED
 Resources:
   BitbucketFileServerRole:
@@ -521,6 +534,7 @@ Resources:
                     - "s3:PutObject"
                   Resource:
                     - !Sub ["arn:aws:s3:::${BucketName}", BucketName: !Ref ESBucketName]
+                    - !Sub ["arn:aws:s3:::${BucketName}/*", BucketName: !Ref ESBucketName]
                 - !Ref "AWS::NoValue"
   BitbucketClusterNodeRole:
     Type: "AWS::IAM::Role"
@@ -582,7 +596,7 @@ Resources:
                   collectd-java: []
                   collectd-generic-jmx: []
                   collectd-rrdtool: []
-              - Ref: "AWS::NoValue"
+              - !Ref "AWS::NoValue"
           files:
             /etc/atl:
               content:
@@ -792,23 +806,6 @@ Resources:
       Tags:
         - Key: Cluster
           Value: !Ref "AWS::StackName"
-  ElasticsearchBucketPolicy:
-    Type: "AWS::S3::BucketPolicy"
-    Condition: CreateESBucket
-    Properties:
-      Bucket: !Ref ElasticsearchBucket
-      PolicyDocument:
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              AWS: !GetAtt BitbucketFileServerRole.Arn
-            Action: ["s3:*"]
-            Resource: !Sub ["arn:aws:s3:::${BucketName}/*", BucketName: !Ref ElasticsearchBucket]
-          - Effect: "Allow"
-            Principal:
-              AWS: !GetAtt BitbucketFileServerRole.Arn
-            Action: ["s3:*"]
-            Resource: !Sub ["arn:aws:s3:::${BucketName}", BucketName: !Ref ElasticsearchBucket]
   FileServer:
     Type: "AWS::EC2::Instance"
     Metadata:
@@ -876,7 +873,10 @@ Resources:
                     - BITBUCKET_HOME=/media/atl/bitbucket
                     - BITBUCKET_UID=atlbitbucket
                     - BITBUCKET_GID=atlbitbucket
-                    - "BACKUP_HOME_TYPE=${BACKUP_HOME_TYPE:-amazon-ebs}"
+                    - !If
+                      - StandbyMode
+                      - "BACKUP_HOME_TYPE=${BACKUP_HOME_TYPE:-zfs}"
+                      - "BACKUP_HOME_TYPE=${BACKUP_HOME_TYPE:-amazon-ebs}"
                     - "BACKUP_DATABASE_TYPE=${BACKUP_DATABASE_TYPE:-amazon-rds}"
                     - BACKUP_ARCHIVE_TYPE=
                     - "BACKUP_ELASTICSEARCH_TYPE=amazon-es"
@@ -957,6 +957,7 @@ Resources:
                     - ESSnapshotId: !Ref "ESSnapshotId"
                   ignoreErrors: false
                   env:
+                    SNAPSHOT_TAG_PREFIX: !Ref "ESSnapshotId"
                     BACKUP_HOME_TYPE: "none"
                     BACKUP_DATABASE_TYPE: "none"
               - !Ref "AWS::NoValue"
@@ -1037,8 +1038,8 @@ Resources:
     Type: "AWS::ElasticLoadBalancing::LoadBalancer"
     Properties:
       AppCookieStickinessPolicy:
-        - CookieName: JSESSIONID
-          PolicyName: JSessionIdStickiness
+        - CookieName: !If [IsVersion4X, JSESSIONID, BITBUCKETSESSIONID]
+          PolicyName: SessionStickiness
       ConnectionDrainingPolicy:
         Enabled: true
         Timeout: 300
@@ -1050,7 +1051,7 @@ Resources:
           Protocol: HTTP
           InstancePort: !If [SetupSSL, 7991, 7990]
           InstanceProtocol: HTTP
-          PolicyNames: [JSessionIdStickiness]
+          PolicyNames: [SessionStickiness]
         - !If
             - SetupSSL
             - LoadBalancerPort: 443
