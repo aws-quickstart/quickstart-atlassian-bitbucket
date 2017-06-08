@@ -1043,6 +1043,18 @@ Resources:
       ConnectionDrainingPolicy:
         Enabled: true
         Timeout: 300
+      Policies:
+        - PolicyName: JSessionIdStickiness
+          PolicyType: AppCookieStickinessPolicyType
+          Attributes:
+           - "Name" : CookieName
+             "Value" : JSESSIONID
+        - PolicyName: SessionStickiness
+          PolicyType: AppCookieStickinessPolicyType
+          Attributes:
+           - "Name" : CookieName
+             "Value" : BITBUCKETSESSIONID
+             
       ConnectionSettings:
         IdleTimeout: 3600
       CrossZone: true
