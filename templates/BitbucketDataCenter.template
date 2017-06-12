@@ -446,40 +446,40 @@ Mappings:
       Arch: HVM64
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-985378ff
+      HVM64: ami-a3c9f3c4
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-55598b3b
+      HVM64: ami-52924e3c
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-cd7a08a2
+      HVM64: ami-503e423f
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-a410a8c7
+      HVM64: ami-79a0261a
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-777b7314
+      HVM64: ami-16160275
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-8f8955e0
+      HVM64: ami-6c954e03
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-7b06071d
+      HVM64: ami-d10612b7
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-d1b7dabd
+      HVM64: ami-0eec8262
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-903fa686
+      HVM64: ami-457b3b53
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-8c4265e9
+      HVM64: ami-536a4c36
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-e7d6f287
+      HVM64: ami-49391929
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-83be21e3
+      HVM64: ami-0384e463
       HVMG2: NOT_SUPPORTED
 Resources:
   BitbucketFileServerRole:
@@ -1059,7 +1059,7 @@ Resources:
               InstancePort: 7990
               InstanceProtocol: HTTP
               PolicyNames:
-                - JSessionIdStickiness
+                - SessionStickiness
               SSLCertificateId: !Sub
                 - "arn:aws:iam::${AccountId}:server-certificate/${SSLCertificateName}"
                 - AccountId: !Ref "AWS::AccountId"
