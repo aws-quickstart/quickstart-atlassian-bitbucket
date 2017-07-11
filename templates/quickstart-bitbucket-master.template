@@ -81,6 +81,20 @@
         },
         {
           "Label": {
+            "default": "Linux Bastion Configuration"
+          },
+          "Parameters": [
+            "BastionInstanceType",
+            "BastionAMIOS",
+            "BastionBanner",
+            "EnableBanner",
+            "NumBastionHosts",
+            "EnableTCPForwarding",
+            "EnableX11Forwarding"
+          ]
+        },
+        {
+          "Label": {
             "default": "Advanced (Optional)"
           },
           "Parameters": [
@@ -105,10 +119,10 @@
       ],
       "ParameterLabels": {
         "AvailabilityZones": {
-          "default": "Availability Zones *"
+          "default": "Availability Zones"
         },
         "KeyName": {
-          "default": "Key Name *"
+          "default": "Key Name"
         },
         "NATInstanceType": {
           "default": "NAT Instance Type"
@@ -132,7 +146,7 @@
           "default": "Quick Start S3 Key Prefix"
         },
         "AccessCIDR": {
-          "default": "Permitted IP range *"
+          "default": "Permitted IP range"
         },
         "VPCCIDR": {
           "default": "VPC CIDR"
@@ -141,7 +155,7 @@
           "default": "Bitbucket properties"
         },
         "BitbucketVersion": {
-          "default": "Version *"
+          "default": "Version"
         },
         "CatalinaOpts": {
           "default": "Catalina options"
@@ -165,10 +179,10 @@
           "default": "Bitbucket primary database"
         },
         "DBMasterUserPassword": {
-          "default": "Master password *"
+          "default": "Master password"
         },
         "DBPassword": {
-          "default": "Bitbucket database password *"
+          "default": "Bitbucket database password"
         },
         "DBStorage": {
           "default": "Database storage"
@@ -187,6 +201,27 @@
         },
         "ElasticsearchInstanceType": {
           "default": "Elasticsearch instance type"
+        },
+        "BastionAMIOS": {
+          "default": "Bastion AMI Operating System"
+        },
+        "BastionBanner": {
+          "default": "Bastion Banner"
+        },
+        "BastionInstanceType": {
+          "default": "Bastion Instance Type"
+        },
+        "EnableBanner": {
+          "default": "Enable Banner"
+        },
+        "EnableTCPForwarding": {
+          "default": "Enable TCP Forwarding"
+        },
+        "EnableX11Forwarding": {
+          "default": "Enable X11 Forwarding"
+        },
+        "NumBastionHosts": {
+          "default": "Number of Bastion Hosts"
         },
         "FileServerInstanceType": {
           "default": "File server instance type"
@@ -268,10 +303,10 @@
       "Type": "String"
     },
     "QSS3KeyPrefix": {
-      "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
-      "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
-      "Default": "atlassian/bitbucket/latest",
-      "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+      "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+      "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
+      "Default": "atlassian/bitbucket/latest/",
+      "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
       "Type": "String"
     },
     "VPCCIDR": {
@@ -412,6 +447,79 @@
       "MaxValue": "30000",
       "ConstraintDescription": "Must be in the range 1000 - 30000."
     },
+       "BastionAMIOS": {
+            "AllowedValues": [
+                "Amazon-Linux-HVM",
+                "CentOS-7-HVM",
+                "Ubuntu-Server-14.04-LTS-HVM",
+                "Ubuntu-Server-16.04-LTS-HVM"
+            ],
+            "Default": "Amazon-Linux-HVM",
+            "Description": "The Linux distribution for the AMI to be used for the bastion instances",
+            "Type": "String"
+        },
+        "BastionBanner": {
+            "Default": "https://s3.amazonaws.com/quickstart-reference/linux/bastion/latest/scripts/banner_message.txt",
+            "Description": "Banner text to display upon login",
+            "Type": "String"
+        },
+        "BastionInstanceType": {
+            "AllowedValues": [
+                "t2.nano",
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge"
+            ],
+            "Default": "t2.micro",
+            "Description": "Amazon EC2 instance type for the bastion instances",
+            "Type": "String"
+        },
+        "EnableBanner": {
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "false",
+            "Description": "To include a banner to be displayed when connecting via SSH to the bastion, set this parameter to true",
+            "Type": "String"
+        },
+        "EnableTCPForwarding": {
+            "Type": "String",
+            "Description": "Enable/Disable TCP Forwarding",
+            "Default": "false",
+            "AllowedValues": [
+                "true",
+                "false"
+            ]
+        },
+        "EnableX11Forwarding": {
+            "Type": "String",
+            "Description": "Enable/Disable X11 Forwarding",
+            "Default": "false",
+            "AllowedValues": [
+                "true",
+                "false"
+            ]
+        },
+        "NumBastionHosts": {
+            "AllowedValues": [
+                "1",
+                "2",
+                "3",
+                "4"
+            ],
+            "Default": "1",
+            "Description": "Enter the number of bastion hosts to create",
+            "Type": "String"
+        },
     "ElasticsearchInstanceType": {
       "Description": "A instance type for Elasticsearch to run on.",
       "Type": "String",
@@ -558,28 +666,32 @@
       }
     }
   },
+  "Conditions": {
+        "GovCloudCondition": {
+            "Fn::Equals": [
+                {
+                    "Ref": "AWS::Region"
+                },
+                "us-gov-west-1"
+            ]
+        }
+  },
   "Resources": {
     "VPCStack": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Join": [
-            "/",
-            [
-              {
-                "Fn::FindInMap": [
-                  "AWSInfoRegionMap",
-                  {
-                    "Ref": "AWS::Region"
-                  },
-                  "QuickStartS3URL"
-                ]
-              },
-              {
-                "Ref": "QSS3BucketName"
-              },
-              "aws/vpc/latest/templates/aws-vpc.template"
-            ]
+          "Fn::Sub": [
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template",
+                        {
+                            "QSS3Region": {
+                                "Fn::If": [
+                                    "GovCloudCondition",
+                                    "s3-us-gov-west-1",
+                                    "s3"
+                                ]
+                            }
+                        }
           ]
         },
         "Parameters": {
@@ -621,27 +733,18 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Join": [
-            "/",
-            [
-              {
-                "Fn::FindInMap": [
-                  "AWSInfoRegionMap",
-                  {
-                    "Ref": "AWS::Region"
-                  },
-                  "QuickStartS3URL"
-                ]
-              },
-              {
-                "Ref": "QSS3BucketName"
-              },
-              {
-                "Ref": "QSS3KeyPrefix"
-              },
-              "templates/BitbucketDataCenter.template"
-            ]
-          ]
+                    "Fn::Sub": [
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/BitbucketDataCenter.template",
+                        {
+                            "QSS3Region": {
+                                "Fn::If": [
+                                    "GovCloudCondition",
+                                    "s3-us-gov-west-1",
+                                    "s3"
+                                ]
+                            }
+                        }
+                    ]
         },
         "Parameters": {
           "AMIOpts": "",
@@ -768,6 +871,50 @@
           "KeyName": {
             "Ref": "KeyName"
           }
+        }
+      }
+    },
+    "LinuxBastionStack": {
+        "DependsOn": "VPCStack",
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/cf-templates-12kanqw8nkwpg-us-east-1/quickstart-linux-bastion/templates/linux-bastion.template" ,
+        "Parameters": {
+                  "VPCID": {
+                      "Fn::GetAtt":[
+                          "VPCStack",
+                          "Outputs.VPCID"
+                      ]
+                  },
+                  "PublicSubnet1ID": {
+                      "Fn::GetAtt":[
+                           "VPCStack",
+                           "Outputs.PublicSubnet1ID"
+                      ]
+                  },
+                  "PublicSubnet2ID": {
+                      "Fn::GetAtt":[
+                          "VPCStack",
+                          "Outputs.PublicSubnet2ID"
+                      ]
+                  },
+                  "BastionInstanceType": { "Ref": "BastionInstanceType" },
+                  "BastionAMIOS": { "Ref": "BastionAMIOS" },
+                  "BastionBanner": { "Ref": "BastionBanner" },
+                  "EnableBanner": { "Ref": "EnableBanner" },
+                  "KeyPairName": { "Ref": "KeyName" },
+                  "QSS3BucketName": { "Ref": "QSS3BucketName" },
+                  "QSS3KeyPrefix": {
+                      "Fn::Join":[
+                          "",
+                          [
+                              { "Ref": "QSS3KeyPrefix"},
+                              "submodules/quickstart-linux-bastion/"
+                          ]
+                      ]
+                  },
+                  "RemoteAccessCIDR": { "Ref": "AccessCIDR"},
+                  "NumBastionHosts": {"Ref": "NumBastionHosts"}
         }
       }
     }

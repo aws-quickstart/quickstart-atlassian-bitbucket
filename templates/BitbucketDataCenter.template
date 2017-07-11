@@ -58,11 +58,11 @@ Metadata:
       BitbucketProperties:
         default: Bitbucket properties
       BitbucketVersion:
-        default: Version *
+        default: Version
       CatalinaOpts:
         default: Catalina options
       CidrBlock:
-        default: Permitted IP range *
+        default: Permitted IP range
       ClusterNodeMax:
         default: Maximum number of cluster nodes
       ClusterNodeMin:
@@ -74,9 +74,9 @@ Metadata:
       DBInstanceClass:
         default: RDS instance class
       DBMasterUserPassword:
-        default: Master password *
+        default: Master password
       DBPassword:
-        default: Bitbucket database password *
+        default: Bitbucket database password
       DBMaster:
         default: Bitbucket primary database
       DBStorage:
@@ -108,17 +108,17 @@ Metadata:
       HomeVolumeSnapshotId:
         default: Home volume snapshot ID to restore
       KeyName:
-        default: Key Name *
+        default: Key Name
       SSLCertificateName:
         default: SSL Certificate Name
       StartCollectd:
         default: Start the collectd service
       ExternalSubnets:
-        default: External Subnets *
+        default: External Subnets
       InternalSubnets:
-        default: Internal Subnets *
+        default: Internal Subnets
       VPC:
-        default: VPC *
+        default: VPC
 Parameters:
   AMIOpts:
     Description: A comma separated list of options to pass to the AMI
@@ -567,6 +567,10 @@ Resources:
       Roles: [!Ref BitbucketClusterNodeRole]
   ClusterNodeGroup:
     Type: "AWS::AutoScaling::AutoScalingGroup"
+    CreationPolicy:
+      ResourceSignal:
+        Count: "1"
+        Timeout: PT30M  
     Properties:
       DesiredCapacity: !If [StandbyMode, 0, !Ref ClusterNodeMin]
       LaunchConfigurationName: !Ref ClusterNodeLaunchConfig
@@ -580,7 +584,7 @@ Resources:
           PropagateAtLaunch: true
         - Key: Cluster
           Value: !Ref "AWS::StackName"
-          PropagateAtLaunch: true
+          PropagateAtLaunch: true       
   ClusterNodeLaunchConfig:
     Type: "AWS::AutoScaling::LaunchConfiguration"
     Metadata:
@@ -808,6 +812,10 @@ Resources:
           Value: !Ref "AWS::StackName"
   FileServer:
     Type: "AWS::EC2::Instance"
+    CreationPolicy:
+      ResourceSignal:
+        Count: "1"
+        Timeout: PT30M  
     Metadata:
       Comment: Set up NFS Server and initial bitbucket.properties
       AWS::CloudFormation::Init:
