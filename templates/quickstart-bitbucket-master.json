@@ -30,5 +30,17 @@
     {
         "ParameterKey": "KeyName",
         "ParameterValue": "cikey"
+    },
+    {
+        "ParameterKey": "BastionAMIOS",
+        "ParameterValue": "Amazon-Linux-HVM"
+    },
+    {
+        "ParameterKey": "BastionInstanceType",
+        "ParameterValue": "t2.micro"
+    },
+    {
+        "ParameterKey": "EnableBanner",
+        "ParameterValue": "false"
     }
 ]
