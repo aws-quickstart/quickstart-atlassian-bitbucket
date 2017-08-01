@@ -38,9 +38,5 @@
     {
         "ParameterKey": "BastionInstanceType",
         "ParameterValue": "t2.micro"
-    },
-    {
-        "ParameterKey": "EnableBanner",
-        "ParameterValue": "false"
     }
 ]
