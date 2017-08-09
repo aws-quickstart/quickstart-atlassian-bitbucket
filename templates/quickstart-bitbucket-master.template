@@ -95,11 +95,15 @@
                     "Parameters": [
                         "DBSnapshotId",
                         "HomeVolumeSnapshotId",
+                        "CreateBucket",
+                        "ESBucketName",
+                        "ESSnapshotId",
                         "BitbucketProperties",
                         "CatalinaOpts",
+                        "AMIOpts",
                         "HomeDeleteOnTermination",
                         "DBMaster",
-                        "StartCollectd"
+                        "StartCollectd"                       
                     ]
                 },
                 {
@@ -154,6 +158,18 @@
                 },
                 "CatalinaOpts": {
                     "default": "Catalina options"
+                },
+                "CreateBucket": {
+                    "default": "Create S3 bucket for Elasticsearch snapshots"
+                },
+                "ESBucketName": {
+                    "default": "Elasticsearch snapshot S3 bucket name"
+                },
+                "ESSnapshotId": {
+                    "default": "Elasticsearch snapshot ID to restore"
+                },
+                "AMIOpts": {
+                    "default": "AMI Options"
                 },
                 "StartCollectd": {
                     "default": "Start the collectd service"
@@ -300,6 +316,30 @@
             "Description": "The CIDR IP range that is permitted to access Bitbucket. Use 0.0.0.0/0 if you want public access from the internet.",
             "Type": "String"
         },
+        "CreateBucket": {
+            "Description": "Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName",
+            "Type": "String",
+            "Default": "false",
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "ConstraintDescription": "Must be 'true' or 'false'."
+        },
+        "ESBucketName": {
+            "Type": "String",
+            "Default": "",
+            "Description": "Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots",
+            "ConstraintDescription": "Must contain only lowercase letters, numbers and hyphens (-).",
+            "AllowedPattern": "[a-z0-9-]*"
+        },
+        "ESSnapshotId": {
+            "Type": "String",
+            "Default": "",
+            "Description": "Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket",
+            "AllowedPattern": "[a-z0-9-]*",
+            "ConstraintDescription": "Must contain only lowercase letters, numbers and hyphens (-)."
+        },
         "BitbucketProperties": {
             "Description": "A comma-separated list of bitbucket properties in the form key1=value1, key2=value2, ... Find documentation at https://confluence.atlassian.com/x/m5ZKLg",
             "Type": "String",
@@ -342,6 +382,11 @@
         },
         "CatalinaOpts": {
             "Description": "Java options passed to the JVM that runs Bitbucket.",
+            "Type": "String",
+            "Default": ""
+        },
+        "AMIOpts": {
+            "Description": "A comma separated list of options to pass to the AMI",
             "Type": "String",
             "Default": ""
         },
@@ -684,7 +729,6 @@
                     ]
                 },
                 "Parameters": {
-                    "AMIOpts": "",
                     "ExternalSubnets": {
                         "Fn::Join": [
                             ",",
@@ -807,6 +851,18 @@
                     },
                     "KeyName": {
                         "Ref": "KeyName"
+                    },
+                    "CreateBucket": {
+                        "Ref": "CreateBucket"
+                    },
+                    "ESBucketName": {
+                        "Ref": "ESBucketName"
+                    },
+                    "ESSnapshotId": {
+                        "Ref": "ESSnapshotId"
+                    },
+                    "AMIOpts": {
+                        "Ref": "AMIOpts"
                     }
                 }
             }
