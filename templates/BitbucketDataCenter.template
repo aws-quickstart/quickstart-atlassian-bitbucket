@@ -378,6 +378,24 @@ Conditions:
     !Equals [!Ref HomeVolumeType, Provisioned IOPS]
   IsVersion4X:
     !Equals ["4", !Select [0, !Split [".", !Ref BitbucketVersion]]]
+  IsVersion5X:
+    !Equals ["5", !Select [0, !Split [".", !Ref BitbucketVersion]]]
+  IsVersionX0:
+    !Equals ["0", !Select [1, !Split [".", !Ref BitbucketVersion]]]
+  IsVersionX1:
+    !Equals ["1", !Select [1, !Split [".", !Ref BitbucketVersion]]]
+  IsVersionX2:
+    !Equals ["2", !Select [1, !Split [".", !Ref BitbucketVersion]]]
+  IsVersionX3:
+    !Equals ["3", !Select [1, !Split [".", !Ref BitbucketVersion]]]
+  IsVersionX4:
+    !Equals ["4", !Select [1, !Split [".", !Ref BitbucketVersion]]]
+  IsVersionX5:
+    !Equals ["5", !Select [1, !Split [".", !Ref BitbucketVersion]]]
+  IsVersionX6:
+    !Equals ["6", !Select [1, !Split [".", !Ref BitbucketVersion]]]
+  ShouldUseES23:
+    !Or [Condition: IsVersion4X, !And [Condition: IsVersion5X, !Or [Condition: IsVersionX0, Condition: IsVersionX1, Condition: IsVersionX2, Condition: IsVersionX3, Condition: IsVersionX4, Condition: IsVersionX5, Condition: IsVersionX6]]]
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
   SetDBMasterUserPassword:
@@ -786,7 +804,7 @@ Resources:
   Elasticsearch:
     Type: "AWS::Elasticsearch::Domain"
     Properties:
-      ElasticsearchVersion: 2.3
+      ElasticsearchVersion: !If [ShouldUseES23, "2.3", "5.5"]
       ElasticsearchClusterConfig:
         InstanceType: !Ref ElasticsearchInstanceType
       AccessPolicies:
