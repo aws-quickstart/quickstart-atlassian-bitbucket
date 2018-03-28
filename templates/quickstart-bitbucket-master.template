@@ -3,118 +3,107 @@
     "Description": "Atlassian Bitbucket Data Center in new VPC License: Apache 2.0 (Please do not remove) Oct,6,2016",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
-            "ParameterGroups": [
-                {
-                    "Label": {
-                        "default": "VPC Network Configuration"
-                    },
-                    "Parameters": [
-                        "AvailabilityZones",
-                        "VPCCIDR",
-                        "PrivateSubnet1CIDR",
-                        "PrivateSubnet2CIDR",
-                        "PublicSubnet1CIDR",
-                        "PublicSubnet2CIDR",
-                        "AccessCIDR",
-                        "SSLCertificateName"
-                    ]
+            "ParameterGroups": [{
+                "Label": {
+                    "default": "VPC Network Configuration"
                 },
-                {
-                    "Label": {
-                        "default": "Amazon EC2 Configuration"
-                    },
-                    "Parameters": [
-                        "KeyName"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Bitbucket setup"
-                    },
-                    "Parameters": [
-                        "BitbucketVersion"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Cluster nodes"
-                    },
-                    "Parameters": [
-                        "ClusterNodeInstanceType",
-                        "ClusterNodeMin",
-                        "ClusterNodeMax"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "File server"
-                    },
-                    "Parameters": [
-                        "FileServerInstanceType",
-                        "HomeSize",
-                        "HomeVolumeType",
-                        "HomeIops"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Database"
-                    },
-                    "Parameters": [
-                        "DBInstanceClass",
-                        "DBMasterUserPassword",
-                        "DBPassword",
-                        "DBStorage",
-                        "DBStorageType",
-                        "DBIops",
-                        "DBMultiAZ"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Elasticsearch"
-                    },
-                    "Parameters": [
-                        "ElasticsearchInstanceType"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Linux Bastion Configuration"
-                    },
-                    "Parameters": [
-                        "BastionInstanceType",
-                        "BastionAMIOS"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Advanced (Optional)"
-                    },
-                    "Parameters": [
-                        "DBSnapshotId",
-                        "HomeVolumeSnapshotId",
-                        "CreateESBucket",
-                        "ESBucketName",
-                        "ESSnapshotId",
-                        "BitbucketProperties",
-                        "CatalinaOpts",
-                        "AMIOpts",
-                        "HomeDeleteOnTermination",
-                        "DBMaster",
-                        "StartCollectd"                       
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "AWS Quick Start Configuration"
-                    },
-                    "Parameters": [
-                        "QSS3BucketName",
-                        "QSS3KeyPrefix"
-                    ]
-                }
-            ],
+                "Parameters": [
+                    "AvailabilityZones",
+                    "VPCCIDR",
+                    "PrivateSubnet1CIDR",
+                    "PrivateSubnet2CIDR",
+                    "PublicSubnet1CIDR",
+                    "PublicSubnet2CIDR",
+                    "AccessCIDR",
+                    "SSLCertificateName"
+                ]
+            }, {
+            "Label": {
+                "default": "Amazon EC2 Configuration"
+            },
+            "Parameters": [
+                "KeyName"
+            ]
+            }, {
+            "Label": {
+                "default": "Bitbucket setup"
+            },
+            "Parameters": [
+                "BitbucketVersion"
+            ]
+            }, {
+            "Label": {
+                "default": "Cluster nodes"
+            },
+            "Parameters": [
+                "ClusterNodeInstanceType",
+                "ClusterNodeMin",
+                "ClusterNodeMax"
+            ]
+            }, {
+            "Label": {
+                "default": "File server"
+            },
+            "Parameters": [
+                "FileServerInstanceType",
+                "HomeSize",
+                "HomeVolumeType",
+                "HomeIops"
+            ]
+            }, {
+            "Label": {
+                "default": "Database"
+            },
+            "Parameters": [
+                "DBInstanceClass",
+                "DBMasterUserPassword",
+                "DBPassword",
+                "DBStorage",
+                "DBStorageType",
+                "DBIops",
+                "DBMultiAZ"
+            ]
+            }, {
+            "Label": {
+                "default": "Elasticsearch"
+            },
+            "Parameters": [
+                "ElasticsearchInstanceType"
+            ]
+            }, {
+            "Label": {
+                "default": "Linux Bastion Configuration"
+            },
+            "Parameters": [
+                "BastionInstanceType",
+                "BastionAMIOS"
+            ]
+            }, {
+            "Label": {
+                "default": "Advanced (Optional)"
+            },
+            "Parameters": [
+                "DBSnapshotId",
+                "HomeVolumeSnapshotId",
+                "CreateESBucket",
+                "ESBucketName",
+                "ESSnapshotId",
+                "BitbucketProperties",
+                "CatalinaOpts",
+                "AMIOpts",
+                "HomeDeleteOnTermination",
+                "DBMaster",
+                "StartCollectd"
+            ]
+            }, {
+            "Label": {
+                "default": "AWS Quick Start Configuration"
+            },
+            "Parameters": [
+                "QSS3BucketName",
+                "QSS3KeyPrefix"
+            ]
+            }],
             "ParameterLabels": {
                 "AvailabilityZones": {
                     "default": "Availability Zones"
@@ -275,14 +264,14 @@
         "QSS3BucketName": {
             "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
             "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
-            "Default": "quickstart-reference",
+            "Default": "aws-quickstart",
             "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
             "Type": "String"
         },
         "QSS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-/]*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
-            "Default": "atlassian/bitbucket/latest/",
+            "Default": "quickstart-atlassian-bitbucket/",
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         },
@@ -631,11 +620,10 @@
     },
     "Conditions": {
         "GovCloudCondition": {
-            "Fn::Equals": [
-                {
-                    "Ref": "AWS::Region"
-                },
-                "us-gov-west-1"
+            "Fn::Equals": [{
+                "Ref": "AWS::Region"
+            },
+            "us-gov-west-1"
             ]
         }
     },
@@ -645,8 +633,7 @@
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template",
-                        {
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template", {
                             "QSS3Region": {
                                 "Fn::If": [
                                     "GovCloudCondition",
@@ -660,8 +647,7 @@
                 "Parameters": {
                     "AvailabilityZones": {
                         "Fn::Join": [
-                            ",",
-                            {
+                            ",", {
                                 "Ref": "AvailabilityZones"
                             }
                         ]
@@ -694,8 +680,7 @@
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/BitbucketDataCenter.template",
-                        {
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/BitbucketDataCenter.template", {
                             "QSS3Region": {
                                 "Fn::If": [
                                     "GovCloudCondition",
@@ -709,40 +694,32 @@
                 "Parameters": {
                     "ExternalSubnets": {
                         "Fn::Join": [
-                            ",",
-                            [
-                                {
-                                    "Fn::GetAtt": [
-                                        "VPCStack",
-                                        "Outputs.PublicSubnet1ID"
-                                    ]
-                                },
-                                {
-                                    "Fn::GetAtt": [
-                                        "VPCStack",
-                                        "Outputs.PublicSubnet2ID"
-                                    ]
-                                }
+                            ",", [{
+                                "Fn::GetAtt": [
+                                    "VPCStack",
+                                    "Outputs.PublicSubnet1ID"
+                                ]
+                            }, {
+                            "Fn::GetAtt": [
+                                "VPCStack",
+                                "Outputs.PublicSubnet2ID"
                             ]
+                            }]
                         ]
                     },
                     "InternalSubnets": {
                         "Fn::Join": [
-                            ",",
-                            [
-                                {
-                                    "Fn::GetAtt": [
-                                        "VPCStack",
-                                        "Outputs.PrivateSubnet1AID"
-                                    ]
-                                },
-                                {
-                                    "Fn::GetAtt": [
-                                        "VPCStack",
-                                        "Outputs.PrivateSubnet2AID"
-                                    ]
-                                }
+                            ",", [{
+                                "Fn::GetAtt": [
+                                    "VPCStack",
+                                    "Outputs.PrivateSubnet1AID"
+                                ]
+                            }, {
+                            "Fn::GetAtt": [
+                                "VPCStack",
+                                "Outputs.PrivateSubnet2AID"
                             ]
+                            }]
                         ]
                     },
                     "VPC": {
@@ -851,8 +828,7 @@
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template",
-                        {
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template", {
                             "QSS3Region": {
                                 "Fn::If": [
                                     "GovCloudCondition",
@@ -896,12 +872,10 @@
                     },
                     "QSS3KeyPrefix": {
                         "Fn::Join": [
-                            "",
-                            [
-                                {
-                                    "Ref": "QSS3KeyPrefix"
-                                },
-                                "submodules/quickstart-linux-bastion/"
+                            "", [{
+                                "Ref": "QSS3KeyPrefix"
+                            },
+                            "submodules/quickstart-linux-bastion/"
                             ]
                         ]
                     },
