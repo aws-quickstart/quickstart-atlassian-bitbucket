@@ -463,7 +463,7 @@ Mappings:
     x1.32xlarge:
       Arch: HVM64
   AWSRegionArch2AMI:
-  ap-northeast-1:
+    ap-northeast-1:
       HVM64: ami-46cfb720
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
