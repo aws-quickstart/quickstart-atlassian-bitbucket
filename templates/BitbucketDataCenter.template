@@ -463,50 +463,50 @@ Mappings:
     x1.32xlarge:
       Arch: HVM64
   AWSRegionArch2AMI:
-    ap-northeast-1:
-      HVM64: ami-a97ab7d6
-      HVMG2: NOT_SUPPORTED
-    ap-northeast-2:
-      HVM64: ami-bdb11bd3
+    us-east-1:
+      HVM64: ami-007d583e51592b28f
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-e4fcd48b
-      HVMG2: NOT_SUPPORTED
-    ap-southeast-1:
-      HVM64: ami-843f3bf8
-      HVMG2: NOT_SUPPORTED
-    ap-southeast-2:
-      HVM64: ami-b26fb3d0
-      HVMG2: NOT_SUPPORTED
-    ca-central-1:
-      HVM64: ami-0777f463
-      HVMG2: NOT_SUPPORTED
-    eu-central-1:
-      HVM64: ami-38d5e5d3
-      HVMG2: NOT_SUPPORTED
-    eu-west-1:
-      HVM64: ami-ffa1a386
-      HVMG2: NOT_SUPPORTED
-    eu-west-2:
-      HVM64: ami-0bac426c
+      HVM64: ami-0177432d41902bdbb
       HVMG2: NOT_SUPPORTED
     eu-west-3:
-      HVM64: ami-f029988d
+      HVM64: ami-0f45279ed791b6e4a
+      HVMG2: NOT_SUPPORTED
+    eu-west-2:
+      HVM64: ami-07d018490aadc8077
+      HVMG2: NOT_SUPPORTED
+    eu-west-1:
+      HVM64: ami-0955f4b496f860cd9
+      HVMG2: NOT_SUPPORTED
+    ap-northeast-2:
+      HVM64: ami-0f83fc6f692522bf6
+      HVMG2: NOT_SUPPORTED
+    ap-northeast-1:
+      HVM64: ami-08ef2026883ad0931
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-700d561c
+      HVM64: ami-0065d07493984a78b
       HVMG2: NOT_SUPPORTED
-    us-east-1:
-      HVM64: ami-6386c21c
+    ca-central-1:
+      HVM64: ami-03a3c1d6650658e9d
+      HVMG2: NOT_SUPPORTED
+    ap-southeast-1:
+      HVM64: ami-003849359de4eb3c5
+      HVMG2: NOT_SUPPORTED
+    ap-southeast-2:
+      HVM64: ami-0a7fe660035acdcff
+      HVMG2: NOT_SUPPORTED
+    eu-central-1:
+      HVM64: ami-00f22060e5c39cb89
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-59330d3c
+      HVM64: ami-0d7e93975ebbe565e
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-4990742a
+      HVM64: ami-0ff59c7466487df7c
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-c2e0a0ba
+      HVM64: ami-0ccfb450bced77082
       HVMG2: NOT_SUPPORTED
 Resources:
   BitbucketFileServerRole:
