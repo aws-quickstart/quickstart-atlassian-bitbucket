@@ -910,18 +910,22 @@ Resources:
                     - BITBUCKET_GID=atlbitbucket
                     - !If
                       - StandbyMode
-                      - "BACKUP_HOME_TYPE=${BACKUP_HOME_TYPE:-zfs}"
-                      - "BACKUP_HOME_TYPE=${BACKUP_HOME_TYPE:-amazon-ebs}"
+                      - "BACKUP_DISK_TYPE=${BACKUP_DISK_TYPE:-zfs}"
+                      - "BACKUP_DISK_TYPE=${BACKUP_DISK_TYPE:-amazon-ebs}"
                     - "BACKUP_DATABASE_TYPE=${BACKUP_DATABASE_TYPE:-amazon-rds}"
                     - BACKUP_ARCHIVE_TYPE=
                     - "BACKUP_ELASTICSEARCH_TYPE=amazon-es"
                     - "BACKUP_ZERO_DOWNTIME=true"
                     - HOME_DIRECTORY_MOUNT_POINT=/media/atl
-                    - HOME_DIRECTORY_DEVICE_NAME=/dev/sdf
-                    - !Sub ["RESTORE_HOME_DIRECTORY_VOLUME_TYPE=${HomeProvisionedIops}", HomeProvisionedIops: !If [IsHomeProvisionedIops, "io1", "gp2"]]
-                    - !If [IsHomeProvisionedIops, !Sub ["RESTORE_HOME_DIRECTORY_IOPS=${HomeIops}", HomeIops: !Ref "HomeIops"], !Ref "AWS::NoValue"]
+                    - "EBS_VOLUME_MOUNT_POINT_AND_DEVICE_NAMES=(/media/atl:/dev/sdf)"
+                    - !Sub ["RESTORE_DISK_VOLUME_TYPE=${HomeProvisionedIops}", HomeProvisionedIops: !If [IsHomeProvisionedIops, "io1", "gp2"]]
+                    - !If [IsHomeProvisionedIops, !Sub ["RESTORE_DISK_IOPS=${HomeIops}", HomeIops: !Ref "HomeIops"], !Ref "AWS::NoValue"]
                     - FILESYSTEM_TYPE=zfs
-                    - "ZFS_HOME_TANK_NAME=$(run sudo zfs list -H -o name,mountpoint | grep \"${HOME_DIRECTORY_MOUNT_POINT}\" | cut -f1)"
+                    - "ZFS_FILESYSTEM_NAMES=()"
+                    - "for volume in \"${EBS_VOLUME_MOUNT_POINT_AND_DEVICE_NAMES[@]}\"; do"
+                    - "    mount_point=\"$(echo \"${volume}\" | cut -d \":\" -f1)\""
+                    - "    ZFS_FILESYSTEM_NAMES+=($(run sudo zfs list -H -o name,mountpoint | grep \"${mount_point}\" | cut -f1))"
+                    - "done"
                     - !Sub ["RDS_INSTANCE_ID=${DB}", DB: !Ref "DB"]
                     - !Sub ["RESTORE_RDS_INSTANCE_CLASS=${DBInstanceClass}", DBInstanceClass: !Ref "DBInstanceClass"]
                     - !Sub ["RESTORE_RDS_MULTI_AZ=${DBMultiAZ}", DBMultiAZ: !Ref "DBMultiAZ"]
@@ -993,7 +997,7 @@ Resources:
                   ignoreErrors: false
                   env:
                     SNAPSHOT_TAG_PREFIX: !Ref "ESSnapshotId"
-                    BACKUP_HOME_TYPE: "none"
+                    BACKUP_DISK_TYPE: "none"
                     BACKUP_DATABASE_TYPE: "none"
               - !Ref "AWS::NoValue"
         configSets:
