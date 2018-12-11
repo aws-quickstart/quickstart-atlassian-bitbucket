@@ -5,11 +5,12 @@ global:
   reporting: true
   regions:
     - eu-west-1
+    - eu-west-2
     - us-east-1
     - us-west-2
 tests:
-  bitbucket:
-   template_file: quickstart-bitbucket-master.template
+  BB  :
+   template_file: quickstart-bitbucket-dc-with-vpc.template.yaml
    parameter_input: quickstart-bitbucket-master.json
    regions:
-    - us-east-1
+     - eu-west-2

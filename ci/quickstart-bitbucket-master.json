@@ -32,15 +32,11 @@
         "ParameterValue": "replaced-by-taskcat-override-file"
     },
     {
-        "ParameterKey": "BastionAMIOS",
-        "ParameterValue": "Amazon-Linux-HVM"
-    },
-    {
-        "ParameterKey": "BastionInstanceType",
-        "ParameterValue": "t2.micro"
-    },
-    {
         "ParameterKey":"QSS3BucketName",
         "ParameterValue":"$[taskcat_autobucket]"
+    },
+    {
+        "ParameterKey":"QSS3KeyPrefix",
+        "ParameterValue":"quickstart-atlassian-bitbucket/"
     }
 ]
