@@ -5,7 +5,7 @@
     },
     {
         "ParameterKey": "BitbucketVersion",
-        "ParameterValue": "4.11.0"
+        "ParameterValue": "5.16.0"
     },
     {
         "ParameterKey": "DBMasterUserPassword",
