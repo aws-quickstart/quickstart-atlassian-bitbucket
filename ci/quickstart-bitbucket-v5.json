@@ -1,0 +1,26 @@
+[
+    {
+        "ParameterKey": "BitbucketVersion",
+        "ParameterValue": "5.16.0"
+    },
+    {
+        "ParameterKey": "DBMasterUserPassword",
+        "ParameterValue": "$[taskcat_genpass_8]"
+    },
+    {
+        "ParameterKey": "DBInstanceClass",
+        "ParameterValue": "db.t2.large"
+    },
+    {
+        "ParameterKey": "DBIops",
+        "ParameterValue": "1000"
+    },
+    {
+        "ParameterKey": "DBPassword",
+        "ParameterValue": "$[taskcat_genpass_8]"
+    },
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "replaced-by-taskcat-override-file"
+    }
+]
