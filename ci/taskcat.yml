@@ -12,6 +12,3 @@ tests:
   BB-5:
    template_file: quickstart-bitbucket-dc-with-vpc.template.yaml
    parameter_input: quickstart-bitbucket-master-v5.json
-  BB-5-novpc:
-    template_file: quickstart-bitbucket-dc.template.yaml
-    parameter_input: quickstart-bitbucket-v5.json
