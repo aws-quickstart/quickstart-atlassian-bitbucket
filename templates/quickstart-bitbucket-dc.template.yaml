@@ -135,9 +135,9 @@ Parameters:
     Description: A comma-separated list of bitbucket properties in the form 'key1=value1, key2=value2, ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
     Type: CommaDelimitedList
   BitbucketVersion:
-    AllowedPattern: '(\d+\.\d+\.\d+(-?.*))'
-    ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 4.10.0 or higher'
-    Description: 'Version of Bitbucket to install, for example: 4.10.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
+    AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
+    ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
+    Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
     Type: String
   CatalinaOpts:
     Default: ''
@@ -454,8 +454,6 @@ Conditions:
     !Not [!Equals [!Ref KeyName, '']]
   IsHomeProvisionedIops:
     !Equals [!Ref HomeVolumeType, Provisioned IOPS]
-  IsVersion4X:
-    !Equals ['4', !Select [0, !Split ['.', !Ref BitbucketVersion]]]
   IsVersion5X:
     !Equals ['5', !Select [0, !Split ['.', !Ref BitbucketVersion]]]
   IsVersionX0:
@@ -473,7 +471,7 @@ Conditions:
   IsVersionX6:
     !Equals ['6', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
   ShouldUseES23:
-    !Or [Condition: IsVersion4X, !And [Condition: IsVersion5X, !Or [Condition: IsVersionX0, Condition: IsVersionX1, Condition: IsVersionX2, Condition: IsVersionX3, Condition: IsVersionX4, Condition: IsVersionX5, Condition: IsVersionX6]]]
+    !And [Condition: IsVersion5X, !Or [Condition: IsVersionX0, Condition: IsVersionX1, Condition: IsVersionX2, Condition: IsVersionX3, Condition: IsVersionX4, Condition: IsVersionX5, Condition: IsVersionX6]]
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
   SetDBMasterUserPassword:
@@ -1103,9 +1101,7 @@ Resources:
       HealthCheck:
         Target: HTTP:7990/status
         Timeout: 29
-        Interval: 30
         UnhealthyThreshold: 2
-        HealthyThreshold: 2
       Scheme: !If [UsePublicIp, 'internet-facing', 'internal']
       SecurityGroups: [!Ref SecurityGroup]
       Subnets: !Split [ ",", !ImportValue ATL-PubNets]
