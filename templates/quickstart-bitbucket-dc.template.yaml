@@ -1070,7 +1070,7 @@ Resources:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       AppCookieStickinessPolicy:
-        - CookieName: !If [IsVersion4X, JSESSIONID, BITBUCKETSESSIONID]
+        - CookieName: BITBUCKETSESSIONID
           PolicyName: SessionStickiness
       ConnectionDrainingPolicy:
         Enabled: true
@@ -1099,6 +1099,8 @@ Resources:
           InstancePort: 7999
           InstanceProtocol: TCP
       HealthCheck:
+        HealthyThreshold: 2
+        Interval: 60
         Target: HTTP:7990/status
         Timeout: 29
         UnhealthyThreshold: 2
