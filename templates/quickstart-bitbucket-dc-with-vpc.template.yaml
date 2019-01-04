@@ -558,3 +558,6 @@ Outputs:
   SGname:
     Description: The name of the SecurityGroup
     Value: !GetAtt 'BitbucketDCStack.Outputs.SGname'
+  BastionPubIp:
+    Description: The Public IP to ssh to the Bastion
+    Value: !GetAtt 'VPCStack.Outputs.BastionPubIp'
