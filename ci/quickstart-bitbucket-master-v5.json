@@ -28,7 +28,7 @@
         "ParameterValue": "$[taskcat_genpass_8]"
     },
     {
-        "ParameterKey": "KeyName",
+        "ParameterKey": "KeyPairName",
         "ParameterValue": "replaced-by-taskcat-override-file"
     },
     {

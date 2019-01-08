@@ -40,7 +40,7 @@ Metadata:
         Parameters:
           - AssociatePublicIpAddress
           - CidrBlock
-          - KeyName
+          - KeyPairName
           - SSLCertificateARN
       - Label:
           default: Advanced (Optional)
@@ -113,7 +113,7 @@ Metadata:
         default: Home volume snapshot ID to restore
       HomeVolumeType:
         default: Home directory volume type
-      KeyName:
+      KeyPairName:
         default: Key Name *
       SSLCertificateARN:
         default: SSL Certificate ARN
@@ -408,7 +408,7 @@ Parameters:
     AllowedValues: [General Purpose (SSD), Provisioned IOPS]
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Type: String
-  KeyName:
+  KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
@@ -451,7 +451,7 @@ Conditions:
   NotStandbyMode:
     !Equals [!Ref DBMaster, '']
   KeyProvided:
-    !Not [!Equals [!Ref KeyName, '']]
+    !Not [!Equals [!Ref KeyPairName, '']]
   IsHomeProvisionedIops:
     !Equals [!Ref HomeVolumeType, Provisioned IOPS]
   IsVersion5X:
@@ -741,7 +741,7 @@ Resources:
         - DeviceName: /dev/xvdf
           Ebs: {}
           NoDevice: true
-      KeyName: !If [ KeyProvided, !Ref KeyName, !ImportValue ATL-DefaultKey ]
+      KeyPairName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       IamInstanceProfile: !Ref BitbucketClusterNodeInstanceProfile
       ImageId:
         !FindInMap
@@ -1016,7 +1016,7 @@ Resources:
         - !Ref "AWS::Region"
         - HVM64
       InstanceType: !Ref FileServerInstanceType
-      KeyName: !If [ KeyProvided, !Ref KeyName, !ImportValue ATL-DefaultKey ]
+      KeyPairName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       NetworkInterfaces:
         - GroupSet: [!Ref SecurityGroup]
           AssociatePublicIpAddress: false
