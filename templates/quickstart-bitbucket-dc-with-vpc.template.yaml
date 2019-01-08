@@ -10,7 +10,7 @@ Metadata:
       - Label:
           default: Networking
         Parameters:
-          - KeyName
+          - KeyPairName
           - AccessCIDR
           - VPCCIDR
           - AvailabilityZones
@@ -112,7 +112,7 @@ Metadata:
         default: Home directory size
       HomeVolumeSnapshotId:
         default: Home volume snapshot ID to restore
-      KeyName:
+      KeyPairName:
         default: Key Name
       SSLCertificateARN:
         default: SSL Certificate ARN
@@ -456,7 +456,7 @@ Parameters:
     AllowedValues: [General Purpose (SSD), Provisioned IOPS]
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Type: String
-  KeyName:
+  KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
@@ -490,7 +490,7 @@ Resources:
         AvailabilityZones: !Join
           - ','
           - !Ref 'AvailabilityZones'
-        KeyPairName: !Ref 'KeyName'
+        KeyPairName: !Ref 'KeyPairName'
         PrivateSubnet1CIDR: !Ref 'PrivateSubnet1CIDR'
         PrivateSubnet2CIDR: !Ref 'PrivateSubnet2CIDR'
         PublicSubnet1CIDR: !Ref 'PublicSubnet1CIDR'
@@ -539,7 +539,7 @@ Resources:
         HomeSize: !Ref 'HomeSize'
         HomeVolumeSnapshotId: !Ref 'HomeVolumeSnapshotId'
         HomeVolumeType: !Ref 'HomeVolumeType'
-        KeyName: !Ref 'KeyName'
+        KeyPairName: !Ref 'KeyPairName'
         SSLCertificateARN: !Ref 'SSLCertificateARN'
         StartCollectd: !Ref 'StartCollectd'
 Outputs:
