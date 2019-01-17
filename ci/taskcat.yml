@@ -6,8 +6,6 @@ global:
   reporting: true
   regions:
     - eu-west-1
-    - us-east-1
-    - ap-southeast-2
 tests:
   BB-5:
     template_file: quickstart-bitbucket-dc-with-vpc.template.yaml
