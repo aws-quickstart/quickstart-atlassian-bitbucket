@@ -1,1 +1,4 @@
-.idea
+/taskcat_outputs
+*~
+*.bak
+/.idea
