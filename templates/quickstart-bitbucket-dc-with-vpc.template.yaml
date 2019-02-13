@@ -3,6 +3,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: "Atlassian Bitbucket Data Center in new VPC License: Apache 2.0"
 Metadata:
   AWS::CloudFormation::Interface:
+
     ParameterGroups:
       - Label:
           default: Bitbucket setup
@@ -55,7 +56,10 @@ Metadata:
           - StartCollectd
           - QSS3BucketName
           - QSS3KeyPrefix
+
     ParameterLabels:
+      AccessCIDR:
+        default: Trusted IP range
       AMIOpts:
         default: AMI Options
       AvailabilityZones:
@@ -114,6 +118,14 @@ Metadata:
         default: Home volume snapshot ID to restore
       KeyPairName:
         default: Key Name
+      PrivateSubnet1CIDR:
+        default: AZ1 private IP address block
+      PrivateSubnet2CIDR:
+        default: AZ2 private IP address block
+      PublicSubnet1CIDR:
+        default: AZ1 public IP address block        
+      PublicSubnet2CIDR:
+        default: AZ2 public IP address block
       SSLCertificateARN:
         default: SSL Certificate ARN
       StartCollectd:
@@ -122,6 +134,9 @@ Metadata:
         default: Quick Start S3 Bucket Name
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
+      VPCCIDR:
+        default: IP address block for the VPC
+
 Parameters:
   AccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
@@ -295,18 +310,31 @@ Parameters:
     ConstraintDescription: Must be an EC2 instance type from the selection list
     Description: 'Instance type for the cluster application nodes. See https://confluence.atlassian.com/x/GpdKLg for guidance'
     Type: String
-  ClusterNodeMax:
-    Default: 2
-    Type: Number
   ClusterNodeMin:
     Default: 1
     Description: Set to 1 for new deployment. Can be updated post launch.
+    Type: Number
+  ClusterNodeMax:
+    Description: Maximum number of nodes in the cluster.
+    Default: 2
     Type: Number
   CreateBucket:
     Default: true
     AllowedValues: [true, false]
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName.
+    Type: String
+  ESBucketName:
+    Default: ''
+    AllowedPattern: '[a-z0-9-]*'
+    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
+    Description: Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.
+    Type: String
+  ESSnapshotId:
+    Default: ''
+    AllowedPattern: '[a-z0-9-]*'
+    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
+    Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
     Type: String
   DBInstanceClass:
     Default: db.m4.large
@@ -346,6 +374,7 @@ Parameters:
     NoEcho: true
     Type: String
   DBMultiAZ:
+    Description: Whether to provision a multi-AZ RDS instance.
     Default: true
     AllowedValues:
       - true
@@ -384,6 +413,7 @@ Parameters:
     Description: Database storage type
     Type: String
   ElasticsearchInstanceType:
+    Description: EC2 instance type for the Amazon Elasticsearch service to run on.
     Type: String
     Default: m4.xlarge.elasticsearch
     AllowedValues:
@@ -398,18 +428,6 @@ Parameters:
       - i2.xlarge.elasticsearch
       - i2.2xlarge.elasticsearch
     ConstraintDescription: Must be an Elasticsearch instance type in the M4, R4 or I2 family
-  ESBucketName:
-    Default: ''
-    AllowedPattern: '[a-z0-9-]*'
-    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
-    Description: Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.
-    Type: String
-  ESSnapshotId:
-    Default: ''
-    AllowedPattern: '[a-z0-9-]*'
-    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
-    Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
-    Type: String
   FileServerInstanceType:
     Default: m4.xlarge
     AllowedValues:
@@ -453,6 +471,7 @@ Parameters:
     Type: String
   HomeVolumeType:
     Default: Provisioned IOPS
+    Description: Bitbucket home storage type.
     AllowedValues: [General Purpose (SSD), Provisioned IOPS]
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Type: String
@@ -467,6 +486,7 @@ Parameters:
     MaxLength: 90
     Type: String
   StartCollectd:
+    Description: Start the 'collectd' metrics agent.
     Default: false
     Type: String
     AllowedValues: [true, false]
