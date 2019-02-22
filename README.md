@@ -5,7 +5,7 @@ Use this Quick Start to deploy Bitbucket Data Center on the AWS Cloud. Bitbucket
 
 This Quick Start uses the [Atlassian Standard Infrastructure (ASI)](https://fwd.aws/xYyYy) as a foundation. You can choose to build a new ASI for your deployment or deploy Bitbucket into your existing ASI. You can also deploy Jira and Confluence Data Center within the same ASI.
 
-![Quick Start architecture for Bitbucket on AWS](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/bitbucket-on-aws-architecture.png)
+![Quick Start architecture for Bitbucket on AWS](https://d1.awsstatic.com/partner-network/QuickStart/datasheets/bitbucket-on-aws-architecture.630a7271e53cd286bf2af5cbfb93cde9d0ba5e65.png)
 
 For architectural details, best practices, step-by-step instructions, and customization options, see the 
 [deployment guide](https://fwd.aws/dEX6W).
