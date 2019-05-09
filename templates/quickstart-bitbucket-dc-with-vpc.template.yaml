@@ -215,7 +215,7 @@ Parameters:
     Description: Pass in any additional JVM options to tune Catalina Tomcat
     Type: String
   ClusterNodeInstanceType:
-    Default: c4.xlarge
+    Default: c5.xlarge
     AllowedValues:
       - c4.large
       - c4.xlarge

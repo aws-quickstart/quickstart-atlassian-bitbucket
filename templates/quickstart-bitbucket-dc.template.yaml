@@ -153,7 +153,7 @@ Parameters:
     MaxLength: 18
     Type: String
   ClusterNodeInstanceType:
-    Default: c4.xlarge
+    Default: c5.xlarge
     AllowedValues:
       - c4.large
       - c4.xlarge
@@ -262,18 +262,6 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName.
     Type: String
-  ESBucketName:
-    Default: ''
-    AllowedPattern: '[a-z0-9-]*'
-    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
-    Description: Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.
-    Type: String
-  ESSnapshotId:
-    Default: ''
-    AllowedPattern: '[a-z0-9-]*'
-    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
-    Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
-    Type: String
   DBInstanceClass:
     Default: db.m4.large
     AllowedValues:
@@ -293,6 +281,10 @@ Parameters:
       - db.t2.large
       - db.t2.xlarge
       - db.t2.2xlarge
+      - db.t3.medium
+      - db.t3.large
+      - db.t3.xlarge
+      - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
     Description: RDS instance type
     Type: String
@@ -366,6 +358,18 @@ Parameters:
       - i2.xlarge.elasticsearch
       - i2.2xlarge.elasticsearch
     ConstraintDescription: Must be an Elasticsearch instance type in the M4, R4 or I2 family
+  ESBucketName:
+    Default: ''
+    AllowedPattern: '[a-z0-9-]*'
+    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
+    Description: Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.
+    Type: String
+  ESSnapshotId:
+    Default: ''
+    AllowedPattern: '[a-z0-9-]*'
+    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
+    Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
+    Type: String
   FileServerInstanceType:
     Default: m4.xlarge
     AllowedValues:
@@ -529,6 +533,8 @@ Resources:
                 - ec2.amazonaws.com
                 - es.amazonaws.com
             Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       Path: /
       Policies:
         - PolicyName: BitbucketFileServerPolicy
@@ -581,6 +587,8 @@ Resources:
             Principal:
               Service: [ec2.amazonaws.com]
             Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       Path: /
       Policies:
         - PolicyName: BitbucketClusterNodePolicy
@@ -762,7 +770,7 @@ Resources:
           - ""
           -
             - "#!/bin/bash -xe\n"
-            - "yum update -y aws-cfn-bootstrap\n"
+            - "yum update -y aws-cfn-bootstrap amazon-ssm-agent\n"
             - !Sub ["/opt/aws/bin/cfn-init -v --stack ${StackName}", StackName: !Ref "AWS::StackName"]
             - !Sub [" --resource ClusterNodeLaunchConfig --region ${Region}\n", Region: !Ref "AWS::Region"]
             - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
@@ -1041,7 +1049,7 @@ Resources:
           - ""
           -
             - "#!/bin/bash -xe\n"
-            - "yum update -y aws-cfn-bootstrap\n"
+            - "yum update -y aws-cfn-bootstrap amazon-ssm-agent\n"
             - !Sub ["/opt/aws/bin/cfn-init -v --stack ${StackName}", StackName: !Ref "AWS::StackName"]
             - !Sub [" --resource FileServer --region ${Region}\n", Region: !Ref "AWS::Region"]
             - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
