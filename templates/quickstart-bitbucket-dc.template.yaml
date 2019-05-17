@@ -153,7 +153,7 @@ Parameters:
     MaxLength: 18
     Type: String
   ClusterNodeInstanceType:
-    Default: c4.xlarge
+    Default: c5.xlarge
     AllowedValues:
       - c4.large
       - c4.xlarge
