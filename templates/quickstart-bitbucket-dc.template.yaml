@@ -660,7 +660,7 @@ Resources:
                   - !Sub ["hazelcast.group.name=${StackName}", StackName: !Ref "AWS::StackName"]
                   - !Sub ["hazelcast.group.password=${StackName}", StackName: !Ref "AWS::StackName"]
                   - !Sub ["plugin.search.elasticsearch.aws.region=${Region}", Region: !Ref "AWS::Region"]
-                  - !Sub ["plugin.search.elasticsearch.baseurl=http://${ESEndpoint}\"", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
+                  - !Sub ["plugin.search.elasticsearch.baseurl=https://${ESEndpoint}\"", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - !Sub ["ATL_BITBUCKET_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - ATL_BITBUCKET_BUNDLED_ELASTICSEARCH_ENABLED=false
                   - ATL_NGINX_ENABLED=false
