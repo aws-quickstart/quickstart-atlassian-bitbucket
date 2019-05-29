@@ -55,7 +55,10 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
-          - StartCollectd
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationPlaybook
+          - DeploymentAutomationKeyName
 
     ParameterLabels:
       AMIOpts:
@@ -96,6 +99,14 @@ Metadata:
         default: Database storage type
       DBSnapshotId:
         default: Database snapshot ID to restore
+      DeploymentAutomationRepository:
+        default: Deployment Automation Git Repository URL
+      DeploymentAutomationBranch:
+        default: Deployment Automation Branch
+      DeploymentAutomationPlaybook:
+        default: The Ansible playbook to invoke to initialise the instance.
+      DeploymentAutomationKeyName:
+        default: SSH keyname to use with the repository (Optional)
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
       ESBucketName:
@@ -118,8 +129,7 @@ Metadata:
         default: Key Name *
       SSLCertificateARN:
         default: SSL Certificate ARN
-      StartCollectd:
-        default: Start the collectd service
+
 Parameters:
   AMIOpts:
     Default: ''
@@ -262,6 +272,22 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName.
     Type: String
+  DeploymentAutomationRepository:
+    Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
+    Type: String
+    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customisations.
+  DeploymentAutomationBranch:
+    Default: "master"
+    Type: String
+    Description: The deployment automation repository branch to pull from.
+  DeploymentAutomationPlaybook:
+    Default: "aws_bitbucket_dc_node.yml"
+    Type: String
+    Description: The Ansible playbook to invoke to initialise the application node on first start.
+  DeploymentAutomationKeyName:
+    Default: ""
+    Type: String
+    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
   ESBucketName:
     Default: ''
     AllowedPattern: '[a-z0-9-]*'
@@ -423,17 +449,10 @@ Parameters:
     MinLength: 0
     MaxLength: 90
     Type: String
-  StartCollectd:
-    Description: Start the 'collectd' metrics agent.
-    Type: String
-    Default: false
-    AllowedValues: [true, false]
-    ConstraintDescription: Must be 'true' or 'false'
+
 Conditions:
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
-  SetupCollectd:
-    !Equals [!Ref StartCollectd, true]
   RestoreFromEBSSnapshot:
     !Not [!Equals [!Ref HomeVolumeSnapshotId, '']]
   RestoreFromRDSSnapshot:
@@ -487,35 +506,54 @@ Conditions:
 Mappings:
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-01cb7136f82407434
+      HVM64: ami-00d101850e971728d
+      HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-05939313da2cee1d9
+      HVM64: ami-08ab3f7e72215fe91
+      HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-0f87eb67101adaa95
+      HVM64: ami-00e782930f1c3dbc7
+      HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-0f737ef2991410f55
+      HVM64: ami-0b5a47f8865280111
+      HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-0f880c612ba9db684
+      HVM64: ami-0fb7513bcdc525c3b
+      HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-07f9b76d33830f1aa
+      HVM64: ami-08a9b721ecc5b0a53
+      HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-02f390185bddcfb01
+      HVM64: ami-0ebe657bc328d4e82
+      HVMG2: NOT_SUPPORTED
+    eu-north-1:
+      HVM64: ami-1fb13961
+      HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-050e8cd830aa9ed94
+      HVM64: ami-030dbca661d402413
+      HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-0a48a64baf846b803
+      HVM64: ami-0009a33f033d8b7b6
+      HVMG2: NOT_SUPPORTED
     eu-west-3:
-      HVM64: ami-0b6f8672aec4fee91
+      HVM64: ami-0ebb3a801d5fb8b9b
+      HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-0b37b97b0afa89d88
+      HVM64: ami-058141e091292ecf0
+      HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-05bf747bde497cacd
+      HVM64: ami-0c6b1d09930fac512
+      HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-00de6870b0710223e
+      HVM64: ami-0ebbf2179e615c338
+      HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-0e3184ec65584b002
+      HVM64: ami-015954d5e5548d13b
+      HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-05653cd3cf9f4ad7c
+      HVM64: ami-0cb72367e98845d43
+      HVMG2: NOT_SUPPORTED
+
 Resources:
   BitbucketFileServerRole:
     Type: AWS::IAM::Role
@@ -620,127 +658,180 @@ Resources:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
       AWS::CloudFormation::Init:
-        configSets:
-          default: [1, 2]
-        '1':
-          packages:
-            !If
-            - SetupCollectd
-            - yum:
-                collectd: []
-                collectd-java: []
-                collectd-generic-jmx: []
-                collectd-rrdtool: []
-            - !Ref AWS::NoValue
+        # configSets:
+        #   default: [1, 2]
+        # '1':
+        config:
+
+          # packages:
+          #   !If
+          #   - SetupCollectd
+          #   - yum:
+          #       collectd: []
+          #       collectd-java: []
+          #       collectd-generic-jmx: []
+          #       collectd-rrdtool: []
+          #   - !Ref AWS::NoValue
+
           files:
             /etc/atl:
               content:
                 !Join
                 - "\n"
                 -
-                  - ATL_APP_DATA_MOUNT_ENABLED=false
+                  - "ATL_PRODUCT=bitbucket"
+                  - "ATL_APP_DATA_MOUNT_ENABLED=false"
+                  - "ATL_JDBC_DB_NAME=bitbucket"
+                  - "ATL_JDBC_DRIVER=org.postgresql.Driver"
+                  - "ATL_JDBC_USER=atlbitbucket"
+                  - "hazelcast.network.aws=true"
+                  - "hazelcast.network.aws.tag.key=Cluster"
+                  - "hazelcast.network.multicast=false"
+                  - ""
+                  - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
+                  - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
+                  - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
                   - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
-                  - ATL_DB_NAME=bitbucket
                   - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
                   - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
-                  - ATL_JDBC_DRIVER=org.postgresql.Driver
                   - !Sub
                     - "ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/bitbucket"
                     - DBEndpointAddress: !GetAtt DB.Endpoint.Address
                       DBEndpointPort: !GetAtt DB.Endpoint.Port
-                  - ATL_JDBC_USER=atlbitbucket
                   - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}", BitbucketProperties: !Join ["\n", !Ref BitbucketProperties]]
-                  - hazelcast.network.aws=true
                   - !Sub ["hazelcast.network.aws.iam.role=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
                   - !Sub ["hazelcast.network.aws.region=${Region}", Region: !Ref "AWS::Region"]
-                  - hazelcast.network.aws.tag.key=Cluster
                   - !Sub ["hazelcast.network.aws.tag.value=${StackName}", StackName: !Ref "AWS::StackName"]
-                  - hazelcast.network.multicast=false
                   - !Sub ["hazelcast.group.name=${StackName}", StackName: !Ref "AWS::StackName"]
                   - !Sub ["hazelcast.group.password=${StackName}", StackName: !Ref "AWS::StackName"]
                   - !Sub ["plugin.search.elasticsearch.aws.region=${Region}", Region: !Ref "AWS::Region"]
                   - !Sub ["plugin.search.elasticsearch.baseurl=http://${ESEndpoint}\"", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
-                  - !Sub ["ATL_BITBUCKET_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
-                  - ATL_BITBUCKET_BUNDLED_ELASTICSEARCH_ENABLED=false
-                  - ATL_NGINX_ENABLED=false
-                  - ATL_POSTGRES_ENABLED=false
-                  - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
-                  - ATL_SSL_SELF_CERT_ENABLED=false
                   - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
                   - !Join ["\n", !Ref AMIOpts]
-            /etc/cfn/cfn-hup.conf:
-              content: !Join
-                - "\n"
-                -
-                  - "[main]"
-                  - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
-                  - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
-              mode: '000400'
+
+            /opt/atlassian/bin/clone_deployment_repo:
+              content: !Sub |
+                #!/bin/bash
+                key_location=/root/.ssh/deployment_repo_key
+                key_name="${DeploymentAutomationKeyName}"
+
+                yum install -y git
+                if [[ ! -z "$key_name" ]]; then
+                    # Ensure awscli is up to date
+                    yum install -y awscli jq
+                    key_val=$(aws --region=${AWS::Region} ssm get-parameters --names "$key_name" --with-decryption | jq --raw-output '.Parameters[0] .Value')
+                    echo -e $key_val > $key_location
+                    chmod 600 $key_location
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $key_location"
+                else
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no"
+                fi
+
+                git clone "${DeploymentAutomationRepository}" -b "${DeploymentAutomationBranch}" /opt/atlassian/dc-deployments-automation/
+              mode: "000750"
               owner: root
               group: root
-            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
-              content:
-                !Join
-                - "\n"
-                -
-                  - "[cfn-auto-reloader-hook]"
-                  - triggers=post.update
-                  - "path=Resources.ClusterNodeLaunchConfig.Metadata.AWS::CloudFormation::Init"
-                  - !Sub
-                    - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource ClusterNodeLaunchConfig --region ${Region}"
-                    - StackName: !Ref "AWS::StackName"
-                      Region: !Ref "AWS::Region"
-                  - runas=root
-            /home/atlbitbucket/.bash_profile:
-              content:
-                !Join
-                - "\n"
-                -
-                  - if [ -f ~/.bashrc ]; then
-                  -     . ~/.bashrc
-                  - fi
-                  - !Sub ["export CATALINA_OPTS=\"${CatalinaOpts}\"", CatalinaOpts: !Ref CatalinaOpts]
-              mode: '000644'
-              owner: atlbitbucket
-              group: atlbitbucket
+
           commands:
-            010_add_nfs_mount:
-              command: !Sub
-                - "echo ${FileServerPrivateIp}:/media/atl/bitbucket/shared /media/atl/bitbucket/shared nfs lookupcache=pos,noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
-                - FileServerPrivateIp: !GetAtt FileServer.PrivateIp
+            070_create_atl_dir:
+              test: "test ! -d /opt/atlassian/"
+              command: mkdir -p /opt/atlassian
               ignoreErrors: false
-            020_make_shared_home_dir:
-              command: mkdir -p /media/atl/bitbucket/shared
-              ignoreErrors: false
-            030_chown_shared_home_dir:
-              command: "chown atlbitbucket:atlbitbucket /media/atl/bitbucket /media/atl/bitbucket/shared"
-              ignoreErrors: false
-          services:
-            sysvinit:
-              cfn-hup:
-                enabled: true
-                ensureRunning: true
-                files: [/etc/cfn/cfn-hup.conf, /etc/cfn/hooks.d/cfn-auto-reloader.conf]
-              collectd:
-                !If [SetupCollectd, {enabled: true, ensureRunning: true}, !Ref "AWS::NoValue"]
-              rpcbind:
-                enabled: true
-                ensureRunning: true
-                packages:
-                  yum: [nfs-utils]
-        '2':
-          commands:
-            040_mount_nfs:
-              command: "bash -c \"until mount /media/atl/bitbucket/shared; do echo 'Mount of shared volume failed trying again in 5 seconds.'; sleep 5; done\""
-              ignoreErrors: false
-          services:
-            sysvinit:
-              nfslock:
-                enabled: true
-                ensureRunning: true
-                packages:
-                  yum: [nfs-utils]
+            071_install_packages:
+              command: yum install -y git python-virtualenv
+              ignoreErrors: true
+            072_clone_atl_scripts:
+              test: "test ! -d /opt/atlassian/dc-deployments-automation/"
+              command: /opt/atlassian/bin/clone_deployment_repo
+              ignoreErrors: true
+            080_run_atl_init_node:
+              command: !Sub |
+                cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local ${DeploymentAutomationPlaybook} /var/log/ansible-bootstrap.log
+              ignoreErrors: true
+
+          #   /etc/cfn/cfn-hup.conf:
+          #     content: !Join
+          #       - "\n"
+          #       -
+          #         - "[main]"
+          #         - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
+          #         - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
+          #     mode: '000400'
+          #     owner: root
+          #     group: root
+
+          #   /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+          #     content:
+          #       !Join
+          #       - "\n"
+          #       -
+          #         - "[cfn-auto-reloader-hook]"
+          #         - triggers=post.update
+          #         - "path=Resources.ClusterNodeLaunchConfig.Metadata.AWS::CloudFormation::Init"
+          #         - !Sub
+          #           - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource ClusterNodeLaunchConfig --region ${Region}"
+          #           - StackName: !Ref "AWS::StackName"
+          #             Region: !Ref "AWS::Region"
+          #         - runas=root
+
+          #   /home/atlbitbucket/.bash_profile:
+          #     content:
+          #       !Join
+          #       - "\n"
+          #       -
+          #         - if [ -f ~/.bashrc ]; then
+          #         -     . ~/.bashrc
+          #         - fi
+          #         - !Sub ["export CATALINA_OPTS=\"${CatalinaOpts}\"", CatalinaOpts: !Ref CatalinaOpts]
+          #     mode: '000644'
+          #     owner: atlbitbucket
+          #     group: atlbitbucket
+
+          # commands:
+          #   010_add_nfs_mount:
+          #     command: !Sub
+          #       - "echo ${FileServerPrivateIp}:/media/atl/bitbucket/shared /media/atl/bitbucket/shared nfs lookupcache=pos,noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
+          #       - FileServerPrivateIp: !GetAtt FileServer.PrivateIp
+          #     ignoreErrors: false
+          #   020_make_shared_home_dir:
+          #     command: mkdir -p /media/atl/bitbucket/shared
+          #     ignoreErrors: false
+          #   030_chown_shared_home_dir:
+          #     command: "chown atlbitbucket:atlbitbucket /media/atl/bitbucket /media/atl/bitbucket/shared"
+          #     ignoreErrors: false
+
+          # services:
+          #   sysvinit:
+          #     cfn-hup:
+          #       enabled: true
+          #       ensureRunning: true
+          #       files: [/etc/cfn/cfn-hup.conf, /etc/cfn/hooks.d/cfn-auto-reloader.conf]
+          #     collectd:
+          #       !If [SetupCollectd, {enabled: true, ensureRunning: true}, !Ref "AWS::NoValue"]
+          #     rpcbind:
+          #       enabled: true
+          #       ensureRunning: true
+          #       packages:
+          #         yum: [nfs-utils]
+
+        # '2':
+        #   commands:
+        #     040_mount_nfs:
+        #       command: "bash -c \"until mount /media/atl/bitbucket/shared; do echo 'Mount of shared volume failed trying again in 5 seconds.'; sleep 5; done\""
+        #       ignoreErrors: false
+        #   services:
+        #     sysvinit:
+        #       nfslock:
+        #         enabled: true
+        #         ensureRunning: true
+        #         packages:
+        #           yum: [nfs-utils]
+
     Properties:
       AssociatePublicIpAddress: false
       BlockDeviceMappings:
@@ -847,17 +938,12 @@ Resources:
     Metadata:
       Comment: Set up NFS Server and initial bitbucket.properties
       AWS::CloudFormation::Init:
-        "1":
-          packages:
-            !If
-            - SetupCollectd
-            -
-              yum:
-                collectd: []
-                collectd-java: []
-                collectd-generic-jmx: []
-                collectd-rrdtool: []
-            - !Ref "AWS::NoValue"
+        # configSets:
+        #   default: [1, 2]
+        # "1":
+
+        config:
+
           files:
             /etc/atl:
               content:
@@ -866,35 +952,14 @@ Resources:
                 -
                   - ATL_ENABLED_PRODUCTS=
                   - ATL_ENABLED_SHARED_HOMES=Bitbucket
-                  - ATL_NGINX_ENABLED=false
-                  - ATL_POSTGRES_ENABLED=false
-                  - ATL_SSL_SELF_CERT_ENABLED=false
-                  - ATL_BITBUCKET_BUNDLED_ELASTICSEARCH_ENABLED=false
                   - ATL_APP_NFS_SERVER=true
-            /etc/cfn/cfn-hup.conf:
-              content:
-                !Join
-                - "\n"
-                -
-                  - "[main]"
-                  - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
-                  - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
-              mode: "000400"
-              owner: root
-              group: root
-            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
-              content:
-                !Join
-                - "\n"
-                -
-                  - "[cfn-auto-reloader-hook]"
-                  - triggers=post.update
-                  - "path=Resources.FileServer.Metadata.AWS::CloudFormation::Init"
-                  - !Sub
-                    - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource FileServer --region ${Region}"
-                    - Region: !Ref "AWS::Region"
-                      StackName: !Ref "AWS::StackName"
-                  - runas=root
+                  - ATL_NFS_SERVER_DEVICE=/dev/sdf
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
+                  - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
+
+
             /opt/atlassian/bitbucket-diy-backup/bitbucket.diy-backup.vars.sh:
               content:
                 !Join
@@ -959,50 +1024,74 @@ Resources:
               mode: "000644"
               owner: "ec2-user"
               group: "ec2-user"
+
+            /opt/atlassian/bin/clone_deployment_repo:
+              content: !Sub |
+                #!/bin/bash
+                key_location=/root/.ssh/deployment_repo_key
+                key_name="${DeploymentAutomationKeyName}"
+
+                yum install -y git
+                if [[ ! -z "$key_name" ]]; then
+                    # Ensure awscli is up to date
+                    yum install -y awscli jq
+                    key_val=$(aws --region=${AWS::Region} ssm get-parameters --names "$key_name" --with-decryption | jq --raw-output '.Parameters[0] .Value')
+                    echo -e $key_val > $key_location
+                    chmod 600 $key_location
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -i $key_location"
+                else
+                    export GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no"
+                fi
+
+                git clone "${DeploymentAutomationRepository}" -b "${DeploymentAutomationBranch}" /opt/atlassian/dc-deployments-automation/
+              mode: "000750"
+              owner: root
+              group: root
+
           commands:
-            010_pull_diy_backup_repo:
-              command: "git pull"
-              cwd: "/opt/atlassian/bitbucket-diy-backup"
+            # 010_pull_diy_backup_repo:
+            #   command: "git pull"
+            #   cwd: "/opt/atlassian/bitbucket-diy-backup"
+            #   ignoreErrors: true
+            070_create_atl_dir:
+              test: "test ! -d /opt/atlassian/"
+              command: mkdir -p /opt/atlassian
+              ignoreErrors: false
+            071_install_packages:
+              command: yum install -y git python-virtualenv
               ignoreErrors: true
-          services:
-            sysvinit:
-              cfn-hup:
-                enabled: true
-                ensureRunning: true
-                files: [/etc/cfn/cfn-hup.conf, /etc/cfn/hooks.d/cfn-auto-reloader.conf]
-              collectd:
-                !If
-                - SetupCollectd
-                - enabled: true
-                  ensureRunning: true
-                - !Ref "AWS::NoValue"
-              rpcbind:
-                enabled: true
-                ensureRunning: true
-        "2":
-          services:
-            sysvinit:
-              nfs:
-                enabled: true
-                ensureRunning: true
-              nfslock:
-                enabled: true
-                ensureRunning: true
-          commands:
-            !If
-            - RestoreFromESSnapshot
-            - 020_restore_es_snapshot:
-                command: !Sub
-                  - "/opt/atlassian/bitbucket-diy-backup/bitbucket.diy-restore.sh ${ESSnapshotId}"
-                  - ESSnapshotId: !Ref "ESSnapshotId"
-                ignoreErrors: false
-                env:
-                  SNAPSHOT_TAG_PREFIX: !Ref "ESSnapshotId"
-                  BACKUP_DISK_TYPE: "none"
-                  BACKUP_DATABASE_TYPE: "none"
-            - !Ref "AWS::NoValue"
-        configSets:
-          default: [1, 2]
+            072_clone_atl_scripts:
+              test: "test ! -d /opt/atlassian/dc-deployments-automation/"
+              command: /opt/atlassian/bin/clone_deployment_repo
+              ignoreErrors: true
+            080_run_atl_init_node:
+              command: !Sub |
+                cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_bitbucket_nfs_node.yml /var/log/ansible-bootstrap.log
+              ignoreErrors: true
+
+        # "2":
+        #   services:
+        #     sysvinit:
+        #       nfs:
+        #         enabled: true
+        #         ensureRunning: true
+        #       nfslock:
+        #         enabled: true
+        #         ensureRunning: true
+        #   commands:
+        #     !If
+        #     - RestoreFromESSnapshot
+        #     - 020_restore_es_snapshot:
+        #         command: !Sub
+        #           - "/opt/atlassian/bitbucket-diy-backup/bitbucket.diy-restore.sh ${ESSnapshotId}"
+        #           - ESSnapshotId: !Ref "ESSnapshotId"
+        #         ignoreErrors: false
+        #         env:
+        #           SNAPSHOT_TAG_PREFIX: !Ref "ESSnapshotId"
+        #           BACKUP_DISK_TYPE: "none"
+        #           BACKUP_DATABASE_TYPE: "none"
+        #     - !Ref "AWS::NoValue"
+
     Properties:
       BlockDeviceMappings:
         - DeviceName: /dev/sdf
