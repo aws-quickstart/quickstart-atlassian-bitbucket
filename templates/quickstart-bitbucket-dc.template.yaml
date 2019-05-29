@@ -567,6 +567,8 @@ Resources:
                 - ec2.amazonaws.com
                 - es.amazonaws.com
             Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       Path: /
       Policies:
         - PolicyName: BitbucketFileServerPolicy
@@ -619,6 +621,8 @@ Resources:
             Principal:
               Service: [ec2.amazonaws.com]
             Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       Path: /
       Policies:
         - PolicyName: BitbucketClusterNodePolicy
