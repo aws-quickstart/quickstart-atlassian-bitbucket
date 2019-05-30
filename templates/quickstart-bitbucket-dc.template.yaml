@@ -45,7 +45,6 @@ Metadata:
       - Label:
           default: Advanced (Optional)
         Parameters:
-          - AMIOpts
           - BitbucketProperties
           - CatalinaOpts
           - CreateBucket
@@ -61,8 +60,6 @@ Metadata:
           - DeploymentAutomationKeyName
 
     ParameterLabels:
-      AMIOpts:
-        default: AMI Options
       AssociatePublicIpAddress:
         default: Assign public IP
       BitbucketProperties:
@@ -131,10 +128,6 @@ Metadata:
         default: SSL Certificate ARN
 
 Parameters:
-  AMIOpts:
-    Default: ''
-    Description: A comma separated list of options to pass to the AMI
-    Type: CommaDelimitedList
   AssociatePublicIpAddress:
     Default: true
     AllowedValues: [true, false]
@@ -685,12 +678,6 @@ Resources:
                 -
                   - "ATL_PRODUCT=bitbucket"
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
-                  - "ATL_JDBC_DB_NAME=bitbucket"
-                  - "ATL_JDBC_DRIVER=org.postgresql.Driver"
-                  - "ATL_JDBC_USER=atlbitbucket"
-                  - "hazelcast.network.aws=true"
-                  - "hazelcast.network.aws.tag.key=Cluster"
-                  - "hazelcast.network.multicast=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
@@ -699,24 +686,37 @@ Resources:
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
-                  - !Sub ["ATL_DB_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
+                  - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
+                  - !Sub ["ATL_AWS_IAM_ROLE=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
+                  - ""
+                  - "ATL_JDBC_DB_NAME=bitbucket"
+                  - "ATL_JDBC_DRIVER=org.postgresql.Driver"
+                  - "ATL_JDBC_USER=atlbitbucket"
+                  - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
+                  - !Sub ["ATL_DB_ROOT_PASSWORD=${DBMasterUserPassword}", DBMasterUserPassword: !Ref DBMasterUserPassword]
                   - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
                   - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
-                  - !Sub
-                    - "ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/bitbucket"
-                    - DBEndpointAddress: !GetAtt DB.Endpoint.Address
-                      DBEndpointPort: !GetAtt DB.Endpoint.Port
-                  - !Sub ["ATL_JDBC_PASSWORD=${DBPassword}", DBPassword: !Ref DBPassword]
-                  - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}", BitbucketProperties: !Join ["\n", !Ref BitbucketProperties]]
-                  - !Sub ["hazelcast.network.aws.iam.role=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
-                  - !Sub ["hazelcast.network.aws.region=${Region}", Region: !Ref "AWS::Region"]
-                  - !Sub ["hazelcast.network.aws.tag.value=${StackName}", StackName: !Ref "AWS::StackName"]
-                  - !Sub ["hazelcast.group.name=${StackName}", StackName: !Ref "AWS::StackName"]
-                  - !Sub ["hazelcast.group.password=${StackName}", StackName: !Ref "AWS::StackName"]
-                  - !Sub ["plugin.search.elasticsearch.aws.region=${Region}", Region: !Ref "AWS::Region"]
-                  - !Sub ["plugin.search.elasticsearch.baseurl=http://${ESEndpoint}\"", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
+                  - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
+                  - ""
+                  - ""
+                  - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=http://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
+                  - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Join ["\\\n", !Ref BitbucketProperties]]
                   - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
-                  - !Join ["\n", !Ref AMIOpts]
+
+                  # - "hazelcast.network.aws=true"
+                  # - "hazelcast.network.aws.tag.key=Cluster"
+                  # - "hazelcast.network.multicast=false"
+                  # - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
+                  # - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
+                  # - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
+                  # - !Sub ["hazelcast.network.aws.iam.role=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
+                  # - !Sub ["hazelcast.network.aws.region=${Region}", Region: !Ref "AWS::Region"]
+                  # - !Sub ["hazelcast.network.aws.tag.value=${StackName}", StackName: !Ref "AWS::StackName"]
+                  # - !Sub ["hazelcast.group.name=${StackName}", StackName: !Ref "AWS::StackName"]
+                  # - !Sub ["hazelcast.group.password=${StackName}", StackName: !Ref "AWS::StackName"]
+                  # - !Sub ["plugin.search.elasticsearch.aws.region=${Region}", Region: !Ref "AWS::Region"]
+                  # - !Sub ["plugin.search.elasticsearch.baseurl=http://${ESEndpoint}\"", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
+                  
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
@@ -976,8 +976,8 @@ Resources:
                     - HTTP: !If [DoSSL, "https", "http"]
                       LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
                   - BITBUCKET_HOME=/media/atl/bitbucket
-                  - BITBUCKET_UID=atlbitbucket
-                  - BITBUCKET_GID=atlbitbucket
+                  - BITBUCKET_UID=bitbucket
+                  - BITBUCKET_GID=bitbucket
                   - !If
                     - StandbyMode
                     - "BACKUP_DISK_TYPE=${BACKUP_DISK_TYPE:-zfs}"
