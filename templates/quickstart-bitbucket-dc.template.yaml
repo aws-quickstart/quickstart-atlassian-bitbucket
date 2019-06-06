@@ -689,7 +689,8 @@ Resources:
                   - ""
                   - !Sub ["ATL_AWS_REGION=${Region}", Region: !Ref "AWS::Region"]
                   - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
-                  - !Sub ["ATL_AWS_IAM_ROLE=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
+                  - !Sub ["ATL_AWS_IAM_ROLE=${Role}", Role: !Ref BitbucketClusterNodeRole]
+                  - !Sub ["ATL_AWS_IAM_ROLE_ARN=${Role}", Role: !GetAtt BitbucketFileServerRole.Arn]
                   - ""
                   - "ATL_JDBC_DB_NAME=bitbucket"
                   - "ATL_JDBC_DRIVER=org.postgresql.Driver"
@@ -975,7 +976,8 @@ Resources:
                   - ""
                   - !Sub ["ATL_AWS_REGION=${Region}", Region: !Ref "AWS::Region"]
                   - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
-                  - !Sub ["ATL_AWS_IAM_ROLE=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
+                  - !Sub ["ATL_AWS_IAM_ROLE=${Role}", Role: !Ref BitbucketFileServerRole]
+                  - !Sub ["ATL_AWS_IAM_ROLE_ARN=${Role}", Role: !GetAtt BitbucketFileServerRole.Arn]
                   - ""
                   - "ATL_JDBC_DB_NAME=bitbucket"
                   - "ATL_JDBC_DRIVER=org.postgresql.Driver"
