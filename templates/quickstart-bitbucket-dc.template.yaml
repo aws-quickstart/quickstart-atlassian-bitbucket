@@ -312,6 +312,10 @@ Parameters:
       - db.t2.large
       - db.t2.xlarge
       - db.t2.2xlarge
+      - db.t3.medium
+      - db.t3.large
+      - db.t3.xlarge
+      - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
     Description: RDS instance type
     Type: String
@@ -385,6 +389,18 @@ Parameters:
       - i2.xlarge.elasticsearch
       - i2.2xlarge.elasticsearch
     ConstraintDescription: Must be an Elasticsearch instance type in the M4, R4 or I2 family
+  ESBucketName:
+    Default: ''
+    AllowedPattern: '[a-z0-9-]*'
+    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
+    Description: Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.
+    Type: String
+  ESSnapshotId:
+    Default: ''
+    AllowedPattern: '[a-z0-9-]*'
+    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
+    Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
+    Type: String
   FileServerInstanceType:
     Default: m4.xlarge
     AllowedValues:
@@ -496,55 +512,56 @@ Conditions:
     !And [!Not [!Equals [!Ref DBMasterUserPassword, '']], Condition: NotStandbyMode]
   UsePublicIp:
     !Equals [!Ref AssociatePublicIpAddress, 'true']
+
 Mappings:
   AWSRegionArch2AMI:
     ap-northeast-1:
-      HVM64: ami-00d101850e971728d
+      HVM64: ami-0c3fd0f5d33134a76
       HVMG2: NOT_SUPPORTED
     ap-northeast-2:
-      HVM64: ami-08ab3f7e72215fe91
+      HVM64: ami-095ca789e0549777d
       HVMG2: NOT_SUPPORTED
     ap-south-1:
-      HVM64: ami-00e782930f1c3dbc7
+      HVM64: ami-0d2692b6acea72ee6
       HVMG2: NOT_SUPPORTED
     ap-southeast-1:
-      HVM64: ami-0b5a47f8865280111
+      HVM64: ami-01f7527546b557442
       HVMG2: NOT_SUPPORTED
     ap-southeast-2:
-      HVM64: ami-0fb7513bcdc525c3b
+      HVM64: ami-0dc96254d5535925f
       HVMG2: NOT_SUPPORTED
     ca-central-1:
-      HVM64: ami-08a9b721ecc5b0a53
+      HVM64: ami-0d4ae09ec9361d8ac
       HVMG2: NOT_SUPPORTED
     eu-central-1:
-      HVM64: ami-0ebe657bc328d4e82
+      HVM64: ami-0cc293023f983ed53
       HVMG2: NOT_SUPPORTED
     eu-north-1:
-      HVM64: ami-1fb13961
+      HVM64: ami-3f36be41
       HVMG2: NOT_SUPPORTED
     eu-west-1:
-      HVM64: ami-030dbca661d402413
+      HVM64: ami-0bbc25e23a7640b9b
       HVMG2: NOT_SUPPORTED
     eu-west-2:
-      HVM64: ami-0009a33f033d8b7b6
+      HVM64: ami-0d8e27447ec2c8410
       HVMG2: NOT_SUPPORTED
     eu-west-3:
-      HVM64: ami-0ebb3a801d5fb8b9b
+      HVM64: ami-0adcddd3324248c4c
       HVMG2: NOT_SUPPORTED
     sa-east-1:
-      HVM64: ami-058141e091292ecf0
+      HVM64: ami-058943e7d9b9cabfb
       HVMG2: NOT_SUPPORTED
     us-east-1:
-      HVM64: ami-0c6b1d09930fac512
+      HVM64: ami-0b898040803850657
       HVMG2: NOT_SUPPORTED
     us-east-2:
-      HVM64: ami-0ebbf2179e615c338
+      HVM64: ami-0d8f6eb4f641ef691
       HVMG2: NOT_SUPPORTED
     us-west-1:
-      HVM64: ami-015954d5e5548d13b
+      HVM64: ami-056ee704806822732
       HVMG2: NOT_SUPPORTED
     us-west-2:
-      HVM64: ami-0cb72367e98845d43
+      HVM64: ami-082b5a644766e0e6f
       HVMG2: NOT_SUPPORTED
 
 Resources:
@@ -713,22 +730,7 @@ Resources:
                   - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=http://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Join ["\\\n", !Ref BitbucketProperties]]
-                  - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
-
-                  # - "hazelcast.network.aws=true"
-                  # - "hazelcast.network.aws.tag.key=Cluster"
-                  # - "hazelcast.network.multicast=false"
-                  # - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_ROLE=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
-                  # - !Sub ["ATL_HAZELCAST_NETWORK_AWS_TAG_VALUE=${HazelcastAWSTagValue}", HazelcastAWSTagValue: !Ref "AWS::StackName"]
-                  # - !Sub ["ATL_HAZELCAST_NETWORK_AWS_IAM_REGION=${HazelcastAWSRegion}", HazelcastAWSRegion: !Ref "AWS::Region"]
-                  # - !Sub ["hazelcast.network.aws.iam.role=${BitbucketClusterNodeRole}", BitbucketClusterNodeRole: !Ref BitbucketClusterNodeRole]
-                  # - !Sub ["hazelcast.network.aws.region=${Region}", Region: !Ref "AWS::Region"]
-                  # - !Sub ["hazelcast.network.aws.tag.value=${StackName}", StackName: !Ref "AWS::StackName"]
-                  # - !Sub ["hazelcast.group.name=${StackName}", StackName: !Ref "AWS::StackName"]
-                  # - !Sub ["hazelcast.group.password=${StackName}", StackName: !Ref "AWS::StackName"]
-                  # - !Sub ["plugin.search.elasticsearch.aws.region=${Region}", Region: !Ref "AWS::Region"]
-                  # - !Sub ["plugin.search.elasticsearch.baseurl=http://${ESEndpoint}\"", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
-                  
+                  - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]                  
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
@@ -770,84 +772,6 @@ Resources:
                 cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local ${DeploymentAutomationPlaybook} /var/log/ansible-bootstrap.log
               ignoreErrors: true
 
-          #   /etc/cfn/cfn-hup.conf:
-          #     content: !Join
-          #       - "\n"
-          #       -
-          #         - "[main]"
-          #         - !Sub ["stack=${StackId}", StackId: !Ref "AWS::StackId"]
-          #         - !Sub ["region=${Region}", Region: !Ref "AWS::Region"]
-          #     mode: '000400'
-          #     owner: root
-          #     group: root
-
-          #   /etc/cfn/hooks.d/cfn-auto-reloader.conf:
-          #     content:
-          #       !Join
-          #       - "\n"
-          #       -
-          #         - "[cfn-auto-reloader-hook]"
-          #         - triggers=post.update
-          #         - "path=Resources.ClusterNodeLaunchConfig.Metadata.AWS::CloudFormation::Init"
-          #         - !Sub
-          #           - "action=/opt/aws/bin/cfn-init -v --stack ${StackName} --resource ClusterNodeLaunchConfig --region ${Region}"
-          #           - StackName: !Ref "AWS::StackName"
-          #             Region: !Ref "AWS::Region"
-          #         - runas=root
-
-          #   /home/atlbitbucket/.bash_profile:
-          #     content:
-          #       !Join
-          #       - "\n"
-          #       -
-          #         - if [ -f ~/.bashrc ]; then
-          #         -     . ~/.bashrc
-          #         - fi
-          #         - !Sub ["export CATALINA_OPTS=\"${CatalinaOpts}\"", CatalinaOpts: !Ref CatalinaOpts]
-          #     mode: '000644'
-          #     owner: atlbitbucket
-          #     group: atlbitbucket
-
-          # commands:
-          #   010_add_nfs_mount:
-          #     command: !Sub
-          #       - "echo ${FileServerPrivateIp}:/media/atl/bitbucket/shared /media/atl/bitbucket/shared nfs lookupcache=pos,noatime,intr,rsize=32768,wsize=32768 0 0 >>/etc/fstab"
-          #       - FileServerPrivateIp: !GetAtt FileServer.PrivateIp
-          #     ignoreErrors: false
-          #   020_make_shared_home_dir:
-          #     command: mkdir -p /media/atl/bitbucket/shared
-          #     ignoreErrors: false
-          #   030_chown_shared_home_dir:
-          #     command: "chown atlbitbucket:atlbitbucket /media/atl/bitbucket /media/atl/bitbucket/shared"
-          #     ignoreErrors: false
-
-          # services:
-          #   sysvinit:
-          #     cfn-hup:
-          #       enabled: true
-          #       ensureRunning: true
-          #       files: [/etc/cfn/cfn-hup.conf, /etc/cfn/hooks.d/cfn-auto-reloader.conf]
-          #     collectd:
-          #       !If [SetupCollectd, {enabled: true, ensureRunning: true}, !Ref "AWS::NoValue"]
-          #     rpcbind:
-          #       enabled: true
-          #       ensureRunning: true
-          #       packages:
-          #         yum: [nfs-utils]
-
-        # '2':
-        #   commands:
-        #     040_mount_nfs:
-        #       command: "bash -c \"until mount /media/atl/bitbucket/shared; do echo 'Mount of shared volume failed trying again in 5 seconds.'; sleep 5; done\""
-        #       ignoreErrors: false
-        #   services:
-        #     sysvinit:
-        #       nfslock:
-        #         enabled: true
-        #         ensureRunning: true
-        #         packages:
-        #           yum: [nfs-utils]
-
     Properties:
       AssociatePublicIpAddress: false
       BlockDeviceMappings:
@@ -869,7 +793,7 @@ Resources:
           - ""
           -
             - "#!/bin/bash -xe\n"
-            - "yum update -y aws-cfn-bootstrap\n"
+            - "yum update -y aws-cfn-bootstrap amazon-ssm-agent\n"
             - !Sub ["/opt/aws/bin/cfn-init -v --stack ${StackName}", StackName: !Ref "AWS::StackName"]
             - !Sub [" --resource ClusterNodeLaunchConfig --region ${Region}\n", Region: !Ref "AWS::Region"]
             - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
@@ -1007,71 +931,6 @@ Resources:
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
 
-            # /opt/atlassian/bitbucket-diy-backup/bitbucket.diy-backup.vars.sh:
-            #   content:
-            #     !Join
-            #     - "\n"
-            #     -
-            #       - "# This file was generated from the BitbucketDataCenter CloudFormation template"
-            #       - !Sub ["INSTANCE_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
-            #       - !Sub
-            #         - "BITBUCKET_URL=${HTTP}://${LoadBalancerDNSName}"
-            #         - HTTP: !If [DoSSL, "https", "http"]
-            #           LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
-            #       - BITBUCKET_HOME=/media/atl/bitbucket
-            #       - BITBUCKET_UID=bitbucket
-            #       - BITBUCKET_GID=bitbucket
-            #       - !If
-            #         - StandbyMode
-            #         - "BACKUP_DISK_TYPE=${BACKUP_DISK_TYPE:-zfs}"
-            #         - "BACKUP_DISK_TYPE=${BACKUP_DISK_TYPE:-amazon-ebs}"
-            #       - "BACKUP_DATABASE_TYPE=${BACKUP_DATABASE_TYPE:-amazon-rds}"
-            #       - BACKUP_ARCHIVE_TYPE=
-            #       - "BACKUP_ELASTICSEARCH_TYPE=amazon-es"
-            #       - "BACKUP_ZERO_DOWNTIME=true"
-            #       - HOME_DIRECTORY_MOUNT_POINT=/media/atl
-            #       - "EBS_VOLUME_MOUNT_POINT_AND_DEVICE_NAMES=(/media/atl:/dev/sdf)"
-            #       - !Sub ["RESTORE_DISK_VOLUME_TYPE=${HomeProvisionedIops}", HomeProvisionedIops: !If [IsHomeProvisionedIops, "io1", "gp2"]]
-            #       - !If [IsHomeProvisionedIops, !Sub ["RESTORE_DISK_IOPS=${HomeIops}", HomeIops: !Ref "HomeIops"], !Ref "AWS::NoValue"]
-            #       - FILESYSTEM_TYPE=zfs
-            #       - "ZFS_FILESYSTEM_NAMES=()"
-            #       - "for volume in \"${EBS_VOLUME_MOUNT_POINT_AND_DEVICE_NAMES[@]}\"; do"
-            #       - "    mount_point=\"$(echo \"${volume}\" | cut -d \":\" -f1)\""
-            #       - "    ZFS_FILESYSTEM_NAMES+=($(run sudo zfs list -H -o name,mountpoint | grep \"${mount_point}\" | cut -f1))"
-            #       - "done"
-            #       - !Sub ["RDS_INSTANCE_ID=${DB}", DB: !Ref "DB"]
-            #       - !Sub ["RESTORE_RDS_INSTANCE_CLASS=${DBInstanceClass}", DBInstanceClass: !Ref "DBInstanceClass"]
-            #       - !Sub ["RESTORE_RDS_MULTI_AZ=${DBMultiAZ}", DBMultiAZ: !Ref "DBMultiAZ"]
-            #       - !Sub ["RESTORE_RDS_SUBNET_GROUP_NAME=${DBSubnetGroup}", DBSubnetGroup: !Ref "DBSubnetGroup"]
-            #       - !Sub ["RESTORE_RDS_SECURITY_GROUP=${SecurityGroup}", SecurityGroup: !Ref "SecurityGroup"]
-            #       - "CURL_OPTIONS=\"-L -s -f\""
-            #       - !Sub ["AWS_REGION=${Region}", Region: !Ref "AWS::Region"]
-            #       - "AWS_INFO=$(curl ${CURL_OPTIONS} http://169.254.169.254/latest/dynamic/instance-identity/document)"
-            #       - "AWS_ACCOUNT_ID=$(echo \"${AWS_INFO}\" | jq -r .accountId)"
-            #       - "AWS_AVAILABILITY_ZONE=$(echo \"${AWS_INFO}\" | jq -r .availabilityZone)"
-            #       - "AWS_REGION=$(echo \"${AWS_INFO}\" | jq -r .region)"
-            #       - "AWS_EC2_INSTANCE_ID=$(echo \"${AWS_INFO}\" | jq -r .instanceId)"
-            #       - AWS_ADDITIONAL_TAGS=
-            #       - "BITBUCKET_VERBOSE_BACKUP=${BITBUCKET_VERBOSE_BACKUP:-true}"
-            #       - KEEP_BACKUPS=5
-            #       - "ELASTICSEARCH_REPOSITORY_NAME=bitbucket-snapshots"
-            #       - "ELASTICSEARCH_INDEX_NAME=bitbucket-search-v1"
-            #       - !Sub ["ELASTICSEARCH_S3_BUCKET=${BucketName}", BucketName: !Ref ESBucketName]
-            #       - !Sub ["ELASTICSEARCH_S3_BUCKET_REGION=${Region}", Region: !Ref "AWS::Region"]
-            #       - !Sub ["ELASTICSEARCH_SNAPSHOT_IAM_ROLE=${Role}", Role: !GetAtt BitbucketFileServerRole.Arn]
-            #       - !Sub ["ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
-            #       - !If
-            #         - StandbyMode
-            #         - !Sub ["STANDBY_JDBC_URL=jdbc:postgres://${DBEndpointAddress}/bitbucket", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
-            #         - !Ref "AWS::NoValue"
-            #       - !If
-            #         - StandbyMode
-            #         - !Sub ["DR_RDS_READ_REPLICA=${DB}", DB: !Ref DB]
-            #         - !Ref "AWS::NoValue"
-            #   mode: "000644"
-            #   owner: "ec2-user"
-            #   group: "ec2-user"
-
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
                 #!/bin/bash
@@ -1116,29 +975,6 @@ Resources:
                 cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_bitbucket_nfs_node.yml /var/log/ansible-bootstrap.log
               ignoreErrors: true
 
-        # "2":
-        #   services:
-        #     sysvinit:
-        #       nfs:
-        #         enabled: true
-        #         ensureRunning: true
-        #       nfslock:
-        #         enabled: true
-        #         ensureRunning: true
-        #   commands:
-        #     !If
-        #     - RestoreFromESSnapshot
-        #     - 020_restore_es_snapshot:
-        #         command: !Sub
-        #           - "/opt/atlassian/bitbucket-diy-backup/bitbucket.diy-restore.sh ${ESSnapshotId}"
-        #           - ESSnapshotId: !Ref "ESSnapshotId"
-        #         ignoreErrors: false
-        #         env:
-        #           SNAPSHOT_TAG_PREFIX: !Ref "ESSnapshotId"
-        #           BACKUP_DISK_TYPE: "none"
-        #           BACKUP_DATABASE_TYPE: "none"
-        #     - !Ref "AWS::NoValue"
-
     Properties:
       BlockDeviceMappings:
         - DeviceName: /dev/sdf
@@ -1177,7 +1013,7 @@ Resources:
           - ""
           -
             - "#!/bin/bash -xe\n"
-            - "yum update -y aws-cfn-bootstrap\n"
+            - "yum update -y aws-cfn-bootstrap amazon-ssm-agent\n"
             - !Sub ["/opt/aws/bin/cfn-init -v --stack ${StackName}", StackName: !Ref "AWS::StackName"]
             - !Sub [" --resource FileServer --region ${Region}\n", Region: !Ref "AWS::Region"]
             - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
