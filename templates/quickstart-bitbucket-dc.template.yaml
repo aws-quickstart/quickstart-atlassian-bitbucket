@@ -672,21 +672,7 @@ Resources:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
       AWS::CloudFormation::Init:
-        # configSets:
-        #   default: [1, 2]
-        # '1':
         config:
-
-          # packages:
-          #   !If
-          #   - SetupCollectd
-          #   - yum:
-          #       collectd: []
-          #       collectd-java: []
-          #       collectd-generic-jmx: []
-          #       collectd-rrdtool: []
-          #   - !Ref AWS::NoValue
-
           files:
             /etc/atl:
               content:
@@ -878,12 +864,7 @@ Resources:
     Metadata:
       Comment: Set up NFS Server and initial bitbucket.properties
       AWS::CloudFormation::Init:
-        # configSets:
-        #   default: [1, 2]
-        # "1":
-
         config:
-
           files:
             /etc/atl:
               content:
@@ -955,10 +936,6 @@ Resources:
               group: root
 
           commands:
-            # 010_pull_diy_backup_repo:
-            #   command: "git pull"
-            #   cwd: "/opt/atlassian/bitbucket-diy-backup"
-            #   ignoreErrors: true
             070_create_atl_dir:
               test: "test ! -d /opt/atlassian/"
               command: mkdir -p /opt/atlassian
