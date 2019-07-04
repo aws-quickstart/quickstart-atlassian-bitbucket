@@ -53,7 +53,10 @@ Metadata:
           - AMIOpts
           - HomeDeleteOnTermination
           - DBMaster
-          - StartCollectd
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationPlaybook
+          - DeploymentAutomationKeyName
           - QSS3BucketName
           - QSS3KeyPrefix
 
@@ -80,6 +83,14 @@ Metadata:
         default: Bitbucket cluster node instance type
       CreateBucket:
         default: Create S3 bucket for Elasticsearch snapshots
+      DeploymentAutomationRepository:
+        default: Deployment Automation Git Repository URL
+      DeploymentAutomationBranch:
+        default: Deployment Automation Branch
+      DeploymentAutomationPlaybook:
+        default: The Ansible playbook to invoke to initialise the instance.
+      DeploymentAutomationKeyName:
+        default: SSH keyname to use with the repository (Optional)
       ESBucketName:
         default: Elasticsearch snapshot S3 bucket name
       ESSnapshotId:
@@ -128,8 +139,6 @@ Metadata:
         default: AZ2 public IP address block
       SSLCertificateARN:
         default: SSL Certificate ARN
-      StartCollectd:
-        default: Start the collectd service
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
       QSS3KeyPrefix:
@@ -324,6 +333,22 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName.
     Type: String
+  DeploymentAutomationRepository:
+    Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
+    Type: String
+    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customisations.
+  DeploymentAutomationBranch:
+    Default: "master"
+    Type: String
+    Description: The deployment automation repository branch to pull from.
+  DeploymentAutomationPlaybook:
+    Default: "aws_bitbucket_dc_node.yml"
+    Type: String
+    Description: The Ansible playbook to invoke to initialise the application node on first start.
+  DeploymentAutomationKeyName:
+    Default: ""
+    Type: String
+    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
   ESBucketName:
     Default: ''
     AllowedPattern: '[a-z0-9-]*'
@@ -485,12 +510,7 @@ Parameters:
     MinLength: 0
     MaxLength: 90
     Type: String
-  StartCollectd:
-    Description: Start the 'collectd' metrics agent.
-    Default: false
-    Type: String
-    AllowedValues: [true, false]
-    ConstraintDescription: Must be 'true' or 'false'
+
 Conditions:
   GovCloudCondition: !Equals
     - !Ref 'AWS::Region'
@@ -550,6 +570,10 @@ Resources:
         DBSnapshotId: !Ref 'DBSnapshotId'
         DBStorage: !Ref 'DBStorage'
         DBStorageType: !Ref 'DBStorageType'
+        DeploymentAutomationRepository: !Ref 'DeploymentAutomationRepository'
+        DeploymentAutomationBranch: !Ref 'DeploymentAutomationBranch'
+        DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
+        DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
         ESBucketName: !Ref 'ESBucketName'
         ESSnapshotId: !Ref 'ESSnapshotId'
@@ -561,7 +585,7 @@ Resources:
         HomeVolumeType: !Ref 'HomeVolumeType'
         KeyPairName: !Ref 'KeyPairName'
         SSLCertificateARN: !Ref 'SSLCertificateARN'
-        StartCollectd: !Ref 'StartCollectd'
+
 Outputs:
   ClusterNodeGroup:
     Description: The name of the auto scaling group of cluster nodes
