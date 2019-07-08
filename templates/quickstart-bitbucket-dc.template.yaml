@@ -41,6 +41,7 @@ Metadata:
           - AssociatePublicIpAddress
           - CidrBlock
           - KeyPairName
+          - CustomDnsName
           - SSLCertificateARN
       - Label:
           default: Advanced (Optional)
@@ -127,6 +128,8 @@ Metadata:
         default: Home directory volume type
       KeyPairName:
         default: Key Name *
+      CustomDnsName:
+        default: Existing DNS name (optional)
       SSLCertificateARN:
         default: SSL Certificate ARN
 
@@ -459,6 +462,10 @@ Parameters:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
+  CustomDnsName:
+    Default: ""
+    Description: 'Use custom existing DNS name for your Data Center instance. Please note: you must own the domain and configure it to point at the load balancer.'
+    Type: String
   SSLCertificateARN:
     Default: ''
     Description: Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created.
@@ -487,6 +494,8 @@ Conditions:
     !Not [!Equals [!Ref ESBucketName, '']]
   StandbyMode:
     !Not [!Equals [!Ref DBMaster, '']]
+  UseCustomDnsName:
+    !Not [!Equals [!Ref CustomDnsName, '']]
   DoSSL:
     !Not [!Equals [!Ref SSLCertificateARN, '']]
   NotStandbyMode:
@@ -690,7 +699,7 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
-                  - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
+                  - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
@@ -1121,11 +1130,17 @@ Outputs:
     Description: The RDS ARN to use when creating a Data Center standby stack
     Value: !If [NotStandbyMode, !Sub ["arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]
   ServiceURL:
-    Description: The URL of the Bitbucket Data Center instance
-    Value: !Sub
-      - "${HTTP}://${LoadBalancerDNSName}"
-      - HTTP: !If [DoSSL, https, http]
-        LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
+    Description: The URL to access this Atlassian service
+    Value: !If
+      - UseCustomDnsName
+      - !Sub
+        - "${HTTP}://${CustomDNSName}"
+        - HTTP: !If [DoSSL, https, http]
+          CustomDNSName: !Ref CustomDnsName
+      - !Sub
+        - "${HTTP}://${LoadBalancerDNSName}"
+        - HTTP: !If [DoSSL, https, http]
+          LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
   SGname:
     Description: The name of the SecurityGroup
     Value: !Ref SecurityGroup
