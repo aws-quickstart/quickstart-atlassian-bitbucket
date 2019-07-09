@@ -16,6 +16,7 @@ Metadata:
           - VPCCIDR
           - AvailabilityZones
           - AssociatePublicIpAddress
+          - CustomDnsName
           - SSLCertificateARN
           - PrivateSubnet1CIDR
           - PrivateSubnet2CIDR
@@ -140,6 +141,8 @@ Metadata:
         default: AZ1 public IP address block        
       PublicSubnet2CIDR:
         default: AZ2 public IP address block
+      CustomDnsName:
+        default: Existing DNS name (optional)
       SSLCertificateARN:
         default: SSL Certificate ARN
       QSS3BucketName:
@@ -511,6 +514,10 @@ Parameters:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
+  CustomDnsName:
+    Default: ""
+    Description: 'Use custom existing DNS name for your Data Center instance. Please note: you must own the domain and configure it to point at the load balancer.'
+    Type: String
   SSLCertificateARN:
     Default: ''
     Description: Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created.
