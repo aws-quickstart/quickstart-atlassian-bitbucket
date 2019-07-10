@@ -15,7 +15,7 @@ Metadata:
           - AccessCIDR
           - VPCCIDR
           - AvailabilityZones
-          - AssociatePublicIpAddress
+          - InternetFacingLoadBalancer
           - CustomDnsName
           - SSLCertificateARN
           - PrivateSubnet1CIDR
@@ -69,8 +69,6 @@ Metadata:
         default: AMI Options
       AvailabilityZones:
         default: Availability Zones
-      AssociatePublicIpAddress:
-        default: Assign public IP
       BitbucketProperties:
         default: Bitbucket properties
       BitbucketVersion:
@@ -131,6 +129,8 @@ Metadata:
         default: Home directory size
       HomeVolumeSnapshotId:
         default: Home volume snapshot ID to restore
+      InternetFacingLoadBalancer:
+        default: Make instance internet facing
       KeyPairName:
         default: Key Name
       PrivateSubnet1CIDR:
@@ -209,12 +209,6 @@ Parameters:
     Default: ''
     Description: A comma separated list of options to pass to the AMI
     Type: CommaDelimitedList
-  AssociatePublicIpAddress:
-    Default: true
-    AllowedValues: [true, false]
-    ConstraintDescription: Must be 'true' or 'false'.
-    Description: Controls if the EC2 instances are assigned a public IP address
-    Type: String
   BitbucketProperties:
     Default: ''
     Description: A comma-separated list of bitbucket properties in the form 'key1=value1, key2=value2, ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
@@ -514,6 +508,12 @@ Parameters:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
+  InternetFacingLoadBalancer:
+    Default: true
+    AllowedValues: [true, false]
+    ConstraintDescription: Must be 'true' or 'false'.
+    Description: Controls if the load balancer is deployed as internet-facing (visible to all on internet) or internal (private to VPC).
+    Type: String
   CustomDnsName:
     Default: ""
     Description: 'Use custom existing DNS name for your Data Center instance. Please note: you must own the domain and configure it to point at the load balancer.'
@@ -564,7 +564,7 @@ Resources:
         AMIOpts: !Join
           - ','
           - !Ref 'AMIOpts'
-        AssociatePublicIpAddress: !Ref 'AssociatePublicIpAddress'
+        InternetFacingLoadBalancer: !Ref 'InternetFacingLoadBalancer'
         BitbucketProperties: !Join
           - ','
           - !Ref 'BitbucketProperties'
