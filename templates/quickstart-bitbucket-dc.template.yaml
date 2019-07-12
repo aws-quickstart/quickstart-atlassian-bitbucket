@@ -291,12 +291,6 @@ Parameters:
     Default: ""
     Type: String
     Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
-  ESBucketName:
-    Default: ''
-    AllowedPattern: '[a-z0-9-]*'
-    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
-    Description: Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.
-    Type: String
   ESSnapshotId:
     Default: ''
     AllowedPattern: '[a-z0-9-]*'
