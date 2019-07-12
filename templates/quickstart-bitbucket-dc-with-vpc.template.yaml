@@ -52,7 +52,6 @@ Metadata:
           - BitbucketProperties
           - JvmHeapOverride
           - JvmSupportOpts
-          - AMIOpts
           - HomeDeleteOnTermination
           - DBMaster
           - DeploymentAutomationRepository
@@ -65,8 +64,6 @@ Metadata:
     ParameterLabels:
       AccessCIDR:
         default: Trusted IP range
-      AMIOpts:
-        default: AMI Options
       AvailabilityZones:
         default: Availability Zones
       AssociatePublicIpAddress:
@@ -205,10 +202,6 @@ Parameters:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     Description: CIDR Block for the VPC
     Type: String
-  AMIOpts:
-    Default: ''
-    Description: A comma separated list of options to pass to the AMI
-    Type: CommaDelimitedList
   AssociatePublicIpAddress:
     Default: true
     AllowedValues: [true, false]
@@ -561,9 +554,6 @@ Resources:
             - s3-us-gov-west-1
             - s3
       Parameters:
-        AMIOpts: !Join
-          - ','
-          - !Ref 'AMIOpts'
         AssociatePublicIpAddress: !Ref 'AssociatePublicIpAddress'
         BitbucketProperties: !Join
           - ','
