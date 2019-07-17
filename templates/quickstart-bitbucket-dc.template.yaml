@@ -38,8 +38,8 @@ Metadata:
       - Label:
           default: Networking
         Parameters:
-          - AssociatePublicIpAddress
           - CidrBlock
+          - InternetFacingLoadBalancer
           - KeyPairName
           - CustomDnsName
           - SSLCertificateARN
@@ -62,8 +62,6 @@ Metadata:
           - DeploymentAutomationKeyName
 
     ParameterLabels:
-      AssociatePublicIpAddress:
-        default: Assign public IP
       BitbucketProperties:
         default: Bitbucket properties
       BitbucketVersion:
@@ -126,6 +124,8 @@ Metadata:
         default: Home volume snapshot ID to restore
       HomeVolumeType:
         default: Home directory volume type
+      InternetFacingLoadBalancer:
+        default: Make instance internet facing
       KeyPairName:
         default: Key Name *
       CustomDnsName:
@@ -134,12 +134,6 @@ Metadata:
         default: SSL Certificate ARN
 
 Parameters:
-  AssociatePublicIpAddress:
-    Default: true
-    AllowedValues: [true, false]
-    ConstraintDescription: Must be 'true' or 'false'.
-    Description: Controls if the EC2 instances are assigned a public IP address
-    Type: String
   BitbucketProperties:
     Default: ''
     Description: A comma-separated list of bitbucket properties in the form 'key1=value1, key2=value2, ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
@@ -446,6 +440,12 @@ Parameters:
     AllowedValues: [General Purpose (SSD), Provisioned IOPS]
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Type: String
+  InternetFacingLoadBalancer:
+    Default: true
+    AllowedValues: [true, false]
+    ConstraintDescription: Must be 'true' or 'false'.
+    Description: Controls whether the load balancer should be visible to the internet (true) or only within the VPC (false).
+    Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
     Description: The EC2 Key Pair to allow SSH access to the instances
@@ -515,7 +515,7 @@ Conditions:
   SetDBMasterUserPassword:
     !And [!Not [!Equals [!Ref DBMasterUserPassword, '']], Condition: NotStandbyMode]
   UsePublicIp:
-    !Equals [!Ref AssociatePublicIpAddress, 'true']
+    !Equals [!Ref InternetFacingLoadBalancer, 'true']
 
 Mappings:
   AWSRegionArch2AMI:
