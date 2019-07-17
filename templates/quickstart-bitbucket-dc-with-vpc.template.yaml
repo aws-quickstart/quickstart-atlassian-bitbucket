@@ -52,7 +52,6 @@ Metadata:
           - BitbucketProperties
           - JvmHeapOverride
           - JvmSupportOpts
-          - AMIOpts
           - HomeDeleteOnTermination
           - DBMaster
           - DeploymentAutomationRepository
@@ -65,8 +64,6 @@ Metadata:
     ParameterLabels:
       AccessCIDR:
         default: Trusted IP range
-      AMIOpts:
-        default: AMI Options
       AvailabilityZones:
         default: Availability Zones
       BitbucketProperties:
