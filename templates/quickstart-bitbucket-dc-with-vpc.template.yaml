@@ -202,10 +202,6 @@ Parameters:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     Description: CIDR Block for the VPC
     Type: String
-  AMIOpts:
-    Default: ''
-    Description: A comma separated list of options to pass to the AMI
-    Type: CommaDelimitedList
   BitbucketProperties:
     Default: ''
     Description: A comma-separated list of bitbucket properties in the form 'key1=value1, key2=value2, ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
@@ -558,9 +554,6 @@ Resources:
             - s3-us-gov-west-1
             - s3
       Parameters:
-        AMIOpts: !Join
-          - ','
-          - !Ref 'AMIOpts'
         InternetFacingLoadBalancer: !Ref 'InternetFacingLoadBalancer'
         BitbucketProperties: !Join
           - ','
