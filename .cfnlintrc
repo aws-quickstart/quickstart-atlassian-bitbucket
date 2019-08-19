@@ -1,0 +1,7 @@
+templates:
+  - templates/*
+ignore_checks:
+  - E2504
+    # The check cannot handle this situation:
+    # Iops: !If [IsHomeProvisionedIops, !Ref HomeIops, !Ref "AWS::NoValue"]
+    # VolumeType: !If [IsHomeProvisionedIops, io1, gp2]
