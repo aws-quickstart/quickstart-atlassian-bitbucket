@@ -767,9 +767,6 @@ Resources:
 
     Properties:
       AssociatePublicIpAddress: false
-      BlockDeviceMappings:
-        - DeviceName: /dev/sdf
-          NoDevice: true
       KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
       IamInstanceProfile: !Ref BitbucketClusterNodeInstanceProfile
       ImageId:
@@ -880,7 +877,7 @@ Resources:
                   - ATL_ENABLED_PRODUCTS=
                   - ATL_ENABLED_SHARED_HOMES=Bitbucket
                   - ATL_APP_NFS_SERVER=true
-                  - ATL_NFS_SERVER_DEVICE=/dev/sdf
+                  - ATL_NFS_SERVER_DEVICE=/dev/xvdf
                   # NOTE: For simplicity we should keep this as close to the BB node version above.
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
@@ -960,15 +957,12 @@ Resources:
 
     Properties:
       BlockDeviceMappings:
-        - DeviceName: /dev/sdf
+        - DeviceName: /dev/xvdf
           Ebs:
             DeleteOnTermination: !Ref HomeDeleteOnTermination
             Iops: !If [IsHomeProvisionedIops, !Ref HomeIops, !Ref "AWS::NoValue"]
             SnapshotId: !If [RestoreFromEBSSnapshot, !Ref HomeVolumeSnapshotId, !Ref "AWS::NoValue"]
             VolumeSize: !Ref HomeSize
-            VolumeType: !If [IsHomeProvisionedIops, io1, gp2]
-        - DeviceName: /dev/sdf
-          NoDevice: {}
       IamInstanceProfile: !Ref BitbucketFileServerInstanceProfile
       EbsOptimized: true
       ImageId:
