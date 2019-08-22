@@ -319,12 +319,12 @@ Parameters:
     MaxValue: 30000
     Type: Number
   DBMasterUserPassword:
-    AllowedPattern: '[a-zA-Z0-9]*'
-    ConstraintDescription: Must be at least 8 alphanumeric characters.
-    Description: Password for the master ('postgres') account.
-    MinLength: 8
+    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
+    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    NoEcho: True
     MaxLength: 128
-    NoEcho: true
+    MinLength: 8
     Type: String
   DBMultiAZ:
     Description: Whether to provision a multi-AZ RDS instance.
@@ -335,9 +335,9 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Type: String
   DBPassword:
-    AllowedPattern: '[a-zA-Z0-9]*'
-    ConstraintDescription: If specified, must be at least 8 alphanumeric characters.
-    Description: Password for the Bitbucket user ('atlbitbucket') account. Max length of 128 characters. Not used if you have specified a Database snapshot ID.
+    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
+    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: Password for the Bitbucket user ('atlbitbucket') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
     MaxLength: 128
     NoEcho: true
     Type: String
@@ -512,7 +512,7 @@ Conditions:
     !And [Condition: IsVersion5X, !Or [Condition: IsVersionX0, Condition: IsVersionX1, Condition: IsVersionX2, Condition: IsVersionX3, Condition: IsVersionX4, Condition: IsVersionX5, Condition: IsVersionX6]]
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
-  SetDBMasterUserPassword:
+  SetDBMasterUserAndPassword:
     !And [!Not [!Equals [!Ref DBMasterUserPassword, '']], Condition: NotStandbyMode]
   UsePublicIp:
     !Equals [!Ref InternetFacingLoadBalancer, 'true']
@@ -659,9 +659,9 @@ Resources:
   ClusterNodeGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      DesiredCapacity: !If [StandbyMode, 0, !Ref ClusterNodeMin]
+      DesiredCapacity: !If [StandbyMode, '0', !Ref ClusterNodeMin]
       LaunchConfigurationName: !Ref ClusterNodeLaunchConfig
-      MinSize: !If [StandbyMode, 0, !Ref ClusterNodeMin]
+      MinSize: !If [StandbyMode, '0', !Ref ClusterNodeMin]
       MaxSize: !Ref ClusterNodeMax
       LoadBalancerNames: [!Ref LoadBalancer]
       VPCZoneIdentifier: !Select [0, [!Split [ ',', !ImportValue ATL-PriNets]]]
@@ -723,7 +723,7 @@ Resources:
                   - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=http://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Join ["\\\n", !Ref BitbucketProperties]]
-                  - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]                  
+                  - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
@@ -792,14 +792,14 @@ Resources:
     Properties:
       AdjustmentType: ChangeInCapacity
       AutoScalingGroupName: !Ref ClusterNodeGroup
-      Cooldown: 600
+      Cooldown: '600'
       ScalingAdjustment: 1
   ClusterNodeScaleDownPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       AdjustmentType: ChangeInCapacity
       AutoScalingGroupName: !Ref ClusterNodeGroup
-      Cooldown: 600
+      Cooldown: '600'
       ScalingAdjustment: -1
   CPUAlarmHigh:
     Type: AWS::CloudWatch::Alarm
@@ -951,7 +951,7 @@ Resources:
               command: /opt/atlassian/bin/clone_deployment_repo
               ignoreErrors: true
             080_run_atl_init_node:
-              command: !Sub |
+              command:
                 cd /opt/atlassian/dc-deployments-automation/ && ./bin/install-ansible && ./bin/ansible-with-atl-env inv/aws_node_local aws_bitbucket_nfs_node.yml /var/log/ansible-bootstrap.log
               ignoreErrors: true
 
@@ -959,9 +959,8 @@ Resources:
       BlockDeviceMappings:
         - DeviceName: /dev/xvdf
           Ebs:
-            VolumeType: !If [IsHomeProvisionedIops, io1, gp2]
-            Iops: !If [IsHomeProvisionedIops, !Ref HomeIops, !Ref "AWS::NoValue"]
             DeleteOnTermination: !Ref HomeDeleteOnTermination
+            Iops: !If [IsHomeProvisionedIops, !Ref HomeIops, !Ref "AWS::NoValue"]
             SnapshotId: !If [RestoreFromEBSSnapshot, !Ref HomeVolumeSnapshotId, !Ref "AWS::NoValue"]
             VolumeSize: !Ref HomeSize
       IamInstanceProfile: !Ref BitbucketFileServerInstanceProfile
@@ -976,7 +975,7 @@ Resources:
       NetworkInterfaces:
         - GroupSet: [!Ref SecurityGroup]
           AssociatePublicIpAddress: false
-          DeviceIndex: 0
+          DeviceIndex: '0'
           DeleteOnTermination: true
           SubnetId: !Select [0, !Split [ ",", !ImportValue ATL-PriNets] ]
       Tags:
@@ -1006,10 +1005,10 @@ Resources:
       DBSnapshotIdentifier: !If [RestoreFromRDSSnapshot, !Ref DBSnapshotId, !Ref "AWS::NoValue"]
       DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: postgres
-      EngineVersion: 10
+      EngineVersion: '10'
       Iops: !If [DBProvisionedIops, !Ref DBIops, !Ref "AWS::NoValue"]
-      MasterUsername: postgres
-      MasterUserPassword: !If [SetDBMasterUserPassword, !Ref DBMasterUserPassword, !Ref "AWS::NoValue"]
+      MasterUsername: !If ["SetDBMasterUserAndPassword", postgres, !Ref "AWS::NoValue"]
+      MasterUserPassword: !If ["SetDBMasterUserAndPassword", !Ref DBMasterUserPassword, !Ref "AWS::NoValue"]
       MultiAZ: !If [StandbyMode, !Ref "AWS::NoValue", !Ref DBMultiAZ]
       StorageType: !If [DBProvisionedIops, io1, gp2]
       SourceDBInstanceIdentifier: !If [StandbyMode, !Ref DBMaster, !Ref "AWS::NoValue"]
@@ -1035,31 +1034,31 @@ Resources:
         IdleTimeout: 3600
       CrossZone: true
       Listeners:
-        - LoadBalancerPort: 80
+        - LoadBalancerPort: '80'
           Protocol: HTTP
-          InstancePort: !If [DoSSL, 7991, 7990]
+          InstancePort: !If [DoSSL, '7991', '7990']
           InstanceProtocol: HTTP
           PolicyNames: [SessionStickiness]
         - !If
           - DoSSL
-          - LoadBalancerPort: 443
+          - LoadBalancerPort: '443'
             Protocol: HTTPS
-            InstancePort: 7990
+            InstancePort: '7990'
             InstanceProtocol: HTTP
             PolicyNames:
               - SessionStickiness
             SSLCertificateId: !Ref SSLCertificateARN
           - !Ref AWS::NoValue
-        - LoadBalancerPort: 7999
+        - LoadBalancerPort: '7999'
           Protocol: TCP
-          InstancePort: 7999
+          InstancePort: '7999'
           InstanceProtocol: TCP
       HealthCheck:
-        HealthyThreshold: 2
-        Interval: 60
+        HealthyThreshold: '2'
+        Interval: '60'
         Target: HTTP:7990/status
-        Timeout: 29
-        UnhealthyThreshold: 2
+        Timeout: '29'
+        UnhealthyThreshold: '2'
       Scheme: !If [UsePublicIp, 'internet-facing', 'internal']
       SecurityGroups: [!Ref SecurityGroup]
       Subnets: !Split [ ",", !ImportValue ATL-PubNets]
@@ -1098,8 +1097,8 @@ Resources:
     Properties:
       GroupId: !Ref SecurityGroup
       IpProtocol: '-1'
-      FromPort: '-1'
-      ToPort: '-1'
+      FromPort: -1
+      ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
 Outputs:
   ClusterNodeGroup:
