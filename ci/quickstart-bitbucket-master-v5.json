@@ -4,10 +4,6 @@
         "ParameterValue": "$[taskcat_genaz_2]"
     },
     {
-        "ParameterKey": "BitbucketVersion",
-        "ParameterValue": "5.16.0"
-    },
-    {
         "ParameterKey": "DBMasterUserPassword",
         "ParameterValue": "$[taskcat_genpass_8]"
     },
