@@ -963,6 +963,7 @@ Resources:
             Iops: !If [IsHomeProvisionedIops, !Ref HomeIops, !Ref "AWS::NoValue"]
             SnapshotId: !If [RestoreFromEBSSnapshot, !Ref HomeVolumeSnapshotId, !Ref "AWS::NoValue"]
             VolumeSize: !Ref HomeSize
+            VolumeType: !If [IsHomeProvisionedIops, io1, gp2]
       IamInstanceProfile: !Ref BitbucketFileServerInstanceProfile
       EbsOptimized: true
       ImageId:
