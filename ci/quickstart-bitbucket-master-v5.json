@@ -9,7 +9,7 @@
     },
     {
         "ParameterKey": "DBMasterUserPassword",
-        "ParameterValue": "$[taskcat_genpass_8]"
+        "ParameterValue": "$[taskcat_genpass_8S]"
     },
     {
         "ParameterKey": "AccessCIDR",
@@ -25,7 +25,7 @@
     },
     {
         "ParameterKey": "DBPassword",
-        "ParameterValue": "$[taskcat_genpass_8]"
+        "ParameterValue": "$[taskcat_genpass_8S]"
     },
     {
         "ParameterKey": "KeyPairName",
