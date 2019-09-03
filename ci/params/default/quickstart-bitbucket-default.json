@@ -1,0 +1,34 @@
+[
+  {
+    "ParameterKey": "DBMultiAZ",
+    "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "BitbucketVersion",
+    "ParameterValue": "6.6.0"
+  },
+  {
+    "ParameterKey": "DBMasterUserPassword",
+    "ParameterValue": "f925dO1ry_"
+  },
+  {
+    "ParameterKey": "CidrBlock",
+    "ParameterValue": "0.0.0.0/0"
+  },
+  {
+    "ParameterKey": "DBInstanceClass",
+    "ParameterValue": "db.t2.large"
+  },
+  {
+    "ParameterKey": "DBIops",
+    "ParameterValue": "1000"
+  },
+  {
+    "ParameterKey": "DBPassword",
+    "ParameterValue": "f925dO1ry_"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "replaced-by-taskcat-override-file"
+  }
+]
