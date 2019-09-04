@@ -103,9 +103,9 @@ Metadata:
       DeploymentAutomationBranch:
         default: Deployment Automation Branch
       DeploymentAutomationPlaybook:
-        default: The Ansible playbook to invoke to initialise the instance.
+        default: Ansible playbook to invoke during instance initialization
       DeploymentAutomationKeyName:
-        default: SSH keyname to use with the repository (Optional)
+        default: SSH key name to use with the repository
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
       ESBucketName:
@@ -129,7 +129,7 @@ Metadata:
       KeyPairName:
         default: Key Name *
       CustomDnsName:
-        default: Existing DNS name (optional)
+        default: Existing DNS name
       SSLCertificateARN:
         default: SSL Certificate ARN
 
@@ -272,7 +272,7 @@ Parameters:
   DeploymentAutomationRepository:
     Default: 'https://bitbucket.org/atlassian/dc-deployments-automation.git'
     Type: String
-    Description: The deployment automation repository to use for per-node initialisation. Leave this as default unless you have customisations.
+    Description: The deployment automation repository to use for per-node initialization. Leave this as default unless you have customizations.
   DeploymentAutomationBranch:
     Default: "master"
     Type: String
@@ -280,7 +280,7 @@ Parameters:
   DeploymentAutomationPlaybook:
     Default: "aws_bitbucket_dc_node.yml"
     Type: String
-    Description: The Ansible playbook to invoke to initialise the application node on first start.
+    Description: The Ansible playbook to invoke to initialize the application node on first start.
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
