@@ -7,7 +7,8 @@ Metadata:
     ParameterGroups:
       - Label:
           default: Bitbucket setup
-        Parameters: [BitbucketVersion]
+        Parameters:
+          - BitbucketVersion
       - Label:
           default: Networking
         Parameters:
@@ -24,10 +25,18 @@ Metadata:
           - PublicSubnet2CIDR
       - Label:
           default: Cluster nodes
-        Parameters: [ClusterNodeInstanceType, ClusterNodeMin, ClusterNodeMax]
+        Parameters:
+          - CloudWatchIntegration
+          - ClusterNodeInstanceType
+          - ClusterNodeMin
+          - ClusterNodeMax
       - Label:
           default: File server
-        Parameters: [FileServerInstanceType, HomeSize, HomeVolumeType, HomeIops]
+        Parameters:
+          - FileServerInstanceType
+          - HomeSize
+          - HomeVolumeType
+          - HomeIops
       - Label:
           default: Database
         Parameters:
@@ -40,7 +49,8 @@ Metadata:
           - DBMultiAZ
       - Label:
           default: Elasticsearch
-        Parameters: [ElasticsearchInstanceType]
+        Parameters:
+          - ElasticsearchInstanceType
       - Label:
           default: Advanced (Optional)
         Parameters:
@@ -90,6 +100,8 @@ Metadata:
         default: Ansible playbook to invoke during instance initialization
       DeploymentAutomationKeyName:
         default: SSH key name to use with the repository
+      CloudWatchIntegration:
+        default: Enable CloudWatch integration
       ESBucketName:
         default: Elasticsearch snapshot S3 bucket name
       ESSnapshotId:
@@ -346,6 +358,12 @@ Parameters:
     Default: ""
     Type: String
     Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
+  CloudWatchIntegration:
+    Default: "Metrics and Logs"
+    Type: String
+    Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
+    AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
+    ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   ESBucketName:
     Default: ''
     AllowedPattern: '[a-z0-9-]*'

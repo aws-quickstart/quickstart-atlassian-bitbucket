@@ -11,6 +11,7 @@ Metadata:
       - Label:
           default: Cluster nodes
         Parameters:
+          - CloudWatchIntegration
           - ClusterNodeInstanceType
           - ClusterNodeMax
           - ClusterNodeMin
@@ -106,6 +107,8 @@ Metadata:
         default: Ansible playbook to invoke during instance initialization
       DeploymentAutomationKeyName:
         default: SSH key name to use with the repository
+      CloudWatchIntegration:
+        default: Enable CloudWatch integration
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
       ESBucketName:
@@ -285,6 +288,12 @@ Parameters:
     Default: ""
     Type: String
     Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
+  CloudWatchIntegration:
+    Default: "Metrics and Logs"
+    Type: String
+    Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
+    AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
+    ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   DBInstanceClass:
     Default: db.m4.large
     AllowedValues:
@@ -456,7 +465,7 @@ Parameters:
     Type: String
   SSLCertificateARN:
     Default: ''
-    Description: Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created.
+    Description: "Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created."
     MinLength: 0
     MaxLength: 90
     Type: String
@@ -464,6 +473,10 @@ Parameters:
 Conditions:
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
+  EnableCloudWatch:
+    !Not [!Equals [!Ref CloudWatchIntegration, 'Off']]
+  EnableCloudWatchLogs:
+    !Equals [!Ref CloudWatchIntegration, 'Metrics and Logs']
   RestoreFromEBSSnapshot:
     !Not [!Equals [!Ref HomeVolumeSnapshotId, '']]
   RestoreFromRDSSnapshot:
@@ -583,6 +596,7 @@ Resources:
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
       Path: /
       Policies:
         - PolicyName: BitbucketFileServerPolicy
@@ -724,6 +738,9 @@ Resources:
                   - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=http://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Join ["\\\n", !Ref BitbucketProperties]]
                   - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
+
+                  - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH=${EnableCW}", EnableCW: !If [EnableCloudWatch, true, false]]
+                  - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH_LOGS=${EnableCWLogs}", EnableCWLogs: !If [EnableCloudWatchLogs, true, false]]
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
@@ -914,6 +931,9 @@ Resources:
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_BRANCH=${DeployRepositoryBranch}", DeployRepositoryBranch: !Ref "DeploymentAutomationBranch"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
+
+                  - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH=${EnableCW}", EnableCW: !If [EnableCloudWatch, true, false]]
+                  - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH_LOGS=${EnableCWLogs}", EnableCWLogs: !If [EnableCloudWatchLogs, true, false]]
 
             /opt/atlassian/bin/clone_deployment_repo:
               content: !Sub |
