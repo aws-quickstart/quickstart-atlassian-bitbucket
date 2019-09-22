@@ -67,6 +67,7 @@ Metadata:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
           - DeploymentAutomationPlaybook
+          - DeploymentAutomationCustomParams
           - DeploymentAutomationKeyName
           - QSS3BucketName
           - QSS3KeyPrefix
@@ -98,6 +99,8 @@ Metadata:
         default: Deployment Automation Branch
       DeploymentAutomationPlaybook:
         default: Ansible playbook to invoke during instance initialization
+      DeploymentAutomationCustomParams:
+        default: Custom command-line parameters for Ansible. (Optional)
       DeploymentAutomationKeyName:
         default: SSH key name to use with the repository
       CloudWatchIntegration:
@@ -354,6 +357,10 @@ Parameters:
     Default: "aws_bitbucket_dc_node.yml"
     Type: String
     Description: The Ansible playbook to invoke to initialize the application node on first start.
+  DeploymentAutomationCustomParams:
+    Default: ""
+    Type: String
+    Description: Additional command-line options for the `ansible-playbook` command. See the repository README for more details. (Optional)
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
@@ -598,6 +605,7 @@ Resources:
         DeploymentAutomationBranch: !Ref 'DeploymentAutomationBranch'
         DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
+        DeployRepositoryCustomParams: !Ref 'DeployRepositoryCustomParams'
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
         ESBucketName: !Ref 'ESBucketName'
         ESSnapshotId: !Ref 'ESSnapshotId'
