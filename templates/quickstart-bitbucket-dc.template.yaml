@@ -1143,6 +1143,12 @@ Outputs:
         - "${HTTP}://${LoadBalancerDNSName}"
         - HTTP: !If [DoSSL, https, http]
           LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
+  LoadBalancerURL:
+    Description: The Load Balancer URL
+    Value: !Sub
+      - "${HTTP}://${LoadBalancerDNSName}"
+      - HTTP: !If [DoSSL, 'https', 'http']
+        LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName
   SGname:
     Description: The name of the SecurityGroup
     Value: !Ref SecurityGroup
