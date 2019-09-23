@@ -605,7 +605,7 @@ Resources:
         DeploymentAutomationBranch: !Ref 'DeploymentAutomationBranch'
         DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
-        DeployRepositoryCustomParams: !Ref 'DeployRepositoryCustomParams'
+        DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
         ESBucketName: !Ref 'ESBucketName'
         ESSnapshotId: !Ref 'ESSnapshotId'
