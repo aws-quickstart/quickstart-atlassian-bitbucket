@@ -62,6 +62,8 @@ Metadata:
           - DeploymentAutomationPlaybook
           - DeploymentAutomationCustomParams
           - DeploymentAutomationKeyName
+          - QSS3BucketName
+          - QSS3KeyPrefix
 
     ParameterLabels:
       BitbucketProperties:
@@ -138,6 +140,10 @@ Metadata:
         default: Existing DNS name
       SSLCertificateARN:
         default: SSL Certificate ARN
+      QSS3BucketName:
+        default: Quick Start S3 Bucket Name
+      QSS3KeyPrefix:
+        default: Quick Start S3 Key Prefix
 
 Parameters:
   BitbucketProperties:
@@ -476,6 +482,25 @@ Parameters:
     MinLength: 0
     MaxLength: 90
     Type: String
+  QSS3BucketName:
+    Default: 'aws-quickstart'
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Description: S3 bucket name for the Quick Start assets. Quick Start bucket name
+      can include numbers, lowercase letters, uppercase letters, and hyphens (-).
+      It cannot start or end with a hyphen (-).
+    Type: String
+  QSS3KeyPrefix:
+    Default: 'quickstart-atlassian-bitbucket/'
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slash (/).
+    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
+      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
+      forward slash (/).
+    Type: String
 
 Conditions:
   DBProvisionedIops:
@@ -536,6 +561,9 @@ Conditions:
     !And [!Not [!Equals [!Ref DBMasterUserPassword, '']], Condition: NotStandbyMode]
   UsePublicIp:
     !Equals [!Ref InternetFacingLoadBalancer, 'true']
+  GovCloudCondition: !Equals
+    - !Ref 'AWS::Region'
+    - us-gov-west-1
 
 Mappings:
   AWSRegionArch2AMI:
@@ -1130,6 +1158,22 @@ Resources:
       FromPort: -1
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
+# Optional: Cloudwatch dashboard to be created when CloudWatch is enabled
+  CloudWatchDashboard:
+    DependsOn:
+      - DB
+    Condition: EnableCloudWatch
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-services/templates/quickstart-cloudwatch-dashboard.yaml
+        - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+      Parameters:
+        ProductStackName: !Sub "${AWS::StackName}"
+        ProductFamilyName: "bitbucket"
+        AsgToMonitor: !Ref ClusterNodeGroup
+        DatabaseIdentifier: !Sub ["${DBStackNamePrefix}-db", {DBStackNamePrefix: !Ref 'AWS::StackName'}]
+
 Outputs:
   ClusterNodeGroup:
     Description: The name of the auto scaling group of cluster nodes
@@ -1164,3 +1208,7 @@ Outputs:
     Export: {
       Name: !Join ['', [!Ref 'AWS::StackName', -SGname]]
     }
+  CloudWatchDashboardURL:
+    Description: CloudWatch monitoring dashboard URL
+    Value: !GetAtt CloudWatchDashboard.Outputs.Dashboard
+    Condition: EnableCloudWatch
