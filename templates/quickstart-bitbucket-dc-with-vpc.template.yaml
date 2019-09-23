@@ -7,7 +7,8 @@ Metadata:
     ParameterGroups:
       - Label:
           default: Bitbucket setup
-        Parameters: [BitbucketVersion]
+        Parameters:
+          - BitbucketVersion
       - Label:
           default: Networking
         Parameters:
@@ -24,10 +25,18 @@ Metadata:
           - PublicSubnet2CIDR
       - Label:
           default: Cluster nodes
-        Parameters: [ClusterNodeInstanceType, ClusterNodeMin, ClusterNodeMax]
+        Parameters:
+          - CloudWatchIntegration
+          - ClusterNodeInstanceType
+          - ClusterNodeMin
+          - ClusterNodeMax
       - Label:
           default: File server
-        Parameters: [FileServerInstanceType, HomeSize, HomeVolumeType, HomeIops]
+        Parameters:
+          - FileServerInstanceType
+          - HomeSize
+          - HomeVolumeType
+          - HomeIops
       - Label:
           default: Database
         Parameters:
@@ -40,7 +49,8 @@ Metadata:
           - DBMultiAZ
       - Label:
           default: Elasticsearch
-        Parameters: [ElasticsearchInstanceType]
+        Parameters:
+          - ElasticsearchInstanceType
       - Label:
           default: Advanced (Optional)
         Parameters:
@@ -57,6 +67,7 @@ Metadata:
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
           - DeploymentAutomationPlaybook
+          - DeploymentAutomationCustomParams
           - DeploymentAutomationKeyName
           - QSS3BucketName
           - QSS3KeyPrefix
@@ -88,8 +99,12 @@ Metadata:
         default: Deployment Automation Branch
       DeploymentAutomationPlaybook:
         default: Ansible playbook to invoke during instance initialization
+      DeploymentAutomationCustomParams:
+        default: Custom command-line parameters for Ansible. (Optional)
       DeploymentAutomationKeyName:
         default: SSH key name to use with the repository
+      CloudWatchIntegration:
+        default: Enable CloudWatch integration
       ESBucketName:
         default: Elasticsearch snapshot S3 bucket name
       ESSnapshotId:
@@ -342,10 +357,20 @@ Parameters:
     Default: "aws_bitbucket_dc_node.yml"
     Type: String
     Description: The Ansible playbook to invoke to initialize the application node on first start.
+  DeploymentAutomationCustomParams:
+    Default: ""
+    Type: String
+    Description: Additional command-line options for the `ansible-playbook` command. See the repository README for more details. (Optional)
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
     Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store.
+  CloudWatchIntegration:
+    Default: "Metrics and Logs"
+    Type: String
+    Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
+    AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
+    ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   ESBucketName:
     Default: ''
     AllowedPattern: '[a-z0-9-]*'
@@ -562,6 +587,7 @@ Resources:
         JvmHeapOverride: !Ref 'JvmHeapOverride'
         JvmSupportOpts: !Ref 'JvmSupportOpts'
         CidrBlock: !Ref 'AccessCIDR'
+        CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
         ClusterNodeMax: !Ref 'ClusterNodeMax'
         ClusterNodeMin: !Ref 'ClusterNodeMin'
@@ -580,6 +606,7 @@ Resources:
         DeploymentAutomationBranch: !Ref 'DeploymentAutomationBranch'
         DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
+        DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
         ESBucketName: !Ref 'ESBucketName'
         ESSnapshotId: !Ref 'ESSnapshotId'
