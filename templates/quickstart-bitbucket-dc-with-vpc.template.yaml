@@ -580,6 +580,7 @@ Resources:
         JvmHeapOverride: !Ref 'JvmHeapOverride'
         JvmSupportOpts: !Ref 'JvmSupportOpts'
         CidrBlock: !Ref 'AccessCIDR'
+        CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
         ClusterNodeMax: !Ref 'ClusterNodeMax'
         ClusterNodeMin: !Ref 'ClusterNodeMin'
