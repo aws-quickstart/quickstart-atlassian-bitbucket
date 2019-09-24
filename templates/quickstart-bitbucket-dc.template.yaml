@@ -1160,8 +1160,6 @@ Resources:
       SourceSecurityGroupId: !Ref SecurityGroup
 # Optional: Cloudwatch dashboard to be created when CloudWatch is enabled
   CloudWatchDashboard:
-    DependsOn:
-      - DB
     Condition: EnableCloudWatch
     Type: AWS::CloudFormation::Stack
     Properties:
