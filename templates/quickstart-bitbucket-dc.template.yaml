@@ -1172,7 +1172,7 @@ Resources:
         ProductStackName: !Sub "${AWS::StackName}"
         ProductFamilyName: "bitbucket"
         AsgToMonitor: !Ref ClusterNodeGroup
-        DatabaseIdentifier: !Sub ["${DBStackNamePrefix}-db", {DBStackNamePrefix: !Ref 'AWS::StackName'}]
+        DatabaseIdentifier: !Ref DB
 
 Outputs:
   ClusterNodeGroup:
