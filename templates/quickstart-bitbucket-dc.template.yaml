@@ -133,7 +133,7 @@ Metadata:
       InternetFacingLoadBalancer:
         default: Make instance internet facing
       KeyPairName:
-        default: SSH Key-Pair Name (optional)
+        default: SSH Key Pair Name (optional)
       CustomDnsName:
         default: Existing DNS name
       SSLCertificateARN:
@@ -294,7 +294,7 @@ Parameters:
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: Named KeyPair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
+    Description: Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
   CloudWatchIntegration:
     Default: "Metrics and Logs"
     Type: String
