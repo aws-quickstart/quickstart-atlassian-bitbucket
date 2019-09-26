@@ -100,7 +100,7 @@ Metadata:
       DeploymentAutomationPlaybook:
         default: Ansible playbook to invoke during instance initialization
       DeploymentAutomationCustomParams:
-        default: Custom command-line parameters for Ansible. (Optional)
+        default: Custom command-line parameters for Ansible
       DeploymentAutomationKeyName:
         default: SSH key name to use with the repository
       CloudWatchIntegration:
@@ -144,7 +144,7 @@ Metadata:
       InternetFacingLoadBalancer:
         default: Make instance internet facing
       KeyPairName:
-        default: SSH Key Pair Name (optional)
+        default: SSH Key Pair Name
       PrivateSubnet1CIDR:
         default: AZ1 private IP address block
       PrivateSubnet2CIDR:
@@ -360,11 +360,11 @@ Parameters:
   DeploymentAutomationCustomParams:
     Default: ""
     Type: String
-    Description: Additional command-line options for the `ansible-playbook` command. See the repository README for more details. (Optional)
+    Description: Additional command-line options for the `ansible-playbook` command. See https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md for more information about overriding parameters. (Optional)
   DeploymentAutomationKeyName:
     Default: ""
     Type: String
-    Description: Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store.
+    Description: Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
   CloudWatchIntegration:
     Default: "Metrics and Logs"
     Type: String
@@ -524,7 +524,7 @@ Parameters:
     Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances. If empty the key pair from Atlassian Standard Infrastructure stack will be used.
+    Description: The EC2 Key Pair to allow SSH access to the instances. If you don't provide one, the Atlassian Standard Infrastructure stack's key pair will be used.
     Type: String
     Default: ''
   InternetFacingLoadBalancer:
