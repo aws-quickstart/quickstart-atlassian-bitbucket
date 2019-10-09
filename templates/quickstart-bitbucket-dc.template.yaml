@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: Atlassian Bitbucket Data Center QS(0034)
+Description: "Atlassian Bitbucket Data Center QS(0034)"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -82,7 +82,7 @@ Metadata:
       ClusterNodeMin:
         default: Minimum number of cluster nodes
       ClusterNodeInstanceType:
-        default: Cluster node instance type
+        default: Bitbucket cluster node instance type
       CreateBucket:
         default: Create S3 bucket for Elasticsearch snapshots
       DBEngine:
@@ -342,7 +342,7 @@ Parameters:
       - db.t3.xlarge
       - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
-    Description: RDS instance type  (must be r4 family if using Aurora).
+    Description: RDS instance type (must be r4 family if using Aurora).
     Type: String
   DBIops:
     Default: 1000
@@ -1224,7 +1224,7 @@ Outputs:
     Description: The RDS ARN to use when creating a Data Center standby stack
     Value: !If [DBEngineAurora, '', !If [NotStandbyMode, !Sub ["arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]]
   ServiceURL:
-    Description: The URL to access this Atlassian service
+    Description: The URL of the Bitbucket Data Center instance
     Value: !If
       - UseCustomDnsName
       - !Sub
