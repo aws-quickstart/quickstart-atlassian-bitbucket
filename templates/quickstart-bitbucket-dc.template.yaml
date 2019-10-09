@@ -25,6 +25,7 @@ Metadata:
       - Label:
           default: Database
         Parameters:
+          - DBEngine
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -84,6 +85,8 @@ Metadata:
         default: Cluster node instance type
       CreateBucket:
         default: Create S3 bucket for Elasticsearch snapshots
+      DBEngine:
+        default: The database engine to deploy with (PostgreSQL or Amazon Aurora PostgreSQL)
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -307,6 +310,14 @@ Parameters:
     Description: "Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether."
     AllowedValues: ["Off", "Metrics Only", "Metrics and Logs"]
     ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
+  DBEngine:
+    Default: 'PostgreSQL'
+    Description: 'Database Engine to use. PostgreSQL or Amazon Aurora Clustered PostgreSQL'
+    AllowedValues:
+      - 'Amazon Aurora PostgreSQL'
+      - 'PostgreSQL'
+    ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
+    Type: String
   DBInstanceClass:
     Default: db.m4.large
     AllowedValues:
@@ -331,12 +342,12 @@ Parameters:
       - db.t3.xlarge
       - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
-    Description: RDS instance type
+    Description: RDS instance type  (must be r4 family if using Aurora).
     Type: String
   DBIops:
     Default: 1000
     ConstraintDescription: Must be in the range 1000 - 30000.
-    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00.'
+    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not valid for Aurora'
     MinValue: 1000
     MaxValue: 30000
     Type: Number
@@ -368,16 +379,16 @@ Parameters:
   DBMaster:
     Default: ''
     ConstraintDescription: Must be a valid RDS ARN.
-    Description: Database ARN of the RDS instance to replicate. Setting this parameter will bring up Bitbucket as a Disaster recovery standby, with an RDS read replica database.
+    Description: Database ARN of the RDS instance to replicate. Setting this parameter will bring up Bitbucket as a Disaster recovery standby, with an RDS read replica database. Not valid for Aurora.
     Type: String
   DBSnapshotId:
     Default: ''
     ConstraintDescription: Must be a valid RDS snapshot ID, or blank.
-    Description: RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance.
+    Description: RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance. Not valid for Aurora.
     Type: String
   DBStorage:
     Default: 10
-    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144
+    Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Aurora.
     MinValue: 5
     MaxValue: 6144
     Type: Number
@@ -567,6 +578,10 @@ Conditions:
   GovCloudCondition: !Equals
     - !Ref 'AWS::Region'
     - us-gov-west-1
+  DBEngineAurora:
+    !Equals [!Ref DBEngine, "Amazon Aurora PostgreSQL"]
+  DBEnginePostgres:
+    !Equals [!Ref DBEngine, "PostgreSQL"]
 
 Mappings:
   AWSRegionArch2AMI:
@@ -760,14 +775,15 @@ Resources:
                   - "ATL_JDBC_USER=atlbitbucket"
                   - !Sub ["ATL_JDBC_PASSWORD='${DBPassword}'", DBPassword: !Ref DBPassword]
                   - !Sub ["ATL_DB_ROOT_PASSWORD='${DBMasterUserPassword}'", DBMasterUserPassword: !Ref DBMasterUserPassword]
-                  - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
-                  - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
-                  - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
+                  - !Sub ["ATL_DB_ENGINE=${DBEngine}", DBEngine: !If [DBEngineAurora, aurora_postgres, !If [DBEnginePostgres, rds_postgres, '']]]
+                  - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !If [DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointAddress, !GetAtt DB.Endpoint.Address]]
+                  - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !If [DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointPort, !GetAtt DB.Endpoint.Port]]
+                  - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/bitbucket", { DBEndpointAddress: !If [DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointAddress, !GetAtt DB.Endpoint.Address], DBEndpointPort: !If [DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointPort, !GetAtt DB.Endpoint.Port]}]
                   - ""
-                  - !Sub ["ATL_RDS_INSTANCE_ID=${DB}", DB: !Ref "DB"]
+                  - !Sub ["ATL_RDS_INSTANCE_ID=${DB}", DB: !If [ DBEngineAurora, !Ref "DBCluster", !Ref "DB"]]
                   - !Sub ["ATL_RDS_INSTANCE_CLASS=${DBInstanceClass}", DBInstanceClass: !Ref "DBInstanceClass"]
                   - !Sub ["ATL_RDS_MULTI_AZ=${DBMultiAZ}", DBMultiAZ: !Ref "DBMultiAZ"]
-                  - !Sub ["ATL_RDS_SUBNET_GROUP_NAME=${DBSubnetGroup}", DBSubnetGroup: !Ref "DBSubnetGroup"]
+                  - !Sub ["ATL_RDS_SUBNET_GROUP_NAME=${DBSubnetGroup}", DBSubnetGroup: !If [ DBEnginePostgres, !Ref "DBSubnetGroup", '']]
                   - !Sub ["ATL_RDS_SECURITY_GROUP=${SecurityGroup}", SecurityGroup: !Ref "SecurityGroup"]
                   - ""
                   - !Sub ["ATL_NFS_DISK_VOLUME_TYPE=${VolType}", VolType: !If [IsHomeProvisionedIops, "io1", "gp2"]]
@@ -948,14 +964,14 @@ Resources:
                   - "ATL_JDBC_USER=atlbitbucket"
                   - !Sub ["ATL_JDBC_PASSWORD='${DBPassword}'", DBPassword: !Ref DBPassword]
                   - !Sub ["ATL_DB_ROOT_PASSWORD='${DBMasterUserPassword}'", DBMasterUserPassword: !Ref DBMasterUserPassword]
-                  - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !GetAtt DB.Endpoint.Address]
-                  - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !GetAtt DB.Endpoint.Port]
-                  - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/confluence", { DBEndpointAddress: !GetAtt DB.Endpoint.Address, DBEndpointPort: !GetAtt DB.Endpoint.Port }]
+                  - !Sub ["ATL_DB_HOST=${DBEndpointAddress}", DBEndpointAddress: !If [ DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointAddress, !GetAtt DB.Endpoint.Address]]
+                  - !Sub ["ATL_DB_PORT=${DBEndpointPort}", DBEndpointPort: !If [ DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointPort, !GetAtt DB.Endpoint.Port]]
+                  - !Sub ["ATL_JDBC_URL=jdbc:postgresql://${DBEndpointAddress}:${DBEndpointPort}/bitbucket", { DBEndpointAddress: !If [ DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointAddress, !GetAtt DB.Endpoint.Address], DBEndpointPort: !If [ DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointPort, !GetAtt DB.Endpoint.Port] }]
                   - ""
-                  - !Sub ["ATL_RDS_INSTANCE_ID=${DB}", DB: !Ref "DB"]
+                  - !Sub ["ATL_RDS_INSTANCE_ID=${DB}", DB: !If [ DBEngineAurora, !Ref "DBCluster", !Ref "DB"]]
                   - !Sub ["ATL_RDS_INSTANCE_CLASS=${DBInstanceClass}", DBInstanceClass: !Ref "DBInstanceClass"]
                   - !Sub ["ATL_RDS_MULTI_AZ=${DBMultiAZ}", DBMultiAZ: !Ref "DBMultiAZ"]
-                  - !Sub ["ATL_RDS_SUBNET_GROUP_NAME=${DBSubnetGroup}", DBSubnetGroup: !Ref "DBSubnetGroup"]
+                  - !Sub ["ATL_RDS_SUBNET_GROUP_NAME=${DBSubnetGroup}", DBSubnetGroup: !If [ DBEnginePostgres, !Ref "DBSubnetGroup", '']]
                   - !Sub ["ATL_RDS_SECURITY_GROUP=${SecurityGroup}", SecurityGroup: !Ref "SecurityGroup"]
                   - ""
                   - !Sub ["ATL_NFS_DISK_VOLUME_TYPE=${VolType}", VolType: !If [IsHomeProvisionedIops, "io1", "gp2"]]
@@ -1058,6 +1074,7 @@ Resources:
             - !Sub [" --resource FileServer --region ${Region}\n", Region: !Ref "AWS::Region"]
   DB:
     Type: AWS::RDS::DBInstance
+    Condition: DBEnginePostgres
     Properties:
       AllocatedStorage: !Ref DBStorage
       DBInstanceClass: !Ref DBInstanceClass
@@ -1079,9 +1096,30 @@ Resources:
       VPCSecurityGroups: [!Ref SecurityGroup]
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
+    Condition: DBEnginePostgres
     Properties:
       DBSubnetGroupDescription: DBSubnetGroup
       SubnetIds: !Split [ ",", !ImportValue ATL-PriNets]
+  DBCluster:
+    Type: AWS::CloudFormation::Stack
+    Condition: DBEngineAurora
+    Properties:
+      TemplateURL: !Sub
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-services/templates/quickstart-database-for-atlassian-services.yaml
+        - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+      Parameters:
+        DatabaseImplementation: !Ref DBEngine
+        DBSecurityGroup: !Ref SecurityGroup
+        DBAutoMinorVersionUpgrade: "true"
+        DBBackupRetentionPeriod: "1"
+        DBInstanceClass: !Ref DBInstanceClass
+        DBIops: !Ref DBIops
+        DBMasterUserPassword: !Ref DBMasterUserPassword
+        DBMultiAZ: !Ref DBMultiAZ
+        DBAllocatedStorage: !Ref DBStorage
+        DBStorageType: !Ref DBStorageType
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
   LoadBalancer:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
@@ -1173,7 +1211,7 @@ Resources:
         ProductStackName: !Sub "${AWS::StackName}"
         ProductFamilyName: "bitbucket"
         AsgToMonitor: !Ref ClusterNodeGroup
-        DatabaseIdentifier: !Ref DB
+        DatabaseIdentifier: !If [ DBEngineAurora, !Ref DBCluster, !Ref DB ]
 
 Outputs:
   ClusterNodeGroup:
@@ -1181,10 +1219,10 @@ Outputs:
     Value: !Ref ClusterNodeGroup
   DBEndpointAddress:
     Description: The Database Connection String
-    Value: !GetAtt DB.Endpoint.Address
+    Value: !If [DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointAddress, !GetAtt DB.Endpoint.Address]
   DBMaster:
     Description: The RDS ARN to use when creating a Data Center standby stack
-    Value: !If [NotStandbyMode, !Sub ["arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]
+    Value: !If [DBEngineAurora, '', !If [NotStandbyMode, !Sub ["arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]]
   ServiceURL:
     Description: The URL to access this Atlassian service
     Value: !If
