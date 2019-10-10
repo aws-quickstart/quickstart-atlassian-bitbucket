@@ -351,6 +351,12 @@ Parameters:
       - db.r4.4xlarge
       - db.r4.8xlarge
       - db.r4.16xlarge
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.12xlarge
+      - db.r5.24xlarge
       - db.t2.medium
       - db.t2.large
       - db.t2.xlarge
@@ -360,7 +366,7 @@ Parameters:
       - db.t3.xlarge
       - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
-    Description: RDS instance type (must be r4 family if using Aurora).
+    Description: RDS instance type (only r4 and r5 families are supported for Aurora).
     Type: String
   DBIops:
     Default: 1000
@@ -562,10 +568,7 @@ Parameters:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     Description: CIDR Block for the VPC
     Type: String
-    MinValue: 100
-    MaxValue: 16384
-    Type: Number
-
+    
 Conditions:
   GovCloudCondition: !Equals
     - !Ref 'AWS::Region'

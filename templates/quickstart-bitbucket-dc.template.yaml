@@ -333,6 +333,12 @@ Parameters:
       - db.r4.4xlarge
       - db.r4.8xlarge
       - db.r4.16xlarge
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.12xlarge
+      - db.r5.24xlarge
       - db.t2.medium
       - db.t2.large
       - db.t2.xlarge
@@ -342,7 +348,7 @@ Parameters:
       - db.t3.xlarge
       - db.t3.2xlarge
     ConstraintDescription: Must be a valid RDS instance class from the list
-    Description: RDS instance type (must be r4 family if using Aurora).
+    Description: RDS instance type (only r4 and r5 families are supported for Aurora).
     Type: String
   DBIops:
     Default: 1000
