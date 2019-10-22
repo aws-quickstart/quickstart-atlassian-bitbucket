@@ -15,6 +15,11 @@ Metadata:
           - ClusterNodeInstanceType
           - ClusterNodeMax
           - ClusterNodeMin
+          - DeploymentAutomationRepository
+          - DeploymentAutomationBranch
+          - DeploymentAutomationPlaybook
+          - DeploymentAutomationKeyName
+          - DeploymentAutomationCustomParams
       - Label:
           default: File server
         Parameters:
@@ -58,11 +63,9 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
-          - DeploymentAutomationRepository
-          - DeploymentAutomationBranch
-          - DeploymentAutomationPlaybook
-          - DeploymentAutomationCustomParams
-          - DeploymentAutomationKeyName
+      - Label:
+          default: AWS Quick Start Configuration
+        Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
 
@@ -86,7 +89,7 @@ Metadata:
       CreateBucket:
         default: Create S3 bucket for Elasticsearch snapshots
       DBEngine:
-        default: The database engine to deploy with (PostgreSQL or Amazon Aurora PostgreSQL)
+        default: The database engine to deploy with
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -312,7 +315,7 @@ Parameters:
     ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   DBEngine:
     Default: 'PostgreSQL'
-    Description: 'Database Engine to use. PostgreSQL or Amazon Aurora Clustered PostgreSQL'
+    Description: 'Database Engine to use. PostgreSQL or Amazon Aurora PostgreSQL'
     AllowedValues:
       - 'Amazon Aurora PostgreSQL'
       - 'PostgreSQL'
