@@ -64,18 +64,33 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
+          - BitbucketLicensekey
+          - BitbucketAdminPassword
+          - BitbucketDatasetURL
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
           - ExportPrefix
-
     ParameterLabels:
       BitbucketProperties:
         default: Bitbucket properties
       BitbucketVersion:
         default: Version *
+<<<<<<< HEAD
+=======
+      BitbucketLicensekey:
+        default: License Key for Bitbucket (if you have one)
+      BitbucketAdminPassword:
+          default: Password for the administrator account
+      BitbucketDatasetURL:
+          default: HTTP/HTTPS URL to download the Bitbucket Dataset
+      JvmHeapOverride:
+        default: JVM Heap Size Override
+      JvmSupportOpts:
+        default: Additional JVM options
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
       CidrBlock:
         default: Permitted IP range *
       ClusterNodeMax:
@@ -168,6 +183,35 @@ Parameters:
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
     Type: String
+<<<<<<< HEAD
+=======
+  BitbucketLicensekey:
+    Default: ''
+    Description: Provide a license key for Bitbucket Data Center if you have one. 
+    Type: String
+  BitbucketAdminPassword:
+    AllowedPattern: >-
+      ^(?=^.{8,255}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[@/"']).*$
+    ConstraintDescription: >-
+      Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: Password for the administrator ('admin') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    NoEcho: True
+    MaxLength: 128
+    MinLength: 8
+    Type: String
+  BitbucketDatasetURL:
+    Default: ''
+    Description: Provide the HTTP/HTTPS URL for the dataset to restore.
+    Type: String
+  JvmHeapOverride:
+    Default: ''
+    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g
+    Type: String
+  JvmSupportOpts:
+    Default: ''
+    Description: Pass in any additional JVM options to tune the Bitbucket instance
+    Type: String
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
   CidrBlock:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x.
@@ -394,7 +438,11 @@ Parameters:
     Description: RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance. Not valid for Aurora.
     Type: String
   DBStorage:
+<<<<<<< HEAD
     Default: 100
+=======
+    Default: 10
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
     Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Aurora.
     MinValue: 5
     MaxValue: 6144
@@ -542,6 +590,10 @@ Parameters:
     Type: String
 
 Conditions:
+  IsLicenseKeyProvided:
+    !Not [!Equals [!Ref BitbucketLicensekey, '']]
+  IsURLProvided:
+    !Not [!Equals [!Ref BitbucketDatasetURL, '']]
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
   EnableCloudWatch:
@@ -661,8 +713,13 @@ Resources:
                 - es.amazonaws.com
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
+<<<<<<< HEAD
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
+=======
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
       Path: /
       Policies:
         - PolicyName: BitbucketFileServerPolicy
@@ -787,6 +844,8 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
+                  - !If  [IsLicenseKeyProvided, "ATL_BB_LICENSEKEY=${BitbucketLicensekey}", !Ref "AWS::NoValue"]
+                  - !If  [IsURLProvided, "ATL_DATASET_URL=${BitbucketDatasetURL}", !Ref "AWS::NoValue"]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
@@ -806,6 +865,10 @@ Resources:
                   - "ATL_JDBC_DB_NAME=bitbucket"
                   - "ATL_JDBC_DRIVER=org.postgresql.Driver"
                   - "ATL_JDBC_USER=atlbitbucket"
+<<<<<<< HEAD
+=======
+                  - !Sub ["ATL_BB_ADMIN_PASSWORD='${BitbucketAdminPassword}'",BitbucketAdminPassword: !Ref BitbucketAdminPassword]
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
                   - !Sub ["ATL_JDBC_PASSWORD='${DBPassword}'", DBPassword: !Ref DBPassword]
                   - !Sub ["ATL_DB_ROOT_PASSWORD='${DBMasterUserPassword}'", DBMasterUserPassword: !Ref DBMasterUserPassword]
                   - !Sub ["ATL_DB_ENGINE=${DBEngine}", DBEngine: !If [DBEngineAurora, aurora_postgres, !If [DBEnginePostgres, rds_postgres, '']]]
@@ -987,6 +1050,7 @@ Resources:
                   - ATL_APP_NFS_SERVER=true
                   - ATL_NFS_SERVER_DEVICE=/dev/xvdf
                   # NOTE: For simplicity we should keep this as close to the BB node version above.
+
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
                   - ""
@@ -1193,9 +1257,13 @@ Resources:
     Condition: DBEnginePostgres
     Properties:
       DBSubnetGroupDescription: DBSubnetGroup
+<<<<<<< HEAD
       SubnetIds: !Split
         - ","
         - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
+=======
+      SubnetIds: !Split [ ",", !ImportValue ATL-PriNets]
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
   DBCluster:
     Type: AWS::CloudFormation::Stack
     Condition: DBEngineAurora
@@ -1214,7 +1282,10 @@ Resources:
         DBMultiAZ: !Ref DBMultiAZ
         DBAllocatedStorage: !Ref DBStorage
         DBStorageType: !Ref DBStorageType
+<<<<<<< HEAD
         ExportPrefix: !Ref ExportPrefix
+=======
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
   LoadBalancer:
@@ -1361,7 +1432,11 @@ Outputs:
     Value: !If [DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointAddress, !GetAtt DB.Endpoint.Address]
   DBMaster:
     Description: The RDS ARN to use when creating a Data Center standby stack
+<<<<<<< HEAD
     Value: !If [DBEngineAurora, '', !If [NotStandbyMode, !Sub ["arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]]
+=======
+    Value: !If [DBEngineAurora, '', !If [NotStandbyMode, !Sub ["arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]]
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
   ServiceURL:
     Description: The URL of the Bitbucket Data Center instance
     Value: !If
@@ -1389,4 +1464,8 @@ Outputs:
   CloudWatchDashboardURL:
     Description: CloudWatch monitoring dashboard URL
     Value: !GetAtt CloudWatchDashboard.Outputs.Dashboard
+<<<<<<< HEAD
     Condition: EnableCloudWatch
+=======
+    Condition: EnableCloudWatch
+>>>>>>> changing the template to add parameters to automate setup of bitbucket
