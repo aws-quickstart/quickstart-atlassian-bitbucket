@@ -63,6 +63,9 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
+          - BitbucketLicensekey
+          - BitbucketAdminPassword
+          - BitbucketDatasetURL
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
@@ -75,6 +78,12 @@ Metadata:
         default: Bitbucket properties
       BitbucketVersion:
         default: Version *
+      BitbucketLicensekey:
+        default: License Key for Bitbucket (if you have one)
+      BitbucketAdminPassword:
+          default: Password for the administrator account
+      BitbucketDatasetURL:
+          default: HTTP/HTTPS URL to download the Bitbucket Dataset
       CidrBlock:
         default: Permitted IP range *
       ClusterNodeMax:
@@ -164,6 +173,24 @@ Parameters:
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
+    Type: String
+  BitbucketLicensekey:
+    Default: ''
+    Description: Provide a license key for Bitbucket Data Center if you have one.
+    Type: String
+  BitbucketAdminPassword:
+    AllowedPattern: >-
+      ^(?=^.{8,255}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[@/"']).*$
+    ConstraintDescription: >-
+      Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: Password for the administrator ('admin') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    NoEcho: True
+    MaxLength: 128
+    MinLength: 8
+    Type: String
+  BitbucketDatasetURL:
+    Default: ''
+    Description: Provide the HTTP/HTTPS URL for the dataset to restore.
     Type: String
   CidrBlock:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
@@ -534,6 +561,10 @@ Parameters:
     Type: String
 
 Conditions:
+  IsLicenseKeyProvided:
+    !Not [!Equals [!Ref BitbucketLicensekey, '']]
+  IsURLProvided:
+    !Not [!Equals [!Ref BitbucketDatasetURL, '']]
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
   EnableCloudWatch:
@@ -761,6 +792,8 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
+                  - !If  [IsLicenseKeyProvided, "ATL_BB_LICENSEKEY=${BitbucketLicensekey}", !Ref "AWS::NoValue"]
+                  - !If  [IsURLProvided, "ATL_DATASET_URL=${BitbucketDatasetURL}", !Ref "AWS::NoValue"]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
@@ -780,6 +813,7 @@ Resources:
                   - "ATL_JDBC_DB_NAME=bitbucket"
                   - "ATL_JDBC_DRIVER=org.postgresql.Driver"
                   - "ATL_JDBC_USER=atlbitbucket"
+                  - !Sub ["ATL_BB_ADMIN_PASSWORD='${BitbucketAdminPassword}'",BitbucketAdminPassword: !Ref BitbucketAdminPassword]
                   - !Sub ["ATL_JDBC_PASSWORD='${DBPassword}'", DBPassword: !Ref DBPassword]
                   - !Sub ["ATL_DB_ROOT_PASSWORD='${DBMasterUserPassword}'", DBMasterUserPassword: !Ref DBMasterUserPassword]
                   - !Sub ["ATL_DB_ENGINE=${DBEngine}", DBEngine: !If [DBEngineAurora, aurora_postgres, !If [DBEnginePostgres, rds_postgres, '']]]
@@ -961,6 +995,7 @@ Resources:
                   - ATL_APP_NFS_SERVER=true
                   - ATL_NFS_SERVER_DEVICE=/dev/xvdf
                   # NOTE: For simplicity we should keep this as close to the BB node version above.
+
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
                   - ""
