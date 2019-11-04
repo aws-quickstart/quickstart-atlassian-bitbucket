@@ -794,8 +794,8 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
-                  - !If [IsLicenseKeyProvided, !Join ['', ["ATL_BB_LICENSEKEY=", !Ref "BitbucketLicenseKey"]], !Ref "AWS::NoValue"]
-                  - !If [IsURLProvided, !Join ['', ["ATL_DATASET_URL=", !Ref "BitbucketDatasetURL"]], !Ref "AWS::NoValue"]
+                  - !If [IsLicenseKeyProvided, !Join ['', ["ATL_BB_LICENSEKEY=", !Ref 'BitbucketLicenseKey']], !Ref "AWS::NoValue"]
+                  - !If [IsURLProvided, !Join ['', ["ATL_DATASET_URL=", !Ref 'BitbucketDatasetURL']], !Ref "AWS::NoValue"]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
