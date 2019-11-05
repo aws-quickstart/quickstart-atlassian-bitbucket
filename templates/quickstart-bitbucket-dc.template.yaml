@@ -352,7 +352,7 @@ Parameters:
     Description: RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance.
     Type: String
   DBStorage:
-    Default: 10
+    Default: 100
     Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144
     MinValue: 5
     MaxValue: 6144
