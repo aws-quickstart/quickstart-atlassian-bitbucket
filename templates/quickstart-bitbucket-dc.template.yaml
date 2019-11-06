@@ -63,7 +63,7 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
-          - BitbucketLicensekey
+          - BitbucketLicenseKey
           - BitbucketAdminPassword
           - BitbucketDatasetURL
       - Label:
@@ -77,7 +77,7 @@ Metadata:
         default: Bitbucket properties
       BitbucketVersion:
         default: Version *
-      BitbucketLicensekey:
+      BitbucketLicenseKey:
         default: License Key for Bitbucket (if you have one)
       BitbucketAdminPassword:
           default: Password for the administrator account
@@ -171,7 +171,7 @@ Parameters:
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
     Type: String
-  BitbucketLicensekey:
+  BitbucketLicenseKey:
     Default: ''
     Description: Provide a license key for Bitbucket Data Center if you have one. 
     Type: String
@@ -554,7 +554,7 @@ Parameters:
 
 Conditions:
   IsLicenseKeyProvided:
-    !Not [!Equals [!Ref BitbucketLicensekey, '']]
+    !Not [!Equals [!Ref BitbucketLicenseKey, '']]
   IsURLProvided:
     !Not [!Equals [!Ref BitbucketDatasetURL, '']]
   DBProvisionedIops:
@@ -794,8 +794,8 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
-                  - !If [IsLicenseKeyProvided, !Join ['', ["ATL_BB_LICENSEKEY=", !Ref 'BitbucketLicenseKey']], !Ref "AWS::NoValue"]
-                  - !If [IsURLProvided, !Join ['', ["ATL_DATASET_URL=", !Ref 'BitbucketDatasetURL']], !Ref "AWS::NoValue"]
+                  - !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !If [IsLicenseKeyProvided, !Ref BitbucketLicenseKey, '']]
+                  - !Sub ["ATL_DATASET_URL=${DatasetURL}", DatasetURL: !If [IsURLProvided, !Ref BitbucketDatasetURL, '']]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
@@ -1031,7 +1031,6 @@ Resources:
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_CUSTOM_PARAMS='${DeployRepositoryCustomParams}'", DeployRepositoryCustomParams: !Ref "DeploymentAutomationCustomParams"]
-
                   - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH=${EnableCW}", EnableCW: !If [EnableCloudWatch, true, false]]
                   - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH_LOGS=${EnableCWLogs}", EnableCWLogs: !If [EnableCloudWatchLogs, true, false]]
 
