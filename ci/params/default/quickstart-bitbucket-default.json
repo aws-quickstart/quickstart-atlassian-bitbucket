@@ -30,5 +30,13 @@
   {
     "ParameterKey": "KeyPairName",
     "ParameterValue": "replaced-by-taskcat-override-file"
-  }
+  },
+  {
+    "ParameterKey": "ClusterNodeInstanceType",
+    "ParameterValue": "t3.medium"
+},
+{
+    "ParameterKey": "DBInstanceClass",
+    "ParameterValue": "db.t3.medium"
+}
 ]
