@@ -794,6 +794,7 @@ Resources:
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !If [IsLicenseKeyProvided, !Ref BitbucketLicenseKey, '']]
                   - !Sub ["ATL_DATASET_URL=${DatasetURL}", DatasetURL: !If [IsURLProvided, !Ref BitbucketDatasetURL, '']]
+                  - !Sub ["ATL_BB_BASEURL=${BaseURL}", BaseURL: !If [UseCustomDnsName, !Sub ["${HTTP}://${CustomDNSName}", { HTTP: !If [DoSSL, https, http], CustomDNSName: !Ref CustomDnsName }], !Sub ["${HTTP}://${LoadBalancerDNSName}", { HTTP: !If [DoSSL, https, http], LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName }]]]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
