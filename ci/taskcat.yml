@@ -23,4 +23,4 @@ tests:
     template_file: quickstart-bitbucket-dc-with-vpc.template.yaml
     parameter_input: quickstart-bitbucket-master-v5.json
     regions:
-     - us-west-1
+     - ap-south-1
