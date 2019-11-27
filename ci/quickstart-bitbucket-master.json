@@ -16,6 +16,10 @@
         "ParameterValue": "10.0.0.0/0"
     },
     {
+        "ParameterKey": "DBMultiAZ",
+        "ParameterValue": "false"
+    },
+    {
         "ParameterKey": "DBInstanceClass",
         "ParameterValue": "db.t2.large"
     },
@@ -38,5 +42,9 @@
     {
         "ParameterKey":"QSS3KeyPrefix",
         "ParameterValue":"quickstart-atlassian-bitbucket/"
+    },
+    {
+        "ParameterKey": "ExportPrefix",
+        "ParameterValue": "$[taskcat_random-string]"
     }
 ]
