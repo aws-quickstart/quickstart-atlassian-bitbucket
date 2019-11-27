@@ -75,10 +75,6 @@ Metadata:
         default: Bitbucket properties
       BitbucketVersion:
         default: Version *
-      JvmHeapOverride:
-        default: JVM Heap Size Override
-      JvmSupportOpts:
-        default: Additional JVM options
       CidrBlock:
         default: Permitted IP range *
       ClusterNodeMax:
@@ -128,7 +124,7 @@ Metadata:
       ESSnapshotId:
         default: Elasticsearch snapshot ID to restore
       ExportPrefix:
-        default: ASI Exported Prefix
+        default: ASI identifier
       FileServerInstanceType:
         default: File server instance type
       HomeDeleteOnTermination:
@@ -143,6 +139,10 @@ Metadata:
         default: Home directory volume type
       InternetFacingLoadBalancer:
         default: Make instance internet facing
+      JvmHeapOverride:
+        default: JVM Heap Size Override
+      JvmSupportOpts:
+        default: Additional JVM options
       KeyPairName:
         default: SSH Key Pair Name
       CustomDnsName:
@@ -164,14 +164,6 @@ Parameters:
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
-    Type: String
-  JvmHeapOverride:
-    Default: ''
-    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g
-    Type: String
-  JvmSupportOpts:
-    Default: ''
-    Description: Pass in any additional JVM options to tune the Bitbucket instance
     Type: String
   CidrBlock:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
@@ -443,7 +435,7 @@ Parameters:
   ExportPrefix:
     Default: 'ATL-'
     Description:
-      Prefix for the exported variables (VPCID, SubnetIDs, KeyName) that are reused by other Atlassian AWS Quickstarts.
+      Each Atlassian Standard Infrastructure (ASI) uses a unique identifier. If you have multiple ASIs within the same AWS region, use this field to specify where to deploy Bitbucket.
     Type: String
   FileServerInstanceType:
     Default: m4.xlarge
@@ -497,6 +489,14 @@ Parameters:
     AllowedValues: [true, false]
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Controls whether the load balancer should be visible to the internet (true) or only within the VPC (false).
+    Type: String
+  JvmHeapOverride:
+    Default: ''
+    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g
+    Type: String
+  JvmSupportOpts:
+    Default: ''
+    Description: Pass in any additional JVM options to tune the Bitbucket instance
     Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
