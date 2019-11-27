@@ -68,6 +68,7 @@ Metadata:
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
+          - ExportPrefix
 
     ParameterLabels:
       BitbucketProperties:
@@ -126,6 +127,8 @@ Metadata:
         default: Elasticsearch snapshot S3 bucket name
       ESSnapshotId:
         default: Elasticsearch snapshot ID to restore
+      ExportPrefix:
+        default: ASI Exported Prefix
       FileServerInstanceType:
         default: File server instance type
       HomeDeleteOnTermination:
@@ -437,6 +440,11 @@ Parameters:
     ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
     Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
     Type: String
+  ExportPrefix:
+    Default: 'ATL-'
+    Description:
+      Prefix for the exported variables (VPCID, SubnetIDs, KeyName) that are reused by other Atlassian AWS Quickstarts.
+    Type: String
   FileServerInstanceType:
     Default: m4.xlarge
     AllowedValues:
@@ -596,52 +604,40 @@ Mappings:
   AWSRegionArch2AMI:
     ap-northeast-1:
       HVM64: ami-0c3fd0f5d33134a76
-      HVMG2: NOT_SUPPORTED
     ap-northeast-2:
       HVM64: ami-095ca789e0549777d
-      HVMG2: NOT_SUPPORTED
     ap-south-1:
       HVM64: ami-0d2692b6acea72ee6
-      HVMG2: NOT_SUPPORTED
     ap-southeast-1:
       HVM64: ami-01f7527546b557442
-      HVMG2: NOT_SUPPORTED
     ap-southeast-2:
       HVM64: ami-0dc96254d5535925f
-      HVMG2: NOT_SUPPORTED
     ca-central-1:
       HVM64: ami-0d4ae09ec9361d8ac
-      HVMG2: NOT_SUPPORTED
     eu-central-1:
       HVM64: ami-0cc293023f983ed53
-      HVMG2: NOT_SUPPORTED
     eu-north-1:
       HVM64: ami-3f36be41
-      HVMG2: NOT_SUPPORTED
     eu-west-1:
       HVM64: ami-0bbc25e23a7640b9b
-      HVMG2: NOT_SUPPORTED
     eu-west-2:
       HVM64: ami-0d8e27447ec2c8410
-      HVMG2: NOT_SUPPORTED
     eu-west-3:
       HVM64: ami-0adcddd3324248c4c
-      HVMG2: NOT_SUPPORTED
     sa-east-1:
       HVM64: ami-058943e7d9b9cabfb
-      HVMG2: NOT_SUPPORTED
     us-east-1:
       HVM64: ami-0b898040803850657
-      HVMG2: NOT_SUPPORTED
     us-east-2:
       HVM64: ami-0d8f6eb4f641ef691
-      HVMG2: NOT_SUPPORTED
     us-west-1:
       HVM64: ami-056ee704806822732
-      HVMG2: NOT_SUPPORTED
     us-west-2:
       HVM64: ami-082b5a644766e0e6f
-      HVMG2: NOT_SUPPORTED
+    us-gov-west-1:
+      HVM64: ami-e9a9d388
+    us-gov-east-1:
+      HVM64: ami-a2d938d3
 
 Resources:
   BitbucketFileServerRole:
@@ -657,8 +653,8 @@ Resources:
                 - es.amazonaws.com
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
       Path: /
       Policies:
         - PolicyName: BitbucketFileServerPolicy
@@ -698,8 +694,8 @@ Resources:
                     - 's3:ListBucket'
                     - 's3:PutObject'
                   Resource:
-                    - !Sub ["arn:aws:s3:::${BucketName}", BucketName: !Ref ESBucketName]
-                    - !Sub ["arn:aws:s3:::${BucketName}/*", BucketName: !Ref ESBucketName]
+                    - !Sub "arn:${AWS::Partition}:s3:::${ESBucketName}"
+                    - !Sub "arn:${AWS::Partition}:s3:::${ESBucketName}/*"
                 - !Ref "AWS::NoValue"
   BitbucketClusterNodeRole:
     Type: AWS::IAM::Role
@@ -712,7 +708,7 @@ Resources:
               Service: [ec2.amazonaws.com]
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
       Path: /
       Policies:
         - PolicyName: BitbucketClusterNodePolicy
@@ -740,10 +736,12 @@ Resources:
       MinSize: !If [StandbyMode, '0', !Ref ClusterNodeMin]
       MaxSize: !Ref ClusterNodeMax
       LoadBalancerNames: [!Ref LoadBalancer]
-      VPCZoneIdentifier: !Select [0, [!Split [ ',', !ImportValue ATL-PriNets]]]
+      VPCZoneIdentifier: !Split
+        - ","
+        - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
       Tags:
         - Key: Name
-          Value: !Sub ["${StackName} Bitbucket Node", StackName: !Ref 'AWS::StackName']
+          Value: !Sub "${AWS::StackName} Bitbucket Node"
           PropagateAtLaunch: true
         - Key: Cluster
           Value: !Ref AWS::StackName
@@ -848,7 +846,10 @@ Resources:
 
     Properties:
       AssociatePublicIpAddress: false
-      KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
+      KeyName: !If
+        - KeyProvided
+        - !Ref KeyPairName
+        - Fn::ImportValue: !Sub "${ExportPrefix}DefaultKey"
       IamInstanceProfile: !Ref BitbucketClusterNodeInstanceProfile
       ImageId:
         !FindInMap
@@ -864,10 +865,10 @@ Resources:
           -
             - "#!/bin/bash -xe\n"
             - "yum update -y aws-cfn-bootstrap amazon-ssm-agent\n"
-            - !Sub ["/opt/aws/bin/cfn-init -v --stack ${StackName}", StackName: !Ref "AWS::StackName"]
-            - !Sub [" --resource ClusterNodeLaunchConfig --region ${Region}\n", Region: !Ref "AWS::Region"]
-            - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
-            - !Sub [" --resource ClusterNodeGroup --region ${Region}", Region: !Ref "AWS::Region"]
+            - !Sub "/opt/aws/bin/cfn-init -v --stack ${AWS::StackName}"
+            - !Sub " --resource FileServer --region ${AWS::Region}\n"
+            - !Sub "/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName}"
+            - !Sub "--resource FileServer --region ${AWS::Region}\n"
   ClusterNodeScaleUpPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
@@ -932,7 +933,7 @@ Resources:
             Resource: "*"
       Tags:
         - Key: Name
-          Value: !Sub ["${StackName} Bitbucket Elasticsearch cluster", StackName: !Ref 'AWS::StackName']
+          Value: !Sub "${AWS::StackName} Bitbucket Elasticsearch cluster"
         - Key: Application
           Value: !Ref "AWS::StackId"
   ElasticsearchBucket:
@@ -1057,16 +1058,23 @@ Resources:
         - !Ref "AWS::Region"
         - HVM64
       InstanceType: !Ref FileServerInstanceType
-      KeyName: !If [ KeyProvided, !Ref KeyPairName, !ImportValue ATL-DefaultKey ]
+      KeyName: !If
+        - KeyProvided
+        - !Ref KeyPairName
+        - Fn::ImportValue: !Sub "${ExportPrefix}DefaultKey"
       NetworkInterfaces:
         - GroupSet: [!Ref SecurityGroup]
           AssociatePublicIpAddress: false
           DeviceIndex: '0'
           DeleteOnTermination: true
-          SubnetId: !Select [0, !Split [ ",", !ImportValue ATL-PriNets] ]
+          SubnetId: !Select
+            - 0
+            - !Split
+              - ","
+              - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
       Tags:
         - Key: Name
-          Value: !Sub ["${StackName} Bitbucket NFS Server", StackName: !Ref 'AWS::StackName']
+          Value: !Sub "${AWS::StackName} Bitbucket NFS Server"
         - Key: Application
           Value:
             !Ref "AWS::StackId"
@@ -1101,14 +1109,16 @@ Resources:
       SourceDBInstanceIdentifier: !If [StandbyMode, !Ref DBMaster, !Ref "AWS::NoValue"]
       Tags:
         - Key: Name
-          Value: !Sub ["${StackName} Bitbucket PostgreSQL Database", StackName: !Ref 'AWS::StackName']
+          Value: !Sub "${AWS::StackName} Bitbucket PostgreSQL Database"
       VPCSecurityGroups: [!Ref SecurityGroup]
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Condition: DBEnginePostgres
     Properties:
       DBSubnetGroupDescription: DBSubnetGroup
-      SubnetIds: !Split [ ",", !ImportValue ATL-PriNets]
+      SubnetIds: !Split
+        - ","
+        - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
   DBCluster:
     Type: AWS::CloudFormation::Stack
     Condition: DBEngineAurora
@@ -1127,6 +1137,7 @@ Resources:
         DBMultiAZ: !Ref DBMultiAZ
         DBAllocatedStorage: !Ref DBStorage
         DBStorageType: !Ref DBStorageType
+        ExportPrefix: !Ref ExportPrefix
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
   LoadBalancer:
@@ -1169,10 +1180,12 @@ Resources:
         UnhealthyThreshold: '2'
       Scheme: !If [UsePublicIp, 'internet-facing', 'internal']
       SecurityGroups: [!Ref SecurityGroup]
-      Subnets: !Split [ ",", !ImportValue ATL-PubNets]
+      Subnets: !Split
+        - ","
+        - Fn::ImportValue: !Sub "${ExportPrefix}PubNets"
       Tags:
         - Key: Name
-          Value: !Sub ["${StackName} LoadBalancer", StackName: !Ref 'AWS::StackName']
+          Value: !Sub "${AWS::StackName} LoadBalancer"
         - Key: Cluster
           Value: !Ref AWS::StackName
   SecurityGroup:
@@ -1196,10 +1209,43 @@ Resources:
           FromPort: 7999
           ToPort: 7999
           CidrIp: !Ref CidrBlock
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp:
+            !Sub
+            - "${NAT1IP}/32"
+            - NAT1IP:
+                Fn::ImportValue: !Sub '${ExportPrefix}NAT1EIP'
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp:
+            !Sub
+            - "${NAT2IP}/32"
+            - NAT2IP:
+                Fn::ImportValue: !Sub '${ExportPrefix}NAT2EIP'
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp:
+            !Sub
+            - "${NAT1IP}/32"
+            - NAT1IP:
+                Fn::ImportValue: !Sub '${ExportPrefix}NAT1EIP'
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp:
+            !Sub
+            - "${NAT2IP}/32"
+            - NAT2IP:
+                Fn::ImportValue: !Sub '${ExportPrefix}NAT2EIP'
       Tags:
         - Key: Name
           Value: !Join [' ', [!Ref 'AWS::StackName', sg]]
-      VpcId: !ImportValue ATL-VPCID
+      VpcId:
+        Fn::ImportValue: !Sub "${ExportPrefix}VPCID"
   SecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -1231,7 +1277,7 @@ Outputs:
     Value: !If [DBEngineAurora, !GetAtt DBCluster.Outputs.RDSEndPointAddress, !GetAtt DB.Endpoint.Address]
   DBMaster:
     Description: The RDS ARN to use when creating a Data Center standby stack
-    Value: !If [DBEngineAurora, '', !If [NotStandbyMode, !Sub ["arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]]
+    Value: !If [DBEngineAurora, '', !If [NotStandbyMode, !Sub ["arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:db:${DB}", {DB: !Ref "DB"}], !Ref "AWS::NoValue"]]
   ServiceURL:
     Description: The URL of the Bitbucket Data Center instance
     Value: !If

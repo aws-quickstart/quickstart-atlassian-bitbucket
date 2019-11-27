@@ -74,6 +74,7 @@ Metadata:
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
+          - ExportPrefix
 
     ParameterLabels:
       BitbucketProperties:
@@ -132,6 +133,8 @@ Metadata:
         default: Elasticsearch snapshot S3 bucket name
       ESSnapshotId:
         default: Elasticsearch snapshot ID to restore
+      ExportPrefix:
+        default: ASI Exported Prefix
       FileServerInstanceType:
         default: File server instance type
       HomeDeleteOnTermination:
@@ -455,6 +458,11 @@ Parameters:
     ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
     Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
     Type: String
+  ExportPrefix:
+    Default: 'ATL-'
+    Description:
+      Prefix for the exported variables (VPCID, SubnetIDs, KeyName) that are reused by other Atlassian AWS Quickstarts.
+    Type: String
   FileServerInstanceType:
     Default: m4.xlarge
     AllowedValues:
@@ -591,6 +599,7 @@ Resources:
         AvailabilityZones: !Join
           - ','
           - !Ref 'AvailabilityZones'
+        ExportPrefix: !Ref ExportPrefix
         KeyPairName: !Ref 'KeyPairName'
         PrivateSubnet1CIDR: !Ref 'PrivateSubnet1CIDR'
         PrivateSubnet2CIDR: !Ref 'PrivateSubnet2CIDR'
@@ -613,8 +622,6 @@ Resources:
           - ','
           - !Ref 'BitbucketProperties'
         BitbucketVersion: !Ref 'BitbucketVersion'
-        JvmHeapOverride: !Ref 'JvmHeapOverride'
-        JvmSupportOpts: !Ref 'JvmSupportOpts'
         CidrBlock: !Ref 'AccessCIDR'
         CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
@@ -637,6 +644,7 @@ Resources:
         DeploymentAutomationPlaybook: !Ref 'DeploymentAutomationPlaybook'
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
         DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
+        ExportPrefix: !Ref ExportPrefix
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
         ESBucketName: !Ref 'ESBucketName'
         ESSnapshotId: !Ref 'ESSnapshotId'
@@ -646,6 +654,8 @@ Resources:
         HomeSize: !Ref 'HomeSize'
         HomeVolumeSnapshotId: !Ref 'HomeVolumeSnapshotId'
         HomeVolumeType: !Ref 'HomeVolumeType'
+        JvmHeapOverride: !Ref 'JvmHeapOverride'
+        JvmSupportOpts: !Ref 'JvmSupportOpts'
         KeyPairName: !Ref 'KeyPairName'
         SSLCertificateARN: !Ref 'SSLCertificateARN'
 
