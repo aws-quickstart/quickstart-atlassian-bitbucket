@@ -5,7 +5,7 @@
   },
   {
     "ParameterKey": "BitbucketVersion",
-    "ParameterValue": "6.6.0"
+    "ParameterValue": "6.8.1"
   },
   {
     "ParameterKey": "DBMasterUserPassword",
@@ -14,10 +14,6 @@
   {
     "ParameterKey": "CidrBlock",
     "ParameterValue": "0.0.0.0/0"
-  },
-  {
-    "ParameterKey": "DBInstanceClass",
-    "ParameterValue": "db.t2.large"
   },
   {
     "ParameterKey": "DBIops",

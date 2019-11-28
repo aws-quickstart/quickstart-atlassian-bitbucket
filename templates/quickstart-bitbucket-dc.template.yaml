@@ -866,9 +866,9 @@ Resources:
             - "#!/bin/bash -xe\n"
             - "yum update -y aws-cfn-bootstrap amazon-ssm-agent\n"
             - !Sub "/opt/aws/bin/cfn-init -v --stack ${AWS::StackName}"
-            - !Sub " --resource FileServer --region ${AWS::Region}\n"
+            - !Sub " --resource ClusterNodeLaunchConfig --region ${AWS::Region}\n"
             - !Sub "/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName}"
-            - !Sub "--resource FileServer --region ${AWS::Region}\n"
+            - !Sub " --resource ClusterNodeGroup --region ${AWS::Region}\n"
   ClusterNodeScaleUpPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
