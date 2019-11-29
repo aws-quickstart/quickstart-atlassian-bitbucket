@@ -21,6 +21,6 @@ global:
 tests:
   BB-5:
     template_file: quickstart-bitbucket-dc-with-vpc.template.yaml
-    parameter_input: quickstart-bitbucket-master-v5.json
+    parameter_input: quickstart-bitbucket-master.json
     regions:
-     - us-west-1
+      - us-west-1
