@@ -17,7 +17,7 @@
   },
   {
     "ParameterKey": "QSS3KeyPrefix",
-    "ParameterValue": "quickstart-atlassian-jira/"
+    "ParameterValue": "quickstart-atlassian-bitbucket/"
   },
   {
     "ParameterKey": "CidrBlock",
