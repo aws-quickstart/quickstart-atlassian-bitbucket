@@ -5,7 +5,7 @@
   },
   {
     "ParameterKey": "BitbucketVersion",
-    "ParameterValue": "6.6.0"
+    "ParameterValue": "6.8.1"
   },
   {
     "ParameterKey": "DBMasterUserPassword",
@@ -14,10 +14,6 @@
   {
     "ParameterKey": "CidrBlock",
     "ParameterValue": "0.0.0.0/0"
-  },
-  {
-    "ParameterKey": "DBInstanceClass",
-    "ParameterValue": "db.t2.large"
   },
   {
     "ParameterKey": "DBIops",
@@ -34,9 +30,17 @@
   {
     "ParameterKey": "ClusterNodeInstanceType",
     "ParameterValue": "t3.medium"
-},
-{
+  },
+  {
     "ParameterKey": "DBInstanceClass",
     "ParameterValue": "db.t3.medium"
-}
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "$[taskcat_autobucket]"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "quickstart-atlassian-bitbucket/"
+  }
 ]
