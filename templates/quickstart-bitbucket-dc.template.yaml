@@ -663,6 +663,8 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - 'autoscaling:DescribeTags'
+                  - 'autoscaling:CreateOrUpdateTags'
                   - 'ec2:AttachVolume'
                   - 'ec2:CopySnapshot'
                   - 'ec2:CreateSnapshot'
@@ -671,6 +673,7 @@ Resources:
                   - 'ec2:DeleteSnapshot'
                   - 'ec2:DescribeInstances'
                   - 'ec2:DescribeSnapshots'
+                  - 'ec2:DescribeTags'
                   - 'ec2:DescribeVolumes'
                   - 'ec2:DetachVolume'
                   - 'rds:AddTagsToResource'
@@ -709,13 +712,18 @@ Resources:
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
       Path: /
       Policies:
         - PolicyName: BitbucketClusterNodePolicy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Action: ['ec2:DescribeInstances']
+              - Action:
+                  - 'autoscaling:DescribeTags'
+                  - 'autoscaling:CreateOrUpdateTags'
+                  - 'ec2:DescribeInstances'
+                  - 'ec2:DescribeTags'
                 Effect: Allow
                 Resource: ['*']
   BitbucketFileServerInstanceProfile:
@@ -745,6 +753,13 @@ Resources:
           PropagateAtLaunch: true
         - Key: Cluster
           Value: !Ref AWS::StackName
+          PropagateAtLaunch: true
+        # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
+        - Key: "atl:quickstart:commit-id"
+          Value: "COMMIT: da3b13803bf12bc77c4ea41800eb274f1da528b4"
+          PropagateAtLaunch: true
+        - Key: "atl:quickstart:timestamp"
+          Value: "TIMESTAMP: 20200108:22.26"
           PropagateAtLaunch: true
   ClusterNodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
