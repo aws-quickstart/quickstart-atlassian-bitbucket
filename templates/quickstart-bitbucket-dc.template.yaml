@@ -421,7 +421,6 @@ Parameters:
     Type: String
   DBStorage:
     Default: 100
-    Default: 10
     Description: Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Aurora.
     MinValue: 5
     MaxValue: 6144
@@ -1431,5 +1430,4 @@ Outputs:
   CloudWatchDashboardURL:
     Description: CloudWatch monitoring dashboard URL
     Value: !GetAtt CloudWatchDashboard.Outputs.Dashboard
-    Condition: EnableCloudWatch
     Condition: EnableCloudWatch
