@@ -69,6 +69,9 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
+          - BitbucketLicenseKey
+          - BitbucketAdminPassword
+          - BitbucketDatasetURL
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
@@ -81,6 +84,12 @@ Metadata:
         default: Bitbucket properties
       BitbucketVersion:
         default: Version *
+      BitbucketLicenseKey:
+        default: License Key for Bitbucket (if you have one)
+      BitbucketAdminPassword:
+          default: Password for the administrator account
+      BitbucketDatasetURL:
+          default: HTTP/HTTPS URL to download the Bitbucket Dataset
       JvmHeapOverride:
         default: JVM Heap Size Override
       JvmSupportOpts:
@@ -182,6 +191,24 @@ Parameters:
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
+    Type: String
+  BitbucketLicenseKey:
+    Default: ''
+    Description: Provide a license key for Bitbucket Data Center if you have one. 
+    Type: String
+  BitbucketAdminPassword:
+    AllowedPattern: >-
+      ^(?=^.{8,255}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[@/"']).*$
+    ConstraintDescription: >-
+      Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: Password for the administrator ('admin') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    NoEcho: True
+    MaxLength: 128
+    MinLength: 8
+    Type: String
+  BitbucketDatasetURL:
+    Default: ''
+    Description: Provide the HTTP/HTTPS URL for the dataset to restore.
     Type: String
   JvmHeapOverride:
     Default: ''
@@ -622,6 +649,9 @@ Resources:
           - ','
           - !Ref 'BitbucketProperties'
         BitbucketVersion: !Ref 'BitbucketVersion'
+        BitbucketLicenseKey: !Ref 'BitbucketLicenseKey'
+        BitbucketAdminPassword: !Ref 'BitbucketAdminPassword'
+        BitbucketDatasetURL: !Ref 'BitbucketDatasetURL'
         CidrBlock: !Ref 'AccessCIDR'
         CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
