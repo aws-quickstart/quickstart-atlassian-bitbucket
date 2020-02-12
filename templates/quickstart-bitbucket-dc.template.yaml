@@ -181,14 +181,8 @@ Parameters:
     Description: Provide a license key for Bitbucket Data Center if you have one. 
     Type: String
   BitbucketAdminPassword:
-    AllowedPattern: >-
-      ^(?=^.{8,255}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[@/"']).*$
-    ConstraintDescription: >-
-      Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
     Description: Password for the administrator ('admin') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
     NoEcho: True
-    MaxLength: 128
-    MinLength: 8
     Type: String
   BitbucketDatasetURL:
     Default: ''
@@ -569,11 +563,11 @@ Parameters:
 
 Conditions:
   IsLicenseKeyProvided:
-    !Not [!Equals [!Ref BitbucketLicenseKey, '']]
+    !Equals [!Ref BitbucketLicenseKey, '']
   IsURLProvided:
-    !Not [!Equals [!Ref BitbucketDatasetURL, '']]
+    !Equals [!Ref BitbucketDatasetURL, '']
   IsBBAdminPassProvided:
-    !Not [!Equals [!Ref BitbucketAdminPassword, '']]
+    !Equals [!Ref BitbucketAdminPassword, '']
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
   EnableCloudWatch:
@@ -820,8 +814,8 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
-                  - !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !If [IsLicenseKeyProvided, !Ref BitbucketLicenseKey, !Ref AWS::NoValue]]
-                  - !Sub ["ATL_DATASET_URL=${DatasetURL}", DatasetURL: !If [IsURLProvided, !Ref BitbucketDatasetURL, !Ref AWS::NoValue]]
+                  - !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !If [IsLicenseKeyProvided, !Ref BitbucketLicenseKey, !Ref "AWS::NoValue"]]
+                  - !Sub ["ATL_DATASET_URL=${DatasetURL}", DatasetURL: !If [IsURLProvided, !Ref BitbucketDatasetURL, !Ref "AWS::NoValue"]]
                   - !Sub ["ATL_BB_BASEURL=${BaseURL}", BaseURL: !If [UseCustomDnsName, !Sub ["${HTTP}://${CustomDNSName}", { HTTP: !If [DoSSL, https, http], CustomDNSName: !Ref CustomDnsName }], !Sub ["${HTTP}://${LoadBalancerDNSName}", { HTTP: !If [DoSSL, https, http], LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName }]]]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
@@ -842,7 +836,7 @@ Resources:
                   - "ATL_JDBC_DB_NAME=bitbucket"
                   - "ATL_JDBC_DRIVER=org.postgresql.Driver"
                   - "ATL_JDBC_USER=atlbitbucket"
-                  - !Sub ["ATL_BB_ADMIN_PASSWORD='${BitbucketAdminPassword}'",BitbucketAdminPassword: !If [IsBBAdminPassProvided, !Ref BitbucketAdminPassword, !Ref AWS::NoValue]]
+                  - !Sub ["ATL_BB_ADMIN_PASSWORD='${BitbucketAdminPassword}'",BitbucketAdminPassword: !If [IsBBAdminPassProvided, !Ref BitbucketAdminPassword, !Ref "AWS::NoValue"]]
                   - !Sub ["ATL_JDBC_PASSWORD='${DBPassword}'", DBPassword: !Ref DBPassword]
                   - !Sub ["ATL_DB_ROOT_PASSWORD='${DBMasterUserPassword}'", DBMasterUserPassword: !Ref DBMasterUserPassword]
                   - !Sub ["ATL_DB_ENGINE=${DBEngine}", DBEngine: !If [DBEngineAurora, aurora_postgres, !If [DBEnginePostgres, rds_postgres, '']]]
