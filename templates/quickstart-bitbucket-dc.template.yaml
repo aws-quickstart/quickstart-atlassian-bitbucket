@@ -744,9 +744,12 @@ Resources:
       MinSize: !If [StandbyMode, '0', !Ref ClusterNodeMin]
       MaxSize: !Ref ClusterNodeMax
       LoadBalancerNames: [!Ref LoadBalancer]
-      VPCZoneIdentifier: !Split
-        - ","
-        - Fn::ImportValue: !Sub "${ExportPrefix}PriNets"
+      VPCZoneIdentifier:
+        - !Select
+          - 0
+          - !Split
+            - ','
+            - Fn::ImportValue: !Sub '${ExportPrefix}PriNets'
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName} Bitbucket Node"
