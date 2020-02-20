@@ -1284,7 +1284,6 @@ Resources:
         ProductStackName: !Sub "${AWS::StackName}"
         ProductFamilyName: "bitbucket"
         AsgToMonitor: !Ref ClusterNodeGroup
-        DatabaseIdentifier: !If [ DBEngineAurora, !Ref DBCluster, !Ref DB ]
 
 Outputs:
   ClusterNodeGroup:
