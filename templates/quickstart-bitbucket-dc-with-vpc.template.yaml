@@ -42,6 +42,7 @@ Metadata:
           default: Elasticsearch
         Parameters:
           - ElasticsearchInstanceType
+          - ElasticsearchNodeVolumeSize
       - Label:
           default: Networking
         Parameters:
@@ -129,6 +130,8 @@ Metadata:
         default: Enable CloudWatch integration
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
+      ElasticsearchNodeVolumeSize:
+        default: Elasticsearch disk-space per node (GB)
       ESBucketName:
         default: Elasticsearch snapshot S3 bucket name
       ESSnapshotId:
@@ -446,6 +449,11 @@ Parameters:
       - i2.xlarge.elasticsearch
       - i2.2xlarge.elasticsearch
     ConstraintDescription: Must be an Elasticsearch instance type in the M4, R4 or I2 family
+  ElasticsearchNodeVolumeSize:
+    Description: EBS volume size per Elasticsearch node (in GB)
+    Type: Number
+    Default: 100
+    MinValue: 100
   ESBucketName:
     Default: ''
     AllowedPattern: '[a-z0-9-]*'
@@ -646,6 +654,7 @@ Resources:
         DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
         ExportPrefix: !Ref ExportPrefix
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
+        ElasticsearchNodeVolumeSize: !Ref 'ElasticsearchNodeVolumeSize'
         ESBucketName: !Ref 'ESBucketName'
         ESSnapshotId: !Ref 'ESSnapshotId'
         FileServerInstanceType: !Ref 'FileServerInstanceType'
