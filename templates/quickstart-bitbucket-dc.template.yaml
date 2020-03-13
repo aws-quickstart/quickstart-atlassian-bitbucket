@@ -121,7 +121,7 @@ Metadata:
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
       ElasticsearchNodeVolumeSize:
-        default: Elasticsearch disk-space per node (GB)
+        default: Elasticsearch disk space per node (GB)
       ESBucketName:
         default: Elasticsearch snapshot S3 bucket name
       ESSnapshotId:
@@ -424,7 +424,7 @@ Parameters:
       - i2.2xlarge.elasticsearch
     ConstraintDescription: Must be an Elasticsearch instance type in the M4, R4 or I2 family
   ElasticsearchNodeVolumeSize:
-    Description: EBS volume size per Elasticsearch node (in GB)
+    Description: The EBS volume size (in GB) of each Elasticsearch node.
     Type: Number
     Default: 100
     MinValue: 100
