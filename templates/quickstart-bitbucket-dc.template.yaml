@@ -163,7 +163,7 @@ Parameters:
     Description: A comma-separated list of bitbucket properties in the form 'key1=value1, key2=value2, ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
     Type: CommaDelimitedList
   BitbucketVersion:
-    Default: 6.10.0
+    Default: "6.10.0"
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
@@ -280,8 +280,8 @@ Parameters:
     Description: Set to 1 for new deployment. Can be updated post launch.
     Type: Number
   CreateBucket:
-    Default: true
-    AllowedValues: [true, false]
+    Default: "true"
+    AllowedValues: ["true", "false"]
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName.
     Type: String
@@ -370,10 +370,10 @@ Parameters:
     Type: String
   DBMultiAZ:
     Description: Whether to provision a multi-AZ RDS instance.
-    Default: true
+    Default: "true"
     AllowedValues:
-      - true
-      - false
+      - "true"
+      - "false"
     ConstraintDescription: Must be 'true' or 'false'.
     Type: String
   DBPassword:
@@ -462,8 +462,8 @@ Parameters:
     Description: Instance type for the file server hosting the Bitbucket shared home directory. See https://confluence.atlassian.com/x/GpdKLg for guidance
     Type: String
   HomeDeleteOnTermination:
-    Default: true
-    AllowedValues: [true, false]
+    Default: "true"
+    AllowedValues: ["true", "false"]
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Delete Bitbucket home directory volume when the file server instance is terminated.  You must back up your data before terminating your file server instance if this option is set to 'true'
     Type: String
@@ -493,8 +493,8 @@ Parameters:
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Type: String
   InternetFacingLoadBalancer:
-    Default: true
-    AllowedValues: [true, false]
+    Default: "true"
+    AllowedValues: ["true", "false"]
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Controls whether the load balancer should be visible to the internet (true) or only within the VPC (false).
     Type: String
