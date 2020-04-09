@@ -1115,13 +1115,64 @@ Resources:
             - !Sub [" --resource FileServer --region ${Region}\n", Region: !Ref "AWS::Region"]
             - !Sub ["/opt/aws/bin/cfn-signal -e $? --stack ${StackName}", StackName: !Ref "AWS::StackName"]
             - !Sub [" --resource FileServer --region ${Region}\n", Region: !Ref "AWS::Region"]
+
+  ## We need a custom resource to generate a meaningful name. If the stack name
+  ## is longer than 57 characters, using {StackName}-db would cause a deployment failure
+  DbInstanceName:
+    Condition: DBEnginePostgres
+    Type: Custom::DbInstanceName
+    Version: 1.0
+    Properties:
+      ServiceToken: !GetAtt DBNameGenerator.Arn
+      StackName: !Ref 'AWS::StackName'
+  DBNameGenerator:
+    Condition: DBEnginePostgres
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt DBNameGeneratorExecutionRole.Arn
+      Runtime: python3.7
+      Timeout: 120
+      Code:
+        ZipFile: |
+          import cfnresponse
+          def lambda_handler(event, context):
+            stack_name = event['ResourceProperties']['StackName']
+            responseData = {}
+            responseData['DBInstanceName'] = stack_name[:57] + "-db"
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+  DBNameGeneratorExecutionRole:
+    Condition: DBEnginePostgres
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*DBNameGenerator*"
   DB:
     Type: AWS::RDS::DBInstance
     Condition: DBEnginePostgres
     Properties:
       AllocatedStorage: !Ref DBStorage
       DBInstanceClass: !Ref DBInstanceClass
-      DBInstanceIdentifier: !Ref AWS::StackName
+      DBInstanceIdentifier: !GetAtt DbInstanceName.DBInstanceName
       DBName: !If [RestoreRDSOrStandby, !Ref "AWS::NoValue", bitbucket]
       DBSnapshotIdentifier: !If [RestoreFromRDSSnapshot, !Ref DBSnapshotId, !Ref "AWS::NoValue"]
       DBSubnetGroupName: !Ref DBSubnetGroup
