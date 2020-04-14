@@ -181,12 +181,15 @@ Parameters:
     Description: (Optional) Provide a license key for Bitbucket Data Center if you have one. 
     Type: String
   BitbucketAdminPassword:
-    Description: (Optional) Password for the administrator ('admin') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol. Optional - If none provided, the template will use the value for the DBPassword.
-    NoEcho: True
+    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
+    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: Password for the Bitbucket administrator ('admin') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    MaxLength: 128
+    NoEcho: true
     Type: String
   BitbucketDatasetURL:
     Default: ''
-    Description: (Optional) Provide the HTTP/HTTPS URL for the dataset to restore.
+    Description: (Optional) Provide the HTTP/HTTPS URL for the dataset to restore. Refer https://confluence.atlassian.com/bitbucketserver/importing-957497836.html
     Type: String
   CidrBlock:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
@@ -562,12 +565,8 @@ Parameters:
     Type: String
 
 Conditions:
-  IsLicenseKeyProvided:
-    !Not [!Equals [!Ref BitbucketLicenseKey, '']]
   IsURLProvided:
     !Not [!Equals [!Ref BitbucketDatasetURL, '']]
-  IsBBAdminPassProvided:
-    !Not [!Equals [!Ref BitbucketAdminPassword, '']]
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
   EnableCloudWatch:
@@ -814,9 +813,8 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
-                  - !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !If [IsLicenseKeyProvided, !Ref BitbucketLicenseKey,'']]
+                  - !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !Ref BitbucketLicenseKey]
                   - !Sub ["ATL_DATASET_URL=${DatasetURL}", DatasetURL: !If [IsURLProvided, !Ref BitbucketDatasetURL,'']]
-                  - !Sub ["ATL_BB_BASEURL=${BaseURL}", BaseURL: !If [UseCustomDnsName, !Sub ["${HTTP}://${CustomDNSName}", { HTTP: !If [DoSSL, https, http], CustomDNSName: !Ref CustomDnsName }], !Sub ["${HTTP}://${LoadBalancerDNSName}", { HTTP: !If [DoSSL, https, http], LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName }]]]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
@@ -836,7 +834,7 @@ Resources:
                   - "ATL_JDBC_DB_NAME=bitbucket"
                   - "ATL_JDBC_DRIVER=org.postgresql.Driver"
                   - "ATL_JDBC_USER=atlbitbucket"
-                  - !Sub ["ATL_BB_ADMIN_PASSWORD='${BitbucketAdminPassword}'",BitbucketAdminPassword: !If [IsBBAdminPassProvided, !Ref BitbucketAdminPassword, !Ref DBPassword ]]
+                  - !Sub ["ATL_BB_ADMIN_PASSWORD='${BitbucketAdminPassword}'",BitbucketAdminPassword: !Ref BitbucketAdminPassword]
                   - !Sub ["ATL_JDBC_PASSWORD='${DBPassword}'", DBPassword: !Ref DBPassword]
                   - !Sub ["ATL_DB_ROOT_PASSWORD='${DBMasterUserPassword}'", DBMasterUserPassword: !Ref DBMasterUserPassword]
                   - !Sub ["ATL_DB_ENGINE=${DBEngine}", DBEngine: !If [DBEngineAurora, aurora_postgres, !If [DBEnginePostgres, rds_postgres, '']]]
