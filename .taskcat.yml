@@ -21,17 +21,17 @@ tests:
     parameters:
       AvailabilityZones: $[taskcat_genaz_2]
       BitbucketVersion: "6.6.0"
-      DBMasterUserPassword: "f925dO1ry_"
+      DBMasterUserPassword: $[taskcat_genpass_10S]
       AccessCIDR: "10.0.0.0/0"
       DBMultiAZ: "false"
       DBInstanceClass: db.t2.large
       DBIops: 1000
-      DBPassword: "f925dO1ry_"
+      DBPassword: $[taskcat_genpass_10S]
       KeyPairName: "replaced-by-taskcat-override-file"
       QSS3BucketName: $[taskcat_autobucket]
       QSS3KeyPrefix: "quickstart-atlassian-bitbucket/"
       ExportPrefix: $[taskcat_random-string]
     regions:
-    - us-west-1
+    - us-east-1
     s3_bucket: ''
     template: templates/quickstart-bitbucket-dc-with-vpc.template.yaml
