@@ -17,19 +17,21 @@ project:
   - us-west-2
   s3_bucket: ''
 tests:
-  BB-5:
+  bitbucket:
     parameters:
-      CidrBlock: 10.0.0.0/0
-      BitbucketVersion: 6.6.0
+      AvailabilityZones: $[taskcat_genaz_2]
+      BitbucketVersion: "6.6.0"
+      DBMasterUserPassword: $[taskcat_genpass_10S]
+      AccessCIDR: "10.0.0.0/0"
+      DBMultiAZ: "false"
       DBInstanceClass: db.t2.large
-      DBIops: '1000'
-      DBMasterUserPassword: f925dO1ry_
-      DBMultiAZ: 'false'
-      DBPassword: f925dO1ry_
-      KeyPairName: replaced-by-taskcat-override-file
+      DBIops: 1000
+      DBPassword: $[taskcat_genpass_10S]
+      KeyPairName: "replaced-by-taskcat-override-file"
       QSS3BucketName: $[taskcat_autobucket]
-      QSS3KeyPrefix: quickstart-atlassian-bitbucket/
+      QSS3KeyPrefix: "quickstart-atlassian-bitbucket/"
+      ExportPrefix: $[taskcat_random-string]
     regions:
     - us-east-1
     s3_bucket: ''
-    template: templates/quickstart-bitbucket-dc.template.yaml
+    template: templates/quickstart-bitbucket-dc-with-vpc.template.yaml

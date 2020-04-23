@@ -2,3 +2,6 @@
 *~
 *.bak
 /.idea
+
+.taskcat_overrides.yml
+.taskcat
