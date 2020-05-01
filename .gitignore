@@ -2,3 +2,5 @@
 *~
 *.bak
 /.idea
+.DS_Store
+ci/taskcat_outputs/
