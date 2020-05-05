@@ -709,13 +709,13 @@ Resources:
                     - !Sub "arn:${AWS::Partition}:s3:::${ESBucketName}/*"
                 - !Ref "AWS::NoValue"
         - PolicyName: SSMParameterPutAccess
-            PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                - Action:
-                    - 'ssm:PutParameter'
-                  Effect: Allow
-                  Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'ssm:PutParameter'
+                Effect: Allow
+                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
   BitbucketClusterNodeRole:
     Type: AWS::IAM::Role
     Properties:
