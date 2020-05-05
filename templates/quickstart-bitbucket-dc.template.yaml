@@ -743,13 +743,13 @@ Resources:
                 Effect: Allow
                 Resource: ['*']
         - PolicyName: SSMParameterPutAccess
-            PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                - Action:
-                    - 'ssm:PutParameter'
-                  Effect: Allow
-                  Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'ssm:PutParameter'
+                Effect: Allow
+                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
   BitbucketFileServerInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
