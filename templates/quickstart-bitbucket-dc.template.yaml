@@ -1005,6 +1005,8 @@ Resources:
           Value: !Ref "AWS::StackName"
   FileServer:
     Type: AWS::EC2::Instance
+    DependsOn:
+      - AnsibleRepoPinSHA
     Metadata:
       Comment: Set up NFS Server and initial bitbucket.properties
       AWS::CloudFormation::Init:
