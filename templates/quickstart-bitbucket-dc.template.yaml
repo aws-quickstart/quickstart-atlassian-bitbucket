@@ -648,7 +648,7 @@ Mappings:
       HVM64: ami-a2d938d3
 
 Resources:
-  PinnedAnsibleSSMRole:
+  AnsiblePinnedShaPutPolicy:
     Type: 'AWS::IAM::Policy'
     Properties:
       PolicyName: SSMParameterPutAccess
