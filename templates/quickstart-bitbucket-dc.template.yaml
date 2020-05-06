@@ -648,6 +648,20 @@ Mappings:
       HVM64: ami-a2d938d3
 
 Resources:
+  PinnedAnsibleSSMRole:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: SSMParameterPutAccess
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'ssm:PutParameter'
+            Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
+      Roles:
+        - !Ref BitbucketFileServerRole
+        - !Ref BitbucketClusterNodeRole
   BitbucketFileServerRole:
     Type: AWS::IAM::Role
     Properties:
@@ -708,14 +722,6 @@ Resources:
                     - !Sub "arn:${AWS::Partition}:s3:::${ESBucketName}"
                     - !Sub "arn:${AWS::Partition}:s3:::${ESBucketName}/*"
                 - !Ref "AWS::NoValue"
-        - PolicyName: SSMParameterPutAccess
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Action:
-                  - 'ssm:PutParameter'
-                Effect: Allow
-                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
   BitbucketClusterNodeRole:
     Type: AWS::IAM::Role
     Properties:
@@ -742,14 +748,6 @@ Resources:
                   - 'ec2:DescribeTags'
                 Effect: Allow
                 Resource: ['*']
-        - PolicyName: SSMParameterPutAccess
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Action:
-                  - 'ssm:PutParameter'
-                Effect: Allow
-                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
   BitbucketFileServerInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
