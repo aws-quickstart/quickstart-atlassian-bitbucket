@@ -12,6 +12,10 @@
     "ParameterValue": "f925dO1ry_"
   },
   {
+    "ParameterKey": "BitbucketAdminPassword",
+    "ParameterValue": "f925dO1ry_"
+  },
+  {
     "ParameterKey": "CidrBlock",
     "ParameterValue": "0.0.0.0/0"
   },
