@@ -8,6 +8,10 @@
         "ParameterValue": "f925dO1ry_"
     },
     {
+        "ParameterKey": "BitbucketAdminPassword",
+        "ParameterValue": "f925dO1ry_"
+    },
+    {
         "ParameterKey": "DBMultiAZ",
         "ParameterValue": "false"
     },
