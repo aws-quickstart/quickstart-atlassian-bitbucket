@@ -64,18 +64,26 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
+          - BitbucketLicenseKey
+          - BitbucketAdminPassword
+          - BitbucketDatasetURL
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
           - ExportPrefix
-
     ParameterLabels:
       BitbucketProperties:
         default: Bitbucket properties
       BitbucketVersion:
         default: Version *
+      BitbucketLicenseKey:
+        default: License Key for Bitbucket (if you have one)
+      BitbucketAdminPassword:
+          default: Password for the administrator account
+      BitbucketDatasetURL:
+          default: HTTP/HTTPS URL to download the Bitbucket Dataset
       CidrBlock:
         default: Permitted IP range *
       ClusterNodeMax:
@@ -167,6 +175,21 @@ Parameters:
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
+    Type: String
+  BitbucketLicenseKey:
+    Default: ''
+    Description: (Optional) Provide a license key for Bitbucket Data Center if you have one. 
+    Type: String
+  BitbucketAdminPassword:
+    AllowedPattern: '((?=^.{0,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*)|(^$)'    
+    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: (Optional) Password for the Bitbucket administrator ('admin') account. 
+    MaxLength: 128
+    NoEcho: true
+    Type: String
+  BitbucketDatasetURL:
+    Default: ''
+    Description: (Optional) Provide the HTTP/HTTPS URL for the dataset to restore. Refer https://confluence.atlassian.com/bitbucketserver/importing-957497836.html
     Type: String
   CidrBlock:
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
@@ -542,6 +565,12 @@ Parameters:
     Type: String
 
 Conditions:
+  IsURLProvided:
+    !Not [!Equals [!Ref BitbucketDatasetURL, '']]
+  IsLicenseKeyProvided:
+    !Not [!Equals [!Ref BitbucketLicenseKey, '']]
+  IsBBAdminPasswordProvided:
+    !Not [!Equals [!Ref BitbucketAdminPassword, '']]
   DBProvisionedIops:
     !Equals [!Ref DBStorageType, Provisioned IOPS]
   EnableCloudWatch:
@@ -677,6 +706,7 @@ Resources:
       ManagedPolicyArns:
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
+
       Path: /
       Policies:
         - PolicyName: BitbucketFileServerPolicy
@@ -803,6 +833,10 @@ Resources:
                   - "ATL_APP_DATA_MOUNT_ENABLED=false"
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
+                  - !If  [IsBBAdminPasswordProvided, !Sub ["ATL_BB_ADMIN_PASSWORD=${BBAdminPassword}", BBAdminPassword: !Ref BitbucketAdminPassword], !Ref "AWS::NoValue"]
+                  - !If  [IsLicenseKeyProvided, !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !Ref BitbucketLicenseKey], !Ref "AWS::NoValue"]
+                  - !If  [IsURLProvided, !Sub ["ATL_DATASET_URL=${DatasetURL}", DatasetURL: !Ref BitbucketDatasetURL], !Ref "AWS::NoValue"]
+                  - !Sub ["ATL_BB_BASEURL=${BaseURL}", BaseURL: !If [UseCustomDnsName, !Sub ["${HTTP}://${CustomDNSName}", { HTTP: !If [DoSSL, https, http], CustomDNSName: !Ref CustomDnsName }], !Sub ["${HTTP}://${LoadBalancerDNSName}", { HTTP: !If [DoSSL, https, http], LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName }]]]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
                   - !Sub ["ATL_FILESERVER_IP=${FileServerPrivateIp}", FileServerPrivateIp: !GetAtt FileServer.PrivateIp]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY=${DeployRepository}", DeployRepository: !Ref "DeploymentAutomationRepository"]
@@ -1020,6 +1054,7 @@ Resources:
                   - ATL_APP_NFS_SERVER=true
                   - ATL_NFS_SERVER_DEVICE=/dev/xvdf
                   # NOTE: For simplicity we should keep this as close to the BB node version above.
+
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - !Sub ["ATL_PROXY_NAME=${LoadBalancerDNSName}", LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName]
                   - ""
@@ -1056,7 +1091,6 @@ Resources:
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_PLAYBOOK=${DeployRepositoryPlaybook}", DeployRepositoryPlaybook: !Ref "DeploymentAutomationPlaybook"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_KEYNAME=${DeployRepositoryKeyName}", DeployRepositoryKeyName: !Ref "DeploymentAutomationKeyName"]
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_CUSTOM_PARAMS='${DeployRepositoryCustomParams}'", DeployRepositoryCustomParams: !Ref "DeploymentAutomationCustomParams"]
-
                   - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH=${EnableCW}", EnableCW: !If [EnableCloudWatch, true, false]]
                   - !Sub ["ATL_AWS_ENABLE_CLOUDWATCH_LOGS=${EnableCWLogs}", EnableCWLogs: !If [EnableCloudWatchLogs, true, false]]
 
