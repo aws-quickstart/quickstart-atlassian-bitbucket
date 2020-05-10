@@ -39,6 +39,10 @@ Metadata:
           - DBStorage
           - DBStorageType
       - Label:
+          default: Bastion host utilization
+          Parameters:
+            - BastionHostRequired
+      - Label:
           default: Elasticsearch
         Parameters:
           - ElasticsearchInstanceType
@@ -154,6 +158,8 @@ Metadata:
         default: JVM Heap Size Override
       JvmSupportOpts:
         default: Additional JVM options
+      BastionHostRequired:
+        default: Enable Bastion host usage
       KeyPairName:
         default: SSH Key Pair Name
       CustomDnsName:
@@ -178,12 +184,12 @@ Parameters:
     Type: String
   BitbucketLicenseKey:
     Default: ''
-    Description: (Optional) Provide a license key for Bitbucket Data Center if you have one. 
+    Description: (Optional) Provide a license key for Bitbucket Data Center if you have one.
     Type: String
   BitbucketAdminPassword:
-    AllowedPattern: '((?=^.{0,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*)|(^$)'    
+    AllowedPattern: '((?=^.{0,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*)|(^$)'
     ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
-    Description: (Optional) Password for the Bitbucket administrator ('admin') account. 
+    Description: (Optional) Password for the Bitbucket administrator ('admin') account.
     MaxLength: 128
     NoEcho: true
     Type: String
@@ -529,9 +535,16 @@ Parameters:
     Default: ''
     Description: Pass in any additional JVM options to tune the Bitbucket instance
     Type: String
+  BastionHostRequired:
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether to grant access to Crowd's EC2 instances through the ASI's Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.
+    Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances. If you don't provide one, the Atlassian Standard Infrastructure stack's key pair will be used.
+    Description: The EC2 Key Pair to allow SSH access to the instances.
     Type: String
     Default: ''
   CustomDnsName:
@@ -636,6 +649,9 @@ Conditions:
     !Equals [!Ref DBEngine, "Amazon Aurora PostgreSQL"]
   DBEnginePostgres:
     !Equals [!Ref DBEngine, "PostgreSQL"]
+  UseBastionHost: !And
+    - !Equals [!Ref BastionHostRequired, true]
+    - !Condition KeyProvided
 
 Mappings:
   AWSRegionArch2AMI:
@@ -940,7 +956,7 @@ Resources:
       KeyName: !If
         - KeyProvided
         - !Ref KeyPairName
-        - Fn::ImportValue: !Sub "${ExportPrefix}DefaultKey"
+        - Ref: AWS::NoValue
       IamInstanceProfile: !Ref BitbucketClusterNodeInstanceProfile
       ImageId:
         !FindInMap
@@ -1368,14 +1384,17 @@ Resources:
           FromPort: 7999
           ToPort: 7999
           CidrIp: !Ref CidrBlock
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp:
-            !Sub
+        - !If
+          - UseBastionHost
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            CidrIp:
+              !Sub
               - "${BastionIp}/32"
               - BastionIp:
                   Fn::ImportValue: !Sub '${ExportPrefix}BastionPrivIp'
+          - Ref: AWS::NoValue
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
