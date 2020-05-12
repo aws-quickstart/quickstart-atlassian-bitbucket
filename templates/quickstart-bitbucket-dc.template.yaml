@@ -42,6 +42,7 @@ Metadata:
           default: Bastion host utilization
           Parameters:
             - BastionHostRequired
+            - KeyPairName
       - Label:
           default: Elasticsearch
         Parameters:
@@ -52,7 +53,6 @@ Metadata:
         Parameters:
           - CidrBlock
           - InternetFacingLoadBalancer
-          - KeyPairName
           - CustomDnsName
           - SSLCertificateARN
       - Label:
