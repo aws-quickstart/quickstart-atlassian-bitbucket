@@ -687,7 +687,6 @@ Resources:
           - Effect: Allow
             Action:
               - 'ssm:PutParameter'
-              - 'ssm:DeleteParameter'
             Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
       Roles:
         - !Ref BitbucketFileServerRole
