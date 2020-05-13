@@ -159,7 +159,7 @@ Metadata:
       JvmSupportOpts:
         default: Additional JVM options
       BastionHostRequired:
-        default: Enable Bastion host usage
+        default: Use Bastion host
       KeyPairName:
         default: SSH Key Pair Name
       CustomDnsName:
