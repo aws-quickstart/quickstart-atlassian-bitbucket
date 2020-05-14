@@ -5,15 +5,19 @@
   },
   {
     "ParameterKey": "BitbucketVersion",
-    "ParameterValue": "6.8.1"
+    "ParameterValue": "6.10.1"
+  },
+  {
+    "ParameterKey": "BitbucketAdminPassword",
+    "ParameterValue": "$[taskcat_genpass_8]S"
+  },
+  {
+    "ParameterKey": "BitbucketLicenseKey",
+    "ParameterValue": "AAABow0ODAoPeNp1kUlv2zAQRu/8FQP0ZoCyvCRpDQhoI7FpilgybLlAtwNFTyw2MimQI7f+96VttUmXHHjhLHjfmxdl3cFcHmA0hfhyNpnM4gnczEsYx+OY5d2uQlfcrz06n/ARS60hqSiXO0xk5ewD+teSGum9liZSdsc8SV9Hd1qh8VgeWjz1ZuKDuCsWYvlv/Ult0TlVS4+ZJEyOADy+4KMpe35bXxE/Wu0Op7HF+N0vSjGXunkGc4Vuj+42S67FleDT7NOYXxbvr/jN5NXLnjGskykaQpeQ65Ctusorp1vS1px/BoNBXpT8bbHki2WRrdPytsj5eiVCIUkdBp4NVAegGqEnBWGU3aCD1tlvqAg+10Ttl9lwuLXRH4jD5jzB8TzxNYLMgrEEG+3J6aojDJu1B7KgOk92F44UsRA6MBtp1FMtweaot3lOF/zoPf7OkS7Fm1Jk/Prjkf3/zvoIQdraPBj73bCVyJPw+EUcs8JtpdFenvSU6EmbLTtJCB9/XzTDR5XHXujDwr0Nappuqw1scI+NbUMoJvay6eSj+J8JvettMCwCFGeLfqXRBKGBQ/HZf6nfl1da0Qf8AhQQu6OUrfk71nQqUW0h3TeNFVyuGg==X02k8"
   },
   {
     "ParameterKey": "DBMasterUserPassword",
     "ParameterValue": "$[taskcat_genpass_8]S"
-  },
-  {
-    "ParameterKey": "BitbucketAdminPassword",
-    "ParameterValue": ""
   },
   {
     "ParameterKey": "CidrBlock",
