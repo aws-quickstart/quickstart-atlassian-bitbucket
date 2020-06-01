@@ -39,6 +39,11 @@ Metadata:
           - DBStorage
           - DBStorageType
       - Label:
+          default: Bastion host provisioning
+          Parameters:
+            - BastionHostRequired
+            - KeyPairName
+      - Label:
           default: Elasticsearch
         Parameters:
           - ElasticsearchInstanceType
@@ -48,7 +53,6 @@ Metadata:
         Parameters:
           - AccessCIDR
           - InternetFacingLoadBalancer
-          - KeyPairName
           - CustomDnsName
           - SSLCertificateARN
           - VPCCIDR
@@ -70,6 +74,9 @@ Metadata:
           - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
+          - BitbucketLicenseKey
+          - BitbucketAdminPassword
+          - BitbucketDatasetURL
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
@@ -82,6 +89,12 @@ Metadata:
         default: Bitbucket properties
       BitbucketVersion:
         default: Version *
+      BitbucketLicenseKey:
+        default: License Key for Bitbucket (if you have one)
+      BitbucketAdminPassword:
+          default: Password for the administrator account
+      BitbucketDatasetURL:
+          default: HTTP/HTTPS URL to download the Bitbucket Dataset
       JvmHeapOverride:
         default: JVM Heap Size Override
       JvmSupportOpts:
@@ -152,6 +165,8 @@ Metadata:
         default: Home directory volume type
       InternetFacingLoadBalancer:
         default: Make instance internet facing
+      BastionHostRequired:
+        default: Deploy Bastion host
       KeyPairName:
         default: SSH Key Pair Name
       CustomDnsName:
@@ -185,6 +200,21 @@ Parameters:
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
+    Type: String
+  BitbucketLicenseKey:
+    Default: ''
+    Description: Provide a license key for Bitbucket Data Center if you have one.
+    Type: String
+  BitbucketAdminPassword:
+    AllowedPattern: '((?=^.{0,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*)|(^$)'
+    ConstraintDescription: Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol
+    Description: (Optional) Password for the Bitbucket administrator ('admin') account.
+    MaxLength: 128
+    NoEcho: true
+    Type: String
+  BitbucketDatasetURL:
+    Default: ''
+    Description: Provide the HTTP/HTTPS URL for the dataset to restore.
     Type: String
   JvmHeapOverride:
     Default: ''
@@ -524,10 +554,17 @@ Parameters:
     ConstraintDescription: Must be 'true' or 'false'.
     Description: Controls whether the load balancer should be visible to the internet (true) or only within the VPC (false).
     Type: String
+  BastionHostRequired:
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether to provision a Bastion host instance. If 'true', then you need to provide an EC2 Key Pair (otherwise, you won't be able to use the Bastion host to access BitBucket instances).
+    Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: The EC2 Key Pair to allow SSH access to the instances.
-    Type: AWS::EC2::KeyPair::KeyName
+    Description: Public/private EC2 Key Pairs to allow you to securely access the Bastion host
+    Type: String
     Default: ''
   CustomDnsName:
     Default: ""
@@ -592,6 +629,11 @@ Conditions:
   GovCloudCondition: !Equals
     - !Ref 'AWS::Region'
     - us-gov-west-1
+  KeyProvided:
+    !Not [!Equals [!Ref KeyPairName, '']]
+  ProvisionBastion: !And
+    - !Equals [!Ref BastionHostRequired, true]
+    - !Condition KeyProvided
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -614,6 +656,8 @@ Resources:
         PublicSubnet1CIDR: !Ref 'PublicSubnet1CIDR'
         PublicSubnet2CIDR: !Ref 'PublicSubnet2CIDR'
         VPCCIDR: !Ref 'VPCCIDR'
+        BastionHostRequired: !Ref 'BastionHostRequired'
+
   BitbucketDCStack:
     DependsOn: VPCStack
     Type: AWS::CloudFormation::Stack
@@ -630,6 +674,9 @@ Resources:
           - ','
           - !Ref 'BitbucketProperties'
         BitbucketVersion: !Ref 'BitbucketVersion'
+        BitbucketLicenseKey: !Ref 'BitbucketLicenseKey'
+        BitbucketAdminPassword: !Ref 'BitbucketAdminPassword'
+        BitbucketDatasetURL: !Ref 'BitbucketDatasetURL'
         CidrBlock: !Ref 'AccessCIDR'
         CloudWatchIntegration: !Ref 'CloudWatchIntegration'
         ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
@@ -667,6 +714,7 @@ Resources:
         JvmSupportOpts: !Ref 'JvmSupportOpts'
         KeyPairName: !Ref 'KeyPairName'
         SSLCertificateARN: !Ref 'SSLCertificateARN'
+        BastionHostRequired: !Ref 'BastionHostRequired'
 
 Outputs:
   ClusterNodeGroup:
@@ -685,5 +733,6 @@ Outputs:
     Description: The name of the SecurityGroup
     Value: !GetAtt 'BitbucketDCStack.Outputs.SGname'
   BastionPubIp:
+    Condition: ProvisionBastion
     Description: The Public IP to ssh to the Bastion
     Value: !GetAtt 'VPCStack.Outputs.BastionPubIp'

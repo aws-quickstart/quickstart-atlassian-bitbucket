@@ -5,11 +5,15 @@
     },
     {
         "ParameterKey": "BitbucketVersion",
-        "ParameterValue": "6.6.0"
+        "ParameterValue": "6.10.0"
     },
     {
         "ParameterKey": "DBMasterUserPassword",
-        "ParameterValue": "f925dO1ry_"
+        "ParameterValue": "$[taskcat_genpass_8S]"
+    },
+    {
+        "ParameterKey": "BitbucketAdminPassword",
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "AccessCIDR",
@@ -29,7 +33,7 @@
     },
     {
         "ParameterKey": "DBPassword",
-        "ParameterValue": "f925dO1ry_"
+        "ParameterValue": "$[taskcat_genpass_8S]"
     },
     {
         "ParameterKey": "KeyPairName",

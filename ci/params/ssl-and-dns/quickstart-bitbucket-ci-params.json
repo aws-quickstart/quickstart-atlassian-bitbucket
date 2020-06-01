@@ -5,7 +5,11 @@
     },
     {
         "ParameterKey": "DBMasterUserPassword",
-        "ParameterValue": "f925dO1ry_"
+        "ParameterValue": "$[taskcat_genpass_8S]"
+    },
+    {
+        "ParameterKey": "BitbucketAdminPassword",
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "DBMultiAZ",
@@ -13,7 +17,7 @@
     },
     {
         "ParameterKey": "DBPassword",
-        "ParameterValue": "f925dO1ry_"
+        "ParameterValue": "$[taskcat_genpass_8S]"
     },
     {
         "ParameterKey": "DBStorage",

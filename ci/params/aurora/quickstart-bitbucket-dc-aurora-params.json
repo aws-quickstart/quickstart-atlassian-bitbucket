@@ -5,11 +5,15 @@
   },
   {
     "ParameterKey": "DBMasterUserPassword",
-    "ParameterValue": "f925dO1ry_"
+    "ParameterValue": "$[taskcat_genpass_8S]"
+  },
+  {
+    "ParameterKey": "BitbucketAdminPassword",
+    "ParameterValue": ""
   },
   {
     "ParameterKey": "DBPassword",
-    "ParameterValue": "f925dO1ry_"
+    "ParameterValue": "$[taskcat_genpass_8S]"
   },
   {
     "ParameterKey": "QSS3BucketName",
