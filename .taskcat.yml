@@ -23,6 +23,7 @@ tests:
       AvailabilityZones: $[taskcat_genaz_2]
       BitbucketVersion: "6.6.0"
       DBMasterUserPassword: $[taskcat_genpass_10S]
+      BitbucketAdminPassword: "replaced-by-taskcat-override-file"
       AccessCIDR: "10.0.0.0/0"
       DBMultiAZ: "false"
       DBInstanceClass: db.t2.large
