@@ -704,8 +704,8 @@ Resources:
             Action:
               - 'ssm:PutParameter'
             Resource: !Sub
-              - arn:${ArnIdentifier}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha
-              - ArnIdentifier: !If ["GovCloudCondition", "aws-us-gov", "aws"]
+              - arn:${ArnPartition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha
+              - ArnPartition: !If ["GovCloudCondition", "aws-us-gov", "aws"]
       Roles:
         - !Ref BitbucketFileServerRole
         - !Ref BitbucketClusterNodeRole
