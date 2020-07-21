@@ -704,8 +704,8 @@ Resources:
             Action:
               - 'ssm:PutParameter'
             Resource: !Sub
-              - arn:{QSS3Region}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha
-              - QSS3Region: !If ["GovCloudCondition", "aws-us-gov", "aws"]
+              - arn:${ArnIdentifier}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha
+              - ArnIdentifier: !If ["GovCloudCondition", "aws-us-gov", "aws"]
       Roles:
         - !Ref BitbucketFileServerRole
         - !Ref BitbucketClusterNodeRole
