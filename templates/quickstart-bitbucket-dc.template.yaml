@@ -642,9 +642,9 @@ Conditions:
     !And [!Not [!Equals [!Ref DBMasterUserPassword, '']], Condition: NotStandbyMode]
   UsePublicIp:
     !Equals [!Ref InternetFacingLoadBalancer, 'true']
-  GovCloudCondition: !Equals
-    - !Ref 'AWS::Region'
-    - us-gov-west-1
+  GovCloudCondition: !Or
+    !Equals [!Ref 'AWS::Region', 'us-gov-west-1']
+    !Equals [!Ref 'AWS::Region', 'us-gov-east-1']
   DBEngineAurora:
     !Equals [!Ref DBEngine, "Amazon Aurora PostgreSQL"]
   DBEnginePostgres:
@@ -691,6 +691,11 @@ Mappings:
       HVM64: ami-e9a9d388
     us-gov-east-1:
       HVM64: ami-a2d938d3
+
+  Regions:
+    Gov:
+      us-gov-west-1: s3-us-gov-west-1
+      us-gov-east-1: s3-us-gov-east-1
 
 Resources:
   AnsiblePinnedShaPutPolicy:
@@ -1302,7 +1307,10 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-services/templates/quickstart-database-for-atlassian-services.yaml
-        - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+        - QSS3Region: !If
+            - GovCloudCondition
+            - !FindInMap [Regions, Gov, !Ref 'AWS::Region']
+            - s3
       Parameters:
         DatabaseImplementation: !Ref DBEngine
         DBSecurityGroup: !Ref SecurityGroup
@@ -1458,7 +1466,10 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-services/templates/quickstart-cloudwatch-dashboard.yaml
-        - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
+        - QSS3Region: !If
+            - GovCloudCondition
+            - !FindInMap [Regions, Gov, !Ref 'AWS::Region']
+            - s3
       Parameters:
         ProductStackName: !Sub "${AWS::StackName}"
         ProductFamilyName: "bitbucket"

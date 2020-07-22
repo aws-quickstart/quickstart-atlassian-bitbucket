@@ -626,14 +626,21 @@ Parameters:
     Type: String
 
 Conditions:
-  GovCloudCondition: !Equals
-    - !Ref 'AWS::Region'
-    - us-gov-west-1
+  GovCloudCondition: !Or
+    !Equals [!Ref 'AWS::Region', 'us-gov-west-1']
+    !Equals [!Ref 'AWS::Region', 'us-gov-east-1']
   KeyProvided:
     !Not [!Equals [!Ref KeyPairName, '']]
   ProvisionBastion: !And
     - !Equals [!Ref BastionHostRequired, true]
     - !Condition KeyProvided
+
+Mappings:
+  Regions:
+    Gov:
+      us-gov-west-1: s3-us-gov-west-1
+      us-gov-east-1: s3-us-gov-east-1
+
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -642,7 +649,7 @@ Resources:
         - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-atlassian-services/templates/quickstart-vpc-for-atlassian-services.yaml
         - QSS3Region: !If
             - GovCloudCondition
-            - s3-us-gov-west-1
+            - !FindInMap [Regions, Gov, !Ref 'AWS::Region']
             - s3
       Parameters:
         AccessCIDR: !Ref 'AccessCIDR'
@@ -666,7 +673,7 @@ Resources:
         - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/quickstart-bitbucket-dc.template.yaml
         - QSS3Region: !If
             - GovCloudCondition
-            - s3-us-gov-west-1
+            - !FindInMap [Regions, Gov, !Ref 'AWS::Region']
             - s3
       Parameters:
         InternetFacingLoadBalancer: !Ref 'InternetFacingLoadBalancer'
