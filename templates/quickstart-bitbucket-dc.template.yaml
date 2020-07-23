@@ -703,8 +703,7 @@ Resources:
           - Effect: Allow
             Action:
               - 'ssm:PutParameter'
-            Resource: !Sub
-              - arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha
+            Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/pinned-ansible-sha"
       Roles:
         - !Ref BitbucketFileServerRole
         - !Ref BitbucketClusterNodeRole
