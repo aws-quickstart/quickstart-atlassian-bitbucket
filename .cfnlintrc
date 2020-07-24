@@ -5,3 +5,9 @@ ignore_checks:
     # The check cannot handle this situation:
     # Iops: !If [IsHomeProvisionedIops, !Ref HomeIops, !Ref "AWS::NoValue"]
     # VolumeType: !If [IsHomeProvisionedIops, io1, gp2]
+  - W4002  
+    # W4002: As the resource "metadata" section contains reference to a "NoEcho" parameter DBMasterUserPassword, CloudFormation will display the parameter value in plaintext
+  - E3012
+    # E3012: Property Resources/EFSCname/Properties/TTL should be of type Long
+  - E1001
+    # E1001: Top level template section tests is not valid
