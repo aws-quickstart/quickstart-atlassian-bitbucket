@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Atlassian Bitbucket Data Center QS(0034)"
+Description: "Atlassian Bitbucket Data Center (qs-1qup6ra1t)"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
