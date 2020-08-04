@@ -15,6 +15,7 @@ Metadata:
           - ClusterNodeInstanceType
           - ClusterNodeMax
           - ClusterNodeMin
+          - ClusterNodeVolumeSize
           - DeploymentAutomationRepository
           - DeploymentAutomationBranch
           - DeploymentAutomationPlaybook
@@ -107,6 +108,8 @@ Metadata:
         default: Minimum number of cluster nodes
       ClusterNodeInstanceType:
         default: Bitbucket cluster node instance type
+      ClusterNodeVolumeSize:
+        default: Cluster node instance volume size
       CreateBucket:
         default: Create S3 bucket for Elasticsearch snapshots
       DBEngine:
@@ -334,6 +337,10 @@ Parameters:
   ClusterNodeMin:
     Default: 1
     Description: Set to 1 for new deployment. Can be updated post launch.
+    Type: Number
+  ClusterNodeVolumeSize:
+    Default: 50
+    Description: Size of cluster node root volume in Gb
     Type: Number
   CreateBucket:
     Default: "true"
@@ -682,6 +689,7 @@ Resources:
         ClusterNodeInstanceType: !Ref 'ClusterNodeInstanceType'
         ClusterNodeMax: !Ref 'ClusterNodeMax'
         ClusterNodeMin: !Ref 'ClusterNodeMin'
+        ClusterNodeVolumeSize: !Ref 'ClusterNodeVolumeSize'
         CreateBucket: !Ref 'CreateBucket'
         CustomDnsName: !Ref 'CustomDnsName'
         DBInstanceClass: !Ref 'DBInstanceClass'
