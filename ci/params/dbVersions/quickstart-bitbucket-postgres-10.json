@@ -16,6 +16,14 @@
     "ParameterValue": "0.0.0.0/0"
   },
   {
+    "ParameterKey": "DBEngineVersion",
+    "ParameterValue": "10"
+  },
+  {
+    "ParameterKey": "DBEngine",
+    "ParameterValue": "PostgreSQL"
+  },
+  {
     "ParameterKey": "DBIops",
     "ParameterValue": "1000"
   },
