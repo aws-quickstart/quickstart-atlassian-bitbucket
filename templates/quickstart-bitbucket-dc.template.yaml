@@ -32,6 +32,7 @@ Metadata:
           default: Database
         Parameters:
           - DBEngine
+          - DBEngineVersion
           - DBInstanceClass
           - DBIops
           - DBMasterUserPassword
@@ -103,6 +104,8 @@ Metadata:
         default: Create S3 bucket for Elasticsearch snapshots
       DBEngine:
         default: The database engine to deploy with
+      DBEngineVersion:
+        default: The database engine version to use
       DBInstanceClass:
         default: Database instance class
       DBIops:
@@ -354,6 +357,14 @@ Parameters:
       - 'Amazon Aurora PostgreSQL'
       - 'PostgreSQL'
     ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
+    Type: String
+  DBEngineVersion:
+    Default: 11
+    AllowedValues:
+      - 10
+      - 11
+      - 12
+    Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Jira version you're installing supports the database engine selected."
     Type: String
   DBInstanceClass:
     Default: db.m4.large
@@ -834,10 +845,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 1f4a225e65963588f7fd184bc93a5a04b4367c3e"
+          Value: "COMMIT: 89cd62a4be68dba385cf6c93b7a3d75b842002dd"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-07-30T01:34:17Z"
+          Value: "TIMESTAMP: 2020-08-05T11:26:44Z"
           PropagateAtLaunch: true
   ClusterNodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -1285,13 +1296,13 @@ Resources:
       DBSnapshotIdentifier: !If [RestoreFromRDSSnapshot, !Ref DBSnapshotId, !Ref "AWS::NoValue"]
       DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: postgres
-      EngineVersion: '10'
+      EngineVersion: !Ref DBEngineVersion
       Iops: !If [DBProvisionedIops, !Ref DBIops, !Ref "AWS::NoValue"]
       MasterUsername: !If ["SetDBMasterUserAndPassword", postgres, !Ref "AWS::NoValue"]
       MasterUserPassword: !If ["SetDBMasterUserAndPassword", !Ref DBMasterUserPassword, !Ref "AWS::NoValue"]
       MultiAZ: !If [StandbyMode, !Ref "AWS::NoValue", !Ref DBMultiAZ]
-      StorageType: !If [DBProvisionedIops, io1, gp2]
       SourceDBInstanceIdentifier: !If [StandbyMode, !Ref DBMaster, !Ref "AWS::NoValue"]
+      StorageType: !If [DBProvisionedIops, io1, gp2]
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName} Bitbucket PostgreSQL Database"
@@ -1313,14 +1324,15 @@ Resources:
         - QSS3Region: !If ["GovCloudCondition", "s3-us-gov-west-1", "s3"]
       Parameters:
         DatabaseImplementation: !Ref DBEngine
-        DBSecurityGroup: !Ref SecurityGroup
+        DBAllocatedStorage: !Ref DBStorage
         DBAutoMinorVersionUpgrade: "true"
         DBBackupRetentionPeriod: "1"
+        DBEngineVersion: !Ref DBEngineVersion
         DBInstanceClass: !Ref DBInstanceClass
         DBIops: !Ref DBIops
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMultiAZ: !Ref DBMultiAZ
-        DBAllocatedStorage: !Ref DBStorage
+        DBSecurityGroup: !Ref SecurityGroup
         DBStorageType: !Ref DBStorageType
         ExportPrefix: !Ref ExportPrefix
         QSS3BucketName: !Ref QSS3BucketName
