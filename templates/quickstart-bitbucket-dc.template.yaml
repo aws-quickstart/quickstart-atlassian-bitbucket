@@ -1206,7 +1206,7 @@ Resources:
       KeyName: !If
         - KeyProvided
         - !Ref KeyPairName
-        - Fn::ImportValue: !Sub "${ExportPrefix}DefaultKey"
+        - Ref: AWS::NoValue
       NetworkInterfaces:
         - GroupSet: [!Ref SecurityGroup]
           AssociatePublicIpAddress: false
