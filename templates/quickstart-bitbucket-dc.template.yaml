@@ -845,10 +845,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 957bfc1bec3d89b927e0253a416886579060e064"
+          Value: "COMMIT: e32a5cf84d397eb727e320df4c650c5f43976025"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-08-07T06:30:47Z"
+          Value: "TIMESTAMP: 2020-08-18T11:20:07Z"
           PropagateAtLaunch: true
   ClusterNodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -1206,7 +1206,7 @@ Resources:
       KeyName: !If
         - KeyProvided
         - !Ref KeyPairName
-        - Fn::ImportValue: !Sub "${ExportPrefix}DefaultKey"
+        - Ref: AWS::NoValue
       NetworkInterfaces:
         - GroupSet: [!Ref SecurityGroup]
           AssociatePublicIpAddress: false
