@@ -635,8 +635,8 @@ Conditions:
     !Equals ['6', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
   ShouldUseES23:
     !And [Condition: IsVersion5X, !Or [Condition: IsVersionX0, Condition: IsVersionX1, Condition: IsVersionX2, Condition: IsVersionX3, Condition: IsVersionX4, Condition: IsVersionX5, Condition: IsVersionX6]]
-  RestoreRDSOrStandby:
-    !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
+  CreateESBucket:
+    !Equals [!Ref CreateBucket, 'true']
   SetDBMasterUserAndPassword:
     !And [!Not [!Equals [!Ref DBMasterUserPassword, '']], Condition: NotStandbyMode]
   UsePublicIp:
