@@ -73,7 +73,6 @@ Metadata:
           - DBMaster
           - DBSnapshotId
           - ESBucketName
-          - ESSnapshotId
           - HomeVolumeSnapshotId
           - HomeDeleteOnTermination
           - BitbucketLicenseKey
@@ -153,8 +152,6 @@ Metadata:
         default: Elasticsearch disk space per node (GB)
       ESBucketName:
         default: Elasticsearch snapshot S3 bucket name
-      ESSnapshotId:
-        default: Elasticsearch snapshot ID to restore
       ExportPrefix:
         default: ASI Exported Prefix
       FileServerInstanceType:
@@ -508,12 +505,6 @@ Parameters:
     ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
     Description: Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.
     Type: String
-  ESSnapshotId:
-    Default: ''
-    AllowedPattern: '[a-z0-9-]*'
-    ConstraintDescription: Must contain only lowercase letters, numbers and hyphens (-).
-    Description: Must be a valid snapshot ID for a snapshot in the configured S3 snapshot repository, must be used in conjunction with ESBucketName set to a correctly configured bucket.
-    Type: String
   ExportPrefix:
     Default: 'ATL-'
     Description:
@@ -723,7 +714,6 @@ Resources:
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
         ElasticsearchNodeVolumeSize: !Ref 'ElasticsearchNodeVolumeSize'
         ESBucketName: !Ref 'ESBucketName'
-        ESSnapshotId: !Ref 'ESSnapshotId'
         FileServerInstanceType: !Ref 'FileServerInstanceType'
         HomeDeleteOnTermination: !Ref 'HomeDeleteOnTermination'
         HomeIops: !Ref 'HomeIops'
