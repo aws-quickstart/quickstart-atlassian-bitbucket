@@ -1044,7 +1044,7 @@ Resources:
           Value: !Ref "AWS::StackId"
   ElasticsearchBucket:
     Type: AWS::S3::Bucket
-    Condition: CreateBucket
+    Condition: CreateESBucket
     Properties:
       BucketName: !Ref ESBucketName
       Tags:
