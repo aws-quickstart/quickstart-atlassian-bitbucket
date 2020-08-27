@@ -638,7 +638,9 @@ Conditions:
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
   CreateESBucket:
-    !Equals [!Ref CreateBucket, 'true']
+    !And
+    - !Equals [!Ref CreateBucket, 'true']
+    - Condition: ESBucketNameSet
   SetDBMasterUserAndPassword:
     !And [!Not [!Equals [!Ref DBMasterUserPassword, '']], Condition: NotStandbyMode]
   UsePublicIp:
