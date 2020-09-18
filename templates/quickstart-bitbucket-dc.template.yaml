@@ -865,7 +865,7 @@ Resources:
                   - !Sub ["ATL_DEPLOYMENT_REPOSITORY_CUSTOM_PARAMS='${DeployRepositoryCustomParams}'", DeployRepositoryCustomParams: !Ref "DeploymentAutomationCustomParams"]
                   - ""
                   - !Sub ["ATL_JVM_HEAP=${JvmHeapOverride}", JvmHeapOverride: !Ref "JvmHeapOverride"]
-                  - !Sub ["ATL_JVM_OPTS=${JvmSupportOpts}", JvmSupportOpts: !Ref "JvmSupportOpts"]
+                  - !Sub ["ATL_JVM_OPTS='${JvmSupportOpts}'", JvmSupportOpts: !Ref "JvmSupportOpts"]
                   - ""
                   - !Sub ["ATL_AWS_REGION=${Region}", Region: !Ref "AWS::Region"]
                   - !Sub ["ATL_AWS_STACK_NAME=${StackName}", StackName: !Ref "AWS::StackName"]
