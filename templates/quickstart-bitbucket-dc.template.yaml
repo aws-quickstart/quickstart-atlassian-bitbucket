@@ -313,7 +313,7 @@ Parameters:
     Type: Number
   ClusterNodeVolumeSize:
     Default: 50
-    Description: Size of cluster node root volume in Gb
+    Description: Size of Bitbucket web server cluster node volume in Gb
     Type: Number
   CreateBucket:
     Default: "true"
@@ -956,6 +956,10 @@ Resources:
 
     Properties:
       AssociatePublicIpAddress: false
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: !Ref ClusterNodeVolumeSize
       KeyName: !If
         - KeyProvided
         - !Ref KeyPairName
@@ -1170,9 +1174,6 @@ Resources:
 
     Properties:
       BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
-            VolumeSize: !Ref ClusterNodeVolumeSize
         - DeviceName: /dev/xvdf
           Ebs:
             DeleteOnTermination: !Ref HomeDeleteOnTermination
