@@ -1,0 +1,7 @@
+// Replace the content in <>
+// Briefly describe the software. Use consistent and clear branding.
+// Include the benefits of using the software on AWS, and provide details on usage scenarios.
+
+Bitbucket Data Center is a Git repository management solution from Atlassian. It provides source code collaboration for enterprises that require high availability and performance at scale. 
+
+Please know that we may share who uses AWS Quick Starts with the AWS partner that collaborated with AWS on the content of the Quick Start.
