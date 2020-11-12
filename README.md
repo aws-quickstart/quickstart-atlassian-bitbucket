@@ -16,6 +16,13 @@ You need to create the required AWS networking infrastructure
 (VPC, subnets) by using the [ASI Quick Start](https://fwd.aws/xYyYy), or by deploying Bitbucket with a new ASI.
 For details, see the [deployment guide](https://fwd.aws/dEX6W).
 
+## Deploying for production
+
+For production deployments, avoid launching the Bitbucket Quick Start from the AWS Quick Start interface. If you do, any changes made to the Quick Start templates will propagate directly to your deployment. These updates sometimes introduce unexpected changes that could break your deployment.
+
+Instead, clone the Bitbucket Quick Start templates to a custom Amazon Simple Storage Service (Amazon S3) bucket. Then, launch the templates directly from the S3 bucket. This practice lets you control when to apply the latest changes to your environment. See [Launching from a cloned Quick Start (recommended for production)
+](https://confluence.atlassian.com/x/GZUdOg#GettingstartedwithBitbucketDataCenterinAWS-s3bucketcustom) for instructions.
+
 ## Development notes
 
 ### Pre-commit hook
