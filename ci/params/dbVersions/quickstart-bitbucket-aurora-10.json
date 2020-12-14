@@ -50,5 +50,9 @@
   {
     "ParameterKey": "QSS3KeyPrefix",
     "ParameterValue": "quickstart-atlassian-bitbucket/"
+  },
+  {
+    "ParameterKey": "BastionHostRequired",
+    "ParameterValue": "false"
   }
 ]
