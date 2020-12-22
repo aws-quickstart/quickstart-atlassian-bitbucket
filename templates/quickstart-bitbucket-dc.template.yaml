@@ -633,8 +633,6 @@ Conditions:
     !Equals ['5', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
   IsVersionX6:
     !Equals ['6', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  ShouldUseES23:
-    !And [Condition: IsVersion5X, !Or [Condition: IsVersionX0, Condition: IsVersionX1, Condition: IsVersionX2, Condition: IsVersionX3, Condition: IsVersionX4, Condition: IsVersionX5, Condition: IsVersionX6]]
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
   CreateESBucket:
@@ -1034,7 +1032,7 @@ Resources:
         EBSEnabled: true
         VolumeSize: !Ref ElasticsearchNodeVolumeSize
         VolumeType: gp2
-      ElasticsearchVersion: !If [ShouldUseES23, "2.3", "5.5"]
+      ElasticsearchVersion: "6.8"
       ElasticsearchClusterConfig:
         InstanceType: !Ref ElasticsearchInstanceType
       AccessPolicies:
