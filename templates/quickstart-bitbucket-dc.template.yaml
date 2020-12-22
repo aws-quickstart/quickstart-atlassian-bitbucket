@@ -617,22 +617,6 @@ Conditions:
     !Not [!Equals [!Ref KeyPairName, '']]
   IsHomeProvisionedIops:
     !Equals [!Ref HomeVolumeType, Provisioned IOPS]
-  IsVersion5X:
-    !Equals ['5', !Select [0, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX0:
-    !Equals ['0', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX1:
-    !Equals ['1', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX2:
-    !Equals ['2', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX3:
-    !Equals ['3', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX4:
-    !Equals ['4', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX5:
-    !Equals ['5', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX6:
-    !Equals ['6', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
   CreateESBucket:
