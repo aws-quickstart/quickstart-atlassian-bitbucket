@@ -50,5 +50,9 @@
     {
         "ParameterKey": "ExportPrefix",
         "ParameterValue": "$[taskcat_random-string]"
+    },
+    {
+        "ParameterKey": "BastionHostRequired",
+        "ParameterValue": "false"
     }
 ]

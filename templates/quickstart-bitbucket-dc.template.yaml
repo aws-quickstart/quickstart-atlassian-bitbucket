@@ -617,24 +617,6 @@ Conditions:
     !Not [!Equals [!Ref KeyPairName, '']]
   IsHomeProvisionedIops:
     !Equals [!Ref HomeVolumeType, Provisioned IOPS]
-  IsVersion5X:
-    !Equals ['5', !Select [0, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX0:
-    !Equals ['0', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX1:
-    !Equals ['1', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX2:
-    !Equals ['2', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX3:
-    !Equals ['3', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX4:
-    !Equals ['4', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX5:
-    !Equals ['5', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  IsVersionX6:
-    !Equals ['6', !Select [1, !Split ['.', !Ref BitbucketVersion]]]
-  ShouldUseES23:
-    !And [Condition: IsVersion5X, !Or [Condition: IsVersionX0, Condition: IsVersionX1, Condition: IsVersionX2, Condition: IsVersionX3, Condition: IsVersionX4, Condition: IsVersionX5, Condition: IsVersionX6]]
   RestoreRDSOrStandby:
     !Or [Condition: RestoreFromRDSSnapshot, Condition: StandbyMode]
   CreateESBucket:
@@ -853,7 +835,7 @@ Resources:
                   - ""
                   - !Sub ["ATL_PRODUCT_VERSION=${BitbucketVersion}", BitbucketVersion: !Ref BitbucketVersion]
                   - !If  [IsBBAdminPasswordProvided, !Sub ["ATL_BB_ADMIN_PASSWORD=${BBAdminPassword}", BBAdminPassword: !Ref BitbucketAdminPassword], !Ref "AWS::NoValue"]
-                  - !If  [IsLicenseKeyProvided, !Sub ["ATL_BB_LICENSEKEY=${LicenseKey}", LicenseKey: !Ref BitbucketLicenseKey], !Ref "AWS::NoValue"]
+                  - !If  [IsLicenseKeyProvided, !Sub ["ATL_BB_LICENSEKEY='${LicenseKey}'", LicenseKey: !Ref BitbucketLicenseKey], !Ref "AWS::NoValue"]
                   - !If  [IsURLProvided, !Sub ["ATL_DATASET_URL=${DatasetURL}", DatasetURL: !Ref BitbucketDatasetURL], !Ref "AWS::NoValue"]
                   - !Sub ["ATL_BB_BASEURL=${BaseURL}", BaseURL: !If [UseCustomDnsName, !Sub ["${HTTP}://${CustomDNSName}", { HTTP: !If [DoSSL, https, http], CustomDNSName: !Ref CustomDnsName }], !Sub ["${HTTP}://${LoadBalancerDNSName}", { HTTP: !If [DoSSL, https, http], LoadBalancerDNSName: !GetAtt LoadBalancer.DNSName }]]]
                   - !Sub ["ATL_PROXY_NAME=${AtlProxyName}", AtlProxyName: !If [UseCustomDnsName, !Ref CustomDnsName, !GetAtt LoadBalancer.DNSName]]
@@ -1034,7 +1016,7 @@ Resources:
         EBSEnabled: true
         VolumeSize: !Ref ElasticsearchNodeVolumeSize
         VolumeType: gp2
-      ElasticsearchVersion: !If [ShouldUseES23, "2.3", "5.5"]
+      ElasticsearchVersion: "6.8"
       ElasticsearchClusterConfig:
         InstanceType: !Ref ElasticsearchInstanceType
       AccessPolicies:
