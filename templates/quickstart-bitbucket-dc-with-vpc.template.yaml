@@ -196,8 +196,8 @@ Metadata:
 Parameters:
   BitbucketProperties:
     Default: ''
-    Description: A comma-separated list of bitbucket properties in the form 'key1=value1, key2=value2, ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
-    Type: CommaDelimitedList
+    Description: A space-separated list of bitbucket properties in the form 'key1=value1 key2=value2 ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
+    Type: String
   BitbucketVersion:
     Default: "6.10.0"
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
@@ -679,9 +679,7 @@ Resources:
             - s3
       Parameters:
         InternetFacingLoadBalancer: !Ref 'InternetFacingLoadBalancer'
-        BitbucketProperties: !Join
-          - ','
-          - !Ref 'BitbucketProperties'
+        BitbucketProperties: !Ref 'BitbucketProperties'
         BitbucketVersion: !Ref 'BitbucketVersion'
         BitbucketLicenseKey: !Ref 'BitbucketLicenseKey'
         BitbucketAdminPassword: !Ref 'BitbucketAdminPassword'
