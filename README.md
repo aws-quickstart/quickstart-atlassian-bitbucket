@@ -42,3 +42,5 @@ manually.
 This Quick Start's CloudFormation templates were developed by Atlassian, in collaboration with AWS. To report an issue or request a feature, you can [contact Atlassian directly](https://support.atlassian.com/contact/#/).
 
 For additional Atlassian documentation on how to manage Quick Start deployments, see [Getting started with Bitbucket Data Center in AWS](https://confluence.atlassian.com/x/GZUdOg).
+
+.
