@@ -44,7 +44,7 @@ Metadata:
           - DBStorageType
       - Label:
           default: Bastion host provisioning
-          Parameters:
+        Parameters:
             - BastionHostRequired
             - KeyPairName
       - Label:
@@ -86,7 +86,6 @@ Metadata:
           - QSS3BucketName
           - QSS3KeyPrefix
           - ExportPrefix
-
     ParameterLabels:
       BitbucketProperties:
         default: Bitbucket properties

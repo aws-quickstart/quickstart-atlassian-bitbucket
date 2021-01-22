@@ -44,7 +44,7 @@ Metadata:
           - DBStorageType
       - Label:
           default: Bastion host utilization
-          Parameters:
+        Parameters:
             - BastionHostRequired
             - KeyPairName
       - Label:
