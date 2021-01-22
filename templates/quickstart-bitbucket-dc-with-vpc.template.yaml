@@ -2,6 +2,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "Atlassian Bitbucket Data Center in new VPC License: Apache 2.0 (qs-1qup6r9tq)"
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into a new VPC"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:

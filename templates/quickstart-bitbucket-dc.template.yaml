@@ -2,6 +2,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "Atlassian Bitbucket Data Center (qs-1qup6ra1t)"
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing VPC"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
