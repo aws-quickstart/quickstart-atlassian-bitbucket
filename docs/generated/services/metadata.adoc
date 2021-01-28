@@ -22,6 +22,7 @@
 :template_cloudwatch:
 :template_custom_dbinstancename:
 :template_dbinstancename:
+:template_deterministic_ec2_instances:
 :template_ec2:
 :template_elasticloadbalancing:
 :template_elasticsearch:
