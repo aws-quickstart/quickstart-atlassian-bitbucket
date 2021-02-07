@@ -358,11 +358,11 @@ Parameters:
     ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
     Type: String
   DBEngineVersion:
-    Default: 11
+    Default: 12
     AllowedValues:
-      - 10
-      - 11
       - 12
+      - 11
+      - 10
     Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Bitbucket version you're installing supports the database engine selected."
     Type: String
   DBInstanceClass:
@@ -814,10 +814,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: e32a5cf84d397eb727e320df4c650c5f43976025"
+          Value: "COMMIT: 62da7e6b05092bf323ac240e7993deb8e41df4ff"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2020-08-18T11:20:07Z"
+          Value: "TIMESTAMP: 2021-02-07T22:53:58Z"
           PropagateAtLaunch: true
   ClusterNodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration

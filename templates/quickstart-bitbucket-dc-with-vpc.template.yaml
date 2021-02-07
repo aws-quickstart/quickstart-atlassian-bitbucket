@@ -384,11 +384,11 @@ Parameters:
     ConstraintDescription: Must be 'Amazon Aurora PostgreSQL' or 'PostgreSQL'.
     Type: String
   DBEngineVersion:
-    Default: 11
+    Default: 12
     AllowedValues:
-      - 10
-      - 11
       - 12
+      - 11
+      - 10
     Description: "The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Bitbucket version you're installing supports the database engine selected."
     Type: String
   DBInstanceClass:

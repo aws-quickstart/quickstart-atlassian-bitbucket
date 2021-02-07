@@ -16,14 +16,6 @@
     "ParameterValue": "0.0.0.0/0"
   },
   {
-    "ParameterKey": "DBEngineVersion",
-    "ParameterValue": "12"
-  },
-  {
-    "ParameterKey": "DBEngine",
-    "ParameterValue": "PostgreSQL"
-  },
-  {
     "ParameterKey": "DBIops",
     "ParameterValue": "1000"
   },
@@ -52,7 +44,7 @@
     "ParameterValue": "quickstart-atlassian-bitbucket/"
   },
   {
-    "ParameterKey": "BastionHostRequired",
-    "ParameterValue": "false"
+    "ParameterKey": "JvmSupportOpts",
+    "ParameterValue": "-Dbla -Dsomething"
   }
 ]
