@@ -17,7 +17,7 @@
   },
   {
     "ParameterKey": "DBEngineVersion",
-    "ParameterValue": "10"
+    "ParameterValue": "12"
   },
   {
     "ParameterKey": "DBEngine",
