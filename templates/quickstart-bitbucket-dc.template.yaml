@@ -50,6 +50,7 @@ Metadata:
       - Label:
           default: Elasticsearch
         Parameters:
+          - ElasticSearchPassword
           - ElasticsearchInstanceType
           - ElasticsearchNodeVolumeSize
       - Label:
@@ -137,6 +138,8 @@ Metadata:
         default: SSH key name to use with the repository
       CloudWatchIntegration:
         default: Enable CloudWatch integration
+      ElasticSearchPassword:
+        default: Elasticsearch master user password
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
       ElasticsearchNodeVolumeSize:
@@ -453,6 +456,14 @@ Parameters:
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Description: Database storage type
     Type: String
+  ElasticSearchPassword:
+    Description: "Password for the elastic search master user, the username will be 'bitbucket'. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 of the following symbols: ! # $ { * : [ = , ] - _ + % &"
+    Type: String
+    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
+    ConstraintDescription: 'Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 of the following symbols: ! # $ { * : [ = , ] - _ @ + % &'
+    NoEcho: True
+    MaxLength: 128
+    MinLength: 8
   ElasticsearchInstanceType:
     Description: EC2 instance type for the Amazon Elasticsearch service to run on.
     Type: String
@@ -876,7 +887,9 @@ Resources:
                   - !Sub ["ATL_NFS_DISK_VOLUME_IOPS=${VolIOPs}", VolIOPs: !If [IsHomeProvisionedIops, !Ref "HomeIops", ""]]
                   - ""
                   - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
-                  - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=http://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
+                  - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=https://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
+                  - "ATL_ELASTICSEARCH_USERNAME=bitbucket"
+                  - !Sub ["ATL_ELASTICSEARCH_PASSWORD=${ESPassword}", ESPassword: !Ref ElasticSearchPassword]
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Ref BitbucketProperties]
                   - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
 
@@ -1026,14 +1039,54 @@ Resources:
         Statement:
           - Effect: "Allow"
             Principal:
-              AWS: !GetAtt BitbucketClusterNodeRole.Arn
-            Action: "es:*"
+              AWS: "*"
+            Action: "es:ESHttp*"
             Resource: "*"
+      AdvancedSecurityOptions:
+        Enabled: true
+        InternalUserDatabaseEnabled: true
+        MasterUserOptions:
+          MasterUserName: bitbucket
+          MasterUserPassword: !Ref ElasticSearchPassword
+      DomainEndpointOptions:
+        EnforceHTTPS: true
+        # Should we enforce TLS 1.2?
+        TLSSecurityPolicy: Policy-Min-TLS-1-2-2019-07
+      EncryptionAtRestOptions:
+        Enabled: true
+      NodeToNodeEncryptionOptions:
+        Enabled: true
+      # VPCOptions:
+      #   SubnetIds:
+      #     - !Select
+      #       - 0
+      #       - !Split
+      #         - ','
+      #         - Fn::ImportValue: !Sub '${ExportPrefix}PriNets'
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName} Bitbucket Elasticsearch cluster"
         - Key: Application
           Value: !Ref "AWS::StackId"
+  ElasticsearchKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Encryption key for Elasticsearch cluster
+      Enabled: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: !Sub "${AWS::StackName}"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
+            Action: 'kms:*'
+            Resource: '*'
+      Tags:
+        - Key: Name
+          Value: !Sub ["${StackName} Elasticsearch Encryption Key", StackName: !Ref 'AWS::StackName']
   ElasticsearchBucket:
     Type: AWS::S3::Bucket
     Condition: CreateESBucket
