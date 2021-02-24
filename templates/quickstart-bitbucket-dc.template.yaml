@@ -887,7 +887,6 @@ Resources:
                   - !Sub ["ATL_NFS_DISK_VOLUME_IOPS=${VolIOPs}", VolIOPs: !If [IsHomeProvisionedIops, !Ref "HomeIops", ""]]
                   - ""
                   - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
-                  - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=https://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - "ATL_ELASTICSEARCH_USERNAME=bitbucket"
                   - "ATL_ELASTICSEARCH_PROTOCOL=https"
                   - !Sub ["ATL_ELASTICSEARCH_PASSWORD=${ESPassword}", ESPassword: !Ref ElasticSearchPassword]
