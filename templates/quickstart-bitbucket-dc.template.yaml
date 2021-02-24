@@ -1054,15 +1054,18 @@ Resources:
         TLSSecurityPolicy: Policy-Min-TLS-1-2-2019-07
       EncryptionAtRestOptions:
         Enabled: true
+        KmsKeyId: !Ref ElasticsearchKMSKey
       NodeToNodeEncryptionOptions:
         Enabled: true
-      # VPCOptions:
-      #   SubnetIds:
-      #     - !Select
-      #       - 0
-      #       - !Split
-      #         - ','
-      #         - Fn::ImportValue: !Sub '${ExportPrefix}PriNets'
+      VPCOptions:
+        SubnetIds:
+          - !Select
+            - 0
+            - !Split
+              - ','
+              - Fn::ImportValue: !Sub '${ExportPrefix}PriNets'
+        SecurityGroupIds:
+          - !Ref SecurityGroup
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName} Bitbucket Elasticsearch cluster"
