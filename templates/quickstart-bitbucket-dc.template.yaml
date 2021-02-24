@@ -889,6 +889,7 @@ Resources:
                   - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - !Sub ["ATL_ELASTICSEARCH_ENDPOINT=https://${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
                   - "ATL_ELASTICSEARCH_USERNAME=bitbucket"
+                  - "ATL_ELASTICSEARCH_PROTOCOL=https"
                   - !Sub ["ATL_ELASTICSEARCH_PASSWORD=${ESPassword}", ESPassword: !Ref ElasticSearchPassword]
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Ref BitbucketProperties]
                   - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
