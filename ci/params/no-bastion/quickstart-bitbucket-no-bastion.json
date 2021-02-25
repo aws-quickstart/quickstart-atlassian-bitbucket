@@ -32,6 +32,10 @@
     "ParameterValue": "$[taskcat_genpass_8S]"
   },
   {
+    "ParameterKey": "ElasticSearchPassword",
+    "ParameterValue": "$[taskcat_genpass_8S]"
+  },
+  {
     "ParameterKey": "BastionHostRequired",
     "ParameterValue": "false"
   },
