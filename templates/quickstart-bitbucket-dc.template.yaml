@@ -139,7 +139,7 @@ Metadata:
       CloudWatchIntegration:
         default: Enable CloudWatch integration
       ElasticSearchPassword:
-        default: Elasticsearch master user password
+        default: Elasticsearch master user password *
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
       ElasticsearchNodeVolumeSize:
