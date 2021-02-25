@@ -50,6 +50,7 @@ Metadata:
       - Label:
           default: Elasticsearch
         Parameters:
+          - ElasticSearchPassword
           - ElasticsearchInstanceType
           - ElasticsearchNodeVolumeSize
       - Label:
@@ -147,6 +148,8 @@ Metadata:
         default: SSH key name to use with the repository
       CloudWatchIntegration:
         default: Enable CloudWatch integration
+      ElasticSearchPassword:
+        default: Elasticsearch master user password
       ElasticsearchInstanceType:
         default: Elasticsearch instance type
       ElasticsearchNodeVolumeSize:
@@ -479,6 +482,14 @@ Parameters:
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
     Description: Database storage type
     Type: String
+  ElasticSearchPassword:
+    Description: "Password for the elasticsearch master user, the username will be 'bitbucket'. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 of the following symbols: ! # $ { * : [ = , ] - _ + % &"
+    Type: String
+    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
+    ConstraintDescription: 'Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 of the following symbols: ! # $ { * : [ = , ] - _ @ + % &'
+    NoEcho: True
+    MaxLength: 128
+    MinLength: 8
   ElasticsearchInstanceType:
     Description: EC2 instance type for the Amazon Elasticsearch service to run on.
     Type: String
@@ -710,6 +721,7 @@ Resources:
         DeploymentAutomationKeyName: !Ref 'DeploymentAutomationKeyName'
         DeploymentAutomationCustomParams: !Ref 'DeploymentAutomationCustomParams'
         ExportPrefix: !Ref ExportPrefix
+        ElasticSearchPassword: !Ref ElasticSearchPassword
         ElasticsearchInstanceType: !Ref 'ElasticsearchInstanceType'
         ElasticsearchNodeVolumeSize: !Ref 'ElasticsearchNodeVolumeSize'
         ESBucketName: !Ref 'ESBucketName'
