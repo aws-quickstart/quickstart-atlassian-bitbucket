@@ -612,6 +612,10 @@ Conditions:
     !Not [!Equals [!Ref CloudWatchIntegration, 'Off']]
   EnableCloudWatchLogs:
     !Equals [!Ref CloudWatchIntegration, 'Metrics and Logs']
+  UseFineGrainedAccessControlES:
+    !Not [!Equals [!Ref ElasticSearchPassword, '']]
+  UseIAMSignedRequestsES:
+    !Equals [!Ref ElasticSearchPassword, '']
   RestoreFromEBSSnapshot:
     !Not [!Equals [!Ref HomeVolumeSnapshotId, '']]
   RestoreFromRDSSnapshot:
@@ -886,10 +890,11 @@ Resources:
                   - !Sub ["ATL_NFS_DISK_VOLUME_TYPE=${VolType}", VolType: !If [IsHomeProvisionedIops, "io1", "gp2"]]
                   - !Sub ["ATL_NFS_DISK_VOLUME_IOPS=${VolIOPs}", VolIOPs: !If [IsHomeProvisionedIops, !Ref "HomeIops", ""]]
                   - ""
-                  - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
-                  - "ATL_ELASTICSEARCH_USERNAME=bitbucket"
-                  - "ATL_ELASTICSEARCH_PROTOCOL=https"
-                  - !Sub ["ATL_ELASTICSEARCH_PASSWORD=${ESPassword}", ESPassword: !Ref ElasticSearchPassword]
+                  - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !If [UseFineGrainedAccessControlES, !GetAtt ElasticsearchSecure.DomainEndpoint, !GetAtt Elasticsearch.DomainEndpoint]]
+                  - !Sub ["ATL_ELASTICSEARCH_PROTOCOL=${ESScheme}", ESScheme: !If [UseFineGrainedAccessControlES, "https", "http"]]
+                  - !If [UseFineGrainedAccessControlES, "ATL_ELASTICSEARCH_USERNAME=bitbucket", !Ref "AWS::NoValue"]
+                  - !If [UseFineGrainedAccessControlES, !Sub ["ATL_ELASTICSEARCH_PASSWORD=${ESPassword}", ESPassword: !Ref ElasticSearchPassword], !Ref "AWS::NoValue"]
+                  - ""
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Ref BitbucketProperties]
                   - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
 
@@ -1025,6 +1030,31 @@ Resources:
           Value: !Ref ClusterNodeGroup
       ComparisonOperator: LessThanThreshold
   Elasticsearch:
+    Condition: UseIAMSignedRequestsES
+    Type: AWS::Elasticsearch::Domain
+    Properties:
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: !Ref ElasticsearchNodeVolumeSize
+        VolumeType: gp2
+      ElasticsearchVersion: "6.8"
+      ElasticsearchClusterConfig:
+        InstanceType: !Ref ElasticsearchInstanceType
+      AccessPolicies:
+        Version: 2012-10-17
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              AWS: !GetAtt BitbucketClusterNodeRole.Arn
+            Action: "es:*"
+            Resource: "*"
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName} Bitbucket Elasticsearch cluster"
+        - Key: Application
+          Value: !Ref "AWS::StackId"
+  ElasticsearchSecure:
+    Condition: UseFineGrainedAccessControlES
     Type: AWS::Elasticsearch::Domain
     Properties:
       EBSOptions:
@@ -1071,6 +1101,7 @@ Resources:
         - Key: Application
           Value: !Ref "AWS::StackId"
   ElasticsearchKMSKey:
+    Condition: UseFineGrainedAccessControlES
     Type: AWS::KMS::Key
     Properties:
       Description: Encryption key for Elasticsearch cluster
@@ -1143,7 +1174,7 @@ Resources:
                   - !Sub ["ATL_NFS_DISK_VOLUME_TYPE=${VolType}", VolType: !If [IsHomeProvisionedIops, "io1", "gp2"]]
                   - !Sub ["ATL_NFS_DISK_VOLUME_IOPS=${VolIOPs}", VolIOPs: !If [IsHomeProvisionedIops, !Ref "HomeIops", ""]]
                   - ""
-                  - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !GetAtt Elasticsearch.DomainEndpoint]
+                  - !Sub ["ATL_ELASTICSEARCH_HOST=${ESEndpoint}", ESEndpoint: !If [UseFineGrainedAccessControlES, !GetAtt ElasticsearchSecure.DomainEndpoint, !GetAtt Elasticsearch.DomainEndpoint]]
                   - !Sub ["ATL_ELASTICSEARCH_S3_BUCKET=${BucketName}", BucketName: !Ref ESBucketName]
                   - !Sub ["ATL_BITBUCKET_PROPERTIES=\"${BitbucketProperties}\"", BitbucketProperties: !Ref BitbucketProperties]
                   - !If [DoSSL, "ATL_SSL_PROXY=true", !Ref "AWS::NoValue"]
