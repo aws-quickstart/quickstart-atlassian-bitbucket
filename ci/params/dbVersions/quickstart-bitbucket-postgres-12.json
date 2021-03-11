@@ -17,7 +17,7 @@
   },
   {
     "ParameterKey": "DBEngineVersion",
-    "ParameterValue": "10"
+    "ParameterValue": "12"
   },
   {
     "ParameterKey": "DBEngine",
@@ -29,6 +29,10 @@
   },
   {
     "ParameterKey": "DBPassword",
+    "ParameterValue": "$[taskcat_genpass_8S]"
+  },
+  {
+    "ParameterKey": "ElasticSearchPassword",
     "ParameterValue": "$[taskcat_genpass_8S]"
   },
   {

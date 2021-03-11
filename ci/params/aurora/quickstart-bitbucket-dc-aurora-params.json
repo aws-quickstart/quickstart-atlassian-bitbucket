@@ -16,6 +16,10 @@
     "ParameterValue": "$[taskcat_genpass_8S]"
   },
   {
+    "ParameterKey": "ElasticSearchPassword",
+    "ParameterValue": "$[taskcat_genpass_8S]"
+  },
+  {
     "ParameterKey": "QSS3BucketName",
     "ParameterValue": "$[taskcat_autobucket]"
   },
