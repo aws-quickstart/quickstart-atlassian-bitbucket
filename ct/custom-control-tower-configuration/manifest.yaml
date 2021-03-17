@@ -3,9 +3,40 @@ version: 2020-01-01
 cloudformation_resources:
   - name: qs-atlassian-bitbucket-1
     template_file: s3://aws-quickstart/quickstart-atlassian-bitbucket/templates/quickstart-bitbucket-dc-with-vpc.template.yaml
-    parameter_file: parameters/parameters.json
+    parameters:
+      - parameter_name: AvailabilityZones
+        parameter_value:
+          - us-east-1a
+          - us-east-1b
+      - parameter_name: KeyPairName
+        parameter_value: aws-qs-tc-all
+      - parameter_name: BitbucketVersion
+        parameter_value: 6.10.0
+      - parameter_name: DBMasterUserPassword
+        parameter_value: Qv6i4*tQ
+      - parameter_name: BitbucketAdminPassword
+        parameter_value: Qv6i4*tQ
+      - parameter_name: AccessCIDR
+        parameter_value: 10.0.0.0/0
+      - parameter_name: DBMultiAZ
+        parameter_value: "false"
+      - parameter_name: DBInstanceClass
+        parameter_value: db.t2.large
+      - parameter_name: DBIops
+        parameter_value: "1000"
+      - parameter_name: DBPassword
+        parameter_value: Qv6i4*tQ
+      - parameter_name: QSS3BucketName
+        parameter_value: aws-quickstart
+      - parameter_name: QSS3KeyPrefix
+        parameter_value: quickstart-atlassian-bitbucket/
+      - parameter_name: ExportPrefix
+        parameter_value: BtzvvEQ3NNNB
+      - parameter_name: BastionHostRequired
+        parameter_value: "false"
     deploy_method: stack_set
-    deploy_to_ou:
-      - Workloads
+    deployment_targets:
+      organizational_units:
+        - Workloads
     regions:
       - us-east-1
