@@ -1,5 +1,5 @@
 region: us-east-1
-version: 2020-01-01
+version: 2020-03-15
 cloudformation_resources:
   - name: qs-atlassian-bitbucket-1
     template_file: s3://aws-quickstart/quickstart-atlassian-bitbucket/templates/quickstart-bitbucket-dc-with-vpc.template.yaml
