@@ -825,10 +825,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 0bf6c6529a5a50615a055dcb2cb6840b519bf926"
+          Value: "COMMIT: 13f126a1c0f37984f5dd74d4538bcb398abe880e"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-02-16T00:09:16Z"
+          Value: "TIMESTAMP: 2021-04-01T01:22:19Z"
           PropagateAtLaunch: true
   ClusterNodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -1049,8 +1049,15 @@ Resources:
           Value: !Sub "${AWS::StackName} Bitbucket Elasticsearch cluster"
         - Key: Application
           Value: !Ref "AWS::StackId"
+  ElasticsearchServiceRole:
+    Condition: UseFineGrainedAccessControlES
+    Type: AWS::IAM::ServiceLinkedRole
+    Properties:
+      AWSServiceName: "es.amazonaws.com"
   ElasticsearchSecure:
     Condition: UseFineGrainedAccessControlES
+    DependsOn:
+      - ElasticsearchServiceRole
     Type: AWS::Elasticsearch::Domain
     Properties:
       EBSOptions:
