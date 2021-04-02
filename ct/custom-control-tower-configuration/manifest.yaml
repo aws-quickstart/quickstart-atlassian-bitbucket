@@ -14,11 +14,11 @@ resources:
       - parameter_key: BitbucketVersion
         parameter_value: 6.10.0
       - parameter_key: DBMasterUserPassword
-        parameter_value: _get_ssm_secure_string_/qs/genericpw/12AN
+        parameter_value: _get_ssm_secure_string_/qs/genericpw/12ANS
       - parameter_key: BitbucketAdminPassword
-        parameter_value: _get_ssm_secure_string_/qs/genericpw/12AN
+        parameter_value: _get_ssm_secure_string_/qs/genericpw/12ANS
       - parameter_key: ElasticSearchPassword
-        parameter_value: _get_ssm_secure_string_/qs/genericpw/12AN
+        parameter_value: _get_ssm_secure_string_/qs/genericpw/12ANS
       - parameter_key: AccessCIDR
         parameter_value: 10.0.0.0/0
       - parameter_key: DBMultiAZ
@@ -28,7 +28,7 @@ resources:
       - parameter_key: DBIops
         parameter_value: "1000"
       - parameter_key: DBPassword
-        parameter_value: _get_ssm_secure_string_/qs/genericpw/12AN
+        parameter_value: _get_ssm_secure_string_/qs/genericpw/12ANS
       - parameter_key: QSS3BucketName
         parameter_value: aws-quickstart
       - parameter_key: QSS3KeyPrefix
