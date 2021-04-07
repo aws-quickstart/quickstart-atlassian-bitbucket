@@ -46,5 +46,9 @@
   {
     "ParameterKey": "BastionHostRequired",
     "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "ElasticSearchPassword",
+    "ParameterValue": ""
   }
 ]
