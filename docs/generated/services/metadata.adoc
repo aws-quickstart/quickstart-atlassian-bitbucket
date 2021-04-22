@@ -13,6 +13,7 @@
 :template_aws_iam_instanceprofile:
 :template_aws_iam_policy:
 :template_aws_iam_role:
+:template_aws_iam_servicelinkedrole:
 :template_aws_kms_key:
 :template_aws_lambda_function:
 :template_aws_rds_dbinstance:
