@@ -811,7 +811,7 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_deployment_steps">Deployment steps</a>
 <ul class="sectlevel2">
 <li><a href="#_launching_from_a_cloned_quick_start_recommended_for_production">Launching from a cloned Quick Start (recommended for production)</a></li>
-<li><a href="#_launch_into_a_new_vpc">Launch into a new VPC</a></li>
+<li><a href="#_launch_into_an_existing_vpc">Launch into an existing VPC</a></li>
 </ul>
 </li>
 <li><a href="#_configuring_bitbucket">Configuring Bitbucket</a>
@@ -1372,7 +1372,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </table>
 </div>
 <div class="paragraph">
-<p>=== Launch into an existing VPC
+<p>=== Launch into a new VPC
 .Bitbucket setup</p>
 </div>
 </li>
@@ -1445,7 +1445,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cluster node instance volume size
 (<code>ClusterNodeVolumeSize</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>50</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Size of Bitbucket web server cluster node volume in Gb</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of cluster node root volume in Gb</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Deployment Automation Git Repository URL
@@ -1466,16 +1466,16 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">The Ansible playbook to invoke to initialize the application node on first start.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SSH key name to use with the repository
-(<code>DeploymentAutomationKeyName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Custom command-line parameters for Ansible
 (<code>DeploymentAutomationCustomParams</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Additional command-line options for the <code>ansible-playbook</code> command. See <a href="https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md" class="bare">https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md</a> for more information about overriding parameters. (Optional)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSH key name to use with the repository
+(<code>DeploymentAutomationKeyName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)</p></td>
 </tr>
 </tbody>
 </table>
@@ -1592,7 +1592,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. Bastion host utilization</caption>
+<caption class="title">Table 4. Bastion host provisioning</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1607,10 +1607,10 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Use Bastion host
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deploy Bastion host
 (<code>BastionHostRequired</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to grant access to BitBucket EC2 instances through the ASI&#8217;s Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to provision a Bastion host instance. If 'true', then you need to provide an EC2 Key Pair (otherwise, you won&#8217;t be able to use the Bastion host to access BitBucket instances).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">SSH Key Pair Name
@@ -1671,8 +1671,8 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Permitted IP range *
-(<code>CidrBlock</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Trusted IP range *
+(<code>AccessCIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block allowed to access the Atlassian product. This should be set to a trusted IP range; if you want to give public access use '0.0.0.0/0'.</p></td>
 </tr>
@@ -1693,6 +1693,42 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 (<code>SSLCertificateARN</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you&#8217;ll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it&#8217;s successfully created.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP address block for the VPC
+(<code>VPCCIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/16</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the VPC</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Availability Zones
+(<code>AvailabilityZones</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AZ1 private IP address block
+(<code>PrivateSubnet1CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/19</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1 located in Availability Zone 1.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AZ2 private IP address block
+(<code>PrivateSubnet2CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.32.0/19</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2 located in Availability Zone 2.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AZ1 public IP address block
+(<code>PublicSubnet1CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.128.0/20</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the public DMZ subnet 1 located in Availability Zone 1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AZ2 public IP address block
+(<code>PublicSubnet2CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.144.0/20</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the public DMZ subnet 2 located in Availability Zone 2</p></td>
 </tr>
 </tbody>
 </table>
@@ -1769,7 +1805,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">License Key for Bitbucket (if you have one)
 (<code>BitbucketLicenseKey</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide a license key for Bitbucket Data Center if you have one.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Provide a license key for Bitbucket Data Center if you have one.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Password for the administrator account
@@ -1781,7 +1817,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">HTTP/HTTPS URL to download the Bitbucket Dataset
 (<code>BitbucketDatasetURL</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the HTTP/HTTPS URL for the dataset to restore. Refer <a href="https://confluence.atlassian.com/bitbucketserver/importing-957497836.html" class="bare">https://confluence.atlassian.com/bitbucketserver/importing-957497836.html</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Provide the HTTP/HTTPS URL for the dataset to restore.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1813,7 +1849,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ASI identifier
+<td class="tableblock halign-left valign-top"><p class="tableblock">ASI Exported Prefix
 (<code>ExportPrefix</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ATL-</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Each Atlassian Standard Infrastructure (ASI) uses a unique identifier. If you have multiple ASIs within the same AWS region, use this field to specify where to deploy Bitbucket.</p></td>
@@ -1822,7 +1858,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </table>
 </div>
 <div class="sect2">
-<h3 id="_launch_into_a_new_vpc">Launch into a new VPC</h3>
+<h3 id="_launch_into_an_existing_vpc">Launch into an existing VPC</h3>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 9. Bitbucket setup</caption>
 <colgroup>
@@ -1889,7 +1925,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cluster node instance volume size
 (<code>ClusterNodeVolumeSize</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>50</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Size of cluster node root volume in Gb</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of Bitbucket web server cluster node volume in Gb</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Deployment Automation Git Repository URL
@@ -1910,16 +1946,16 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">The Ansible playbook to invoke to initialize the application node on first start.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Custom command-line parameters for Ansible
-(<code>DeploymentAutomationCustomParams</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Additional command-line options for the <code>ansible-playbook</code> command. See <a href="https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md" class="bare">https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md</a> for more information about overriding parameters. (Optional)</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">SSH key name to use with the repository
 (<code>DeploymentAutomationKeyName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom command-line parameters for Ansible
+(<code>DeploymentAutomationCustomParams</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional command-line options for the <code>ansible-playbook</code> command. See <a href="https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md" class="bare">https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md</a> for more information about overriding parameters. (Optional)</p></td>
 </tr>
 </tbody>
 </table>
@@ -2036,7 +2072,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 13. Bastion host provisioning</caption>
+<caption class="title">Table 13. Bastion host utilization</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -2051,10 +2087,10 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Deploy Bastion host
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use Bastion host
 (<code>BastionHostRequired</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to provision a Bastion host instance. If 'true', then you need to provide an EC2 Key Pair (otherwise, you won&#8217;t be able to use the Bastion host to access BitBucket instances).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to grant access to BitBucket EC2 instances through the ASI&#8217;s Bastion host (if it exists). If 'true', remember to provide an EC2 Key Pair. If your ASI does not have a Bastion host, set this to 'false'.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">SSH Key Pair Name
@@ -2115,8 +2151,8 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Trusted IP range *
-(<code>AccessCIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Permitted IP range *
+(<code>CidrBlock</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block allowed to access the Atlassian product. This should be set to a trusted IP range; if you want to give public access use '0.0.0.0/0'.</p></td>
 </tr>
@@ -2137,42 +2173,6 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 (<code>SSLCertificateARN</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you&#8217;ll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it&#8217;s successfully created.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">IP address block for the VPC
-(<code>VPCCIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/16</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the VPC</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Availability Zones
-(<code>AvailabilityZones</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AZ1 private IP address block
-(<code>PrivateSubnet1CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/19</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1 located in Availability Zone 1.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AZ2 private IP address block
-(<code>PrivateSubnet2CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.32.0/19</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2 located in Availability Zone 2.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AZ1 public IP address block
-(<code>PublicSubnet1CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.128.0/20</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the public DMZ subnet 1 located in Availability Zone 1</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AZ2 public IP address block
-(<code>PublicSubnet2CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.144.0/20</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the public DMZ subnet 2 located in Availability Zone 2</p></td>
 </tr>
 </tbody>
 </table>
@@ -2249,7 +2249,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">License Key for Bitbucket (if you have one)
 (<code>BitbucketLicenseKey</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Provide a license key for Bitbucket Data Center if you have one.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide a license key for Bitbucket Data Center if you have one.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Password for the administrator account
@@ -2261,7 +2261,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">HTTP/HTTPS URL to download the Bitbucket Dataset
 (<code>BitbucketDatasetURL</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Provide the HTTP/HTTPS URL for the dataset to restore.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the HTTP/HTTPS URL for the dataset to restore. Refer <a href="https://confluence.atlassian.com/bitbucketserver/importing-957497836.html" class="bare">https://confluence.atlassian.com/bitbucketserver/importing-957497836.html</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -2293,7 +2293,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ASI Exported Prefix
+<td class="tableblock halign-left valign-top"><p class="tableblock">ASI identifier
 (<code>ExportPrefix</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ATL-</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Each Atlassian Standard Infrastructure (ASI) uses a unique identifier. If you have multiple ASIs within the same AWS region, use this field to specify where to deploy Bitbucket.</p></td>
@@ -2599,7 +2599,7 @@ and to share your customizations with others.</p>
 </html>
 <!--
 repo commit:
-25c53fb46a2cc1bd1481796eaab7cdce4c40e723
+edeeee1ef08515427da675fef6298b2f11a8224e
 
 submodule config:
 +59b9927c61cd1831141cf0350520c89abb2246da docs/boilerplate (heads/main)
