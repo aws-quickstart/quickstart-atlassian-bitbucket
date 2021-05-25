@@ -850,15 +850,15 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_launch_into_a_new_vpc">Launch into a new VPC</a></li>
 </ul>
 </li>
+<li><a href="#_deploy_with_control_tower">Deploy with Control Tower</a>
+<ul class="sectlevel2">
+<li><a href="#_review_the_manifest_yaml_file">Review the manifest.yaml file</a></li>
+<li><a href="#_upload_the_manifest_yaml_file">Upload the manifest.yaml file</a></li>
+</ul>
+</li>
 <li><a href="#_configuring_bitbucket">Configuring Bitbucket</a>
 <ul class="sectlevel2">
 <li><a href="#_adding_nodes_to_the_bitbucket_cluster">Adding nodes to the Bitbucket cluster</a></li>
-</ul>
-</li>
-<li><a href="#_deploying_with_control_tower">Deploying with Control Tower</a>
-<ul class="sectlevel2">
-<li><a href="#_review_the_manifest_file">Review the manifest file.</a></li>
-<li><a href="#_upload_the_manifest_file">Upload the manifest file</a></li>
 </ul>
 </li>
 <li><a href="#_troubleshooting">Troubleshooting</a></li>
@@ -2342,8 +2342,66 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 . On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.
 . On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.
 . Choose <strong>Create stack</strong> to deploy the stack.
-. Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Bitbucket Data Center deployment is ready.
+. Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Bitbucket deployment is ready.
 . To view the created resources, see the values displayed in the <strong>Outputs</strong> tab for the stack.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_deploy_with_control_tower">Deploy with Control Tower</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can deploy Bitbucket in a customized AWS Control Tower environment to help you set up a secure, multi-account AWS environment using AWS best practices. For details, see <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/" target="_blank" rel="noopener">Customizations for AWS Control Tower</a>.</p>
+</div>
+<div class="paragraph">
+<p>The root directory of the Bitbucket Quick Start repo includes a <code>ct</code> folder with a <code>manifest.yaml</code> file to assist you with the AWS Control Tower deployment. This file has been customized for the Bitbucket Data Center Quick Start.</p>
+</div>
+<div class="paragraph">
+<p>In the following sections, you will review and update the settings in this file and then upload it to the S3 bucket that is used for the deployment.</p>
+</div>
+<div class="sect2">
+<h3 id="_review_the_manifest_yaml_file">Review the manifest.yaml file</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Navigate to the root directory of the Bitbucket Quick Start, and open the <code>manifest.yaml</code> file, located in the <code>ct</code> folder.</p>
+</li>
+<li>
+<p>Confirm that the <code>region</code> attribute references the Region where AWS Control Tower is deployed. The default Region is us-east-1. You will update the <code>regions</code> attribute (located in the <strong>resources</strong> section) in a later step.</p>
+</li>
+<li>
+<p>Confirm that the <code>resource_file</code> attribute points to the public S3 bucket for the Bitbucket Data Center Quick Start. Using a public S3 bucket ensures a consistent code base across the different deployment options.</p>
+<div class="paragraph">
+<p>If you prefer to deploy from your own S3 bucket, update the path as needed.</p>
+</div>
+</li>
+<li>
+<p>Review each of the <code>parameters</code> attributes and update them as needed to match the requirements of your deployment.</p>
+</li>
+<li>
+<p>Confirm that the <code>deployment_targets</code> attribute is configured for either your target accounts or organizational units (OUs).</p>
+</li>
+<li>
+<p>For the <code>regions</code> attribute, add the Region where you plan to deploy the Bitbucket Quick Start. The default Region is us-east-1.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_upload_the_manifest_yaml_file">Upload the manifest.yaml file</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Compress the <code>manifest.yaml</code> file and name it <code>custom-control-tower-configuration.zip</code>.</p>
+</li>
+<li>
+<p>Upload the <code>custom-control-tower-configuration.zip</code> file to the S3 bucket that was created for the AWS Control Tower deployment (<code>custom-control-tower-configuration-&lt;accountnumber&gt;-&lt;region&gt;</code>).</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The file upload initiates the customized pipeline that deploys the Quick Start to your target accounts.</p>
 </div>
 </div>
 </div>
@@ -2458,99 +2516,6 @@ You can also migrate Bitbucket data from an existing deployment to this one. For
 </div>
 </div>
 <div class="sect1">
-<h2 id="_deploying_with_control_tower">Deploying with Control Tower</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Bitbucket Data Center can be deployed in a Control Tower environment. To accomplish this, we make use of <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customizations for AWS Control Tower</a> solution. A folder labeled "ct" has been provided in the repository for this Quick Start to aid in the deployment.</p>
-</div>
-<div class="paragraph">
-<p>After the <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customization for AWS Control Tower</a> solution has been deployed, use the contents of the "ct" folder (located in the root of the GitHub repositoy) to customize your deployment.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>└── ct
-   ├── custom-control-tower-configuration
-   │   └── manifest.yaml
-   └── custom-control-tower-configuration.zip</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The manifest.yaml file has been customized for the Bitbucket Data Center Quick Start.</p>
-</div>
-<div class="sect2">
-<h3 id="_review_the_manifest_file">Review the manifest file.</h3>
-<div class="paragraph">
-<p>Open and review the <strong>manifest.yaml</strong> file</p>
-</div>
-<div class="paragraph">
-<p><strong>region:</strong> Ensure the <em>region</em> attribute references the region where the Customization for AWS Control Tower has been deployed. (The default region is "us-east-1")</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-There is a second <em>region</em> attribute located under the <em>resources</em> section, that attribute is used to define the region where the Quick Start will be deployed.
-</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_review_the_resources_section">Review the <em>resources</em> section</h4>
-<div class="paragraph">
-<p><strong>resource_file:</strong> The <em>resource_file</em> attribute points to the public S3 bucket for the Bitbucket Data Center Quick Start, if you are deploying from your own s3 bucket, update this reference appropriately.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-There are other methods for deploying Bitbucket Data Center using Customization for AWS Control Tower, we have chosen to make use of the public s3 repository to ensure a consistent code base across the different deployment options. Visit the <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customizations for AWS Control Tower</a> solution page for additional information.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p><strong>parameters:</strong> Update The <em>parameters</em> attribute to suit your deployment.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Carefuly review and update these attributes, to ensure the deployment is successful.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p><strong>deployment_targets:</strong> Ensure your <em>deployment_targets</em> is configured for either your target account(s) or target OU(s)</p>
-</div>
-<div class="paragraph">
-<p><strong>region:</strong> Enter the <em>region</em> where you wish to deploy the Bitbucket Quick Start. (The default region is "us-east-1")</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_upload_the_manifest_file">Upload the manifest file</h3>
-<div class="paragraph">
-<p>Compress the "manifest.yaml" file and name it <strong>custom-control-tower-configuration.zip</strong>
-Upload the <strong>custom-control-tower-configuration.zip</strong> to the s3 bucket that was created by the Customization for AWS Control Tower solution. (custom-control-tower-configuration-<em>accountnumber</em>-<em>region</em>)
-The file upload will trigger the customized pipeline that will deploy the Quick Start to your target accounts.</p>
-</div>
-<div class="paragraph">
-<p>Visit the <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customizations for AWS Control Tower</a> solution page for additional information.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_troubleshooting">Troubleshooting</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -2630,9 +2595,9 @@ and to share your customizations with others.</p>
 </html>
 <!--
 repo commit:
-bd3d1f704784e8fe3202486c8eaa29e461c8bc6f
+79e2b5e8d7fe757ee887f4b46375e86abf9bba2d
 
 submodule config:
- 4b31f09b105a1aa1ea6e421e0e33b647196f4c69 docs/boilerplate (heads/main)
+ a9d6c5903745c1091793d3cd1f960948919c2c9f docs/boilerplate (heads/main)
  4d079d160553c471be84b3f0d487b58fd74b299c submodules/quickstart-atlassian-services (v2.0-42-g4d079d1)
 -->
