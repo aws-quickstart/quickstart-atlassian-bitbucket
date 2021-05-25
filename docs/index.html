@@ -182,7 +182,7 @@ p a>code:hover{color:rgba(0,0,0,.9)}
   padding-top:0;
   overflow:hidden;
   background:#283e5b;
-  border-bottom: 4px solid #435c7c;
+  /* border-bottom: 4px solid #435c7c; */
   width:320px;
   height:154px;
   top:0;
@@ -411,7 +411,7 @@ span.icon>.fa{cursor:default}
 a span.icon>.fa{cursor:inherit}
 .admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
 .admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
-.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";color: rgb(3, 87, 21);}
 .admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
 .admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
 .admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
@@ -747,8 +747,43 @@ p {
   font-weight  : 300 !important;
 }
 
-#toc.toc2 #toctitle{
-  background-image: url('images/AWS-Logo.svg');
+/* image layout */
+#toc.toc2 #toctitle {
+  background-image: url("images/AWS-Logo.svg");
+  background-repeat: no-repeat;
+  background-size: 50%;
+  background-position: center;
+  width: auto;
+  height: 15%;
+}
+
+/* Left Navbar size */
+#toc.toc2 {
+  width: 17%;
+  min-width: 15em;
+}
+
+/* auto width for main page */
+body.toc2 {
+  padding-left: 22%;
+  padding-right: 2%;
+}
+
+/* hide left nav bar if page size is smaller than 767px */
+@media screen and (max-width: 767px) {
+  #toc {
+      display: none !important;
+  }
+  body.toc2 {
+    padding-left: 1%;
+    padding-right: 1%;
+    position: relative;
+  }
+
+  #content {
+    padding-left: 2%;
+    padding-right: 2%;
+  }
 }
 
 /* QS Tables */
@@ -793,14 +828,7 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_bitbucket_data_center_on_aws">Bitbucket Data Center on AWS</a></li>
 <li><a href="#_aws_costs">AWS costs</a></li>
 <li><a href="#_software_licenses">Software licenses</a></li>
-<li><a href="#_architecture">Architecture</a>
-<ul class="sectlevel2">
-<li><a href="#_amazon_elasticsearch">Amazon Elasticsearch</a></li>
-<li><a href="#_nfs_for_shared_storage">NFS for shared storage</a></li>
-<li><a href="#_auto_scaling_groups_in_this_quick_start">Auto Scaling groups in this Quick Start</a></li>
-<li><a href="#_amazon_aurora_database_for_high_availability">Amazon Aurora database for high availability</a></li>
-</ul>
-</li>
+<li><a href="#_architecture">Architecture</a></li>
 <li><a href="#_planning_the_deployment">Planning the deployment</a>
 <ul class="sectlevel2">
 <li><a href="#_specialized_knowledge">Specialized knowledge</a></li>
@@ -815,15 +843,15 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_launch_into_a_new_vpc">Launch into a new VPC</a></li>
 </ul>
 </li>
+<li><a href="#_deploy_with_control_tower">Deploy with Control Tower</a>
+<ul class="sectlevel2">
+<li><a href="#_review_the_manifest_yaml_file">Review the manifest.yaml file</a></li>
+<li><a href="#_upload_the_manifest_yaml_file">Upload the manifest.yaml file</a></li>
+</ul>
+</li>
 <li><a href="#_configuring_bitbucket">Configuring Bitbucket</a>
 <ul class="sectlevel2">
 <li><a href="#_adding_nodes_to_the_bitbucket_cluster">Adding nodes to the Bitbucket cluster</a></li>
-</ul>
-</li>
-<li><a href="#_deploying_with_control_tower">Deploying with Control Tower</a>
-<ul class="sectlevel2">
-<li><a href="#_review_the_manifest_file">Review the manifest file.</a></li>
-<li><a href="#_upload_the_manifest_file">Upload the manifest file</a></li>
 </ul>
 </li>
 <li><a href="#_troubleshooting">Troubleshooting</a></li>
@@ -844,12 +872,25 @@ p.footer-text a{color:#d7d8d8}
 <img src="https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
 </div>
 </div>
-<div class="paragraph text-center">
+<h3 id="_draft_document_unofficial_guidance" class="discrete text-center">DRAFT DOCUMENT / UNOFFICIAL GUIDANCE</h3>
+<div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/__settings</em>.adoc</code></strong>_</p>
+</div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph text-center">
 <p><strong>October 2020</strong><br>
 <em>Adam Brokes, Ben Partridge, Carlos Corredor, Chris Szmajda, Don Domingo, Dylan Rathbone, Felix Haehnel, Steve Smith, Varun Arbatti</em><br>
 <em>Tony Vattathil - Principal Solutions Architect, AWS</em></p>
-</div>
-<div class="admonitionblock tip text-left">
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock tip">
 <table>
 <tr>
 <td class="icon">
@@ -871,11 +912,23 @@ report bugs, or submit feature ideas for this Quick Start.
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/overview_target_and_usage.adoc</code></strong></em></p>
+</div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>This Quick Start is for users who want to deploy Bitbucket Data Center in a supported configuration in the AWS Cloud, following AWS and Atlassian best practices.</p>
 </div>
 <div class="paragraph">
 <p>This Quick Start uses the <a href="https://fwd.aws/xYyYy">Atlassian Standard Infrastructure</a> (ASI) as a foundation. You can choose to build a new ASI for your deployment or deploy Bitbucket into your existing ASI. You can also deploy Jira, Confluence, and Crowd Data Center within the same ASI.</p>
-</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -894,11 +947,23 @@ Amazon may share user-deployment information with the AWS Partner that collabora
 <h2 id="_bitbucket_data_center_on_aws">Bitbucket Data Center on AWS</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/product_description.adoc</code></strong></em></p>
+</div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>Bitbucket Data Center is a Git repository management solution from Atlassian. It provides source code collaboration for enterprises that require high availability and performance at scale.</p>
 </div>
 <div class="paragraph">
 <p>Please know that we may share who uses AWS Quick Starts with the AWS partner that collaborated with AWS on the content of the Quick Start.</p>
-</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect1">
@@ -921,7 +986,7 @@ see the pricing pages for each AWS service you use. Prices are subject to change
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-After you deploy the Quick Start, <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html" target="_blank" rel="noopener">create AWS Cost and Usage Reports</a> to deliver billing metrics to an Amazon Simple Storage Service (Amazon S3) bucket in your account. These reports provide cost estimates based on usage throughout each month and aggregate the data at the end of the month. For more information, see <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html" target="_blank" rel="noopener">What are AWS Cost and Usage Reports?</a>
+After you deploy the Quick Start, create <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html" target="_blank" rel="noopener">AWS Cost and Usage Reports</a> to deliver billing metrics to an Amazon Simple Storage Service (Amazon S3) bucket in your account. These reports provide cost estimates based on usage throughout each month and aggregate the data at the end of the month. For more information, see <a href="https://docs.aws.amazon.com/cur/latest/userguide/what-is-cur.html" target="_blank" rel="noopener">What are AWS Cost and Usage Reports?</a>
 </td>
 </tr>
 </table>
@@ -932,14 +997,35 @@ After you deploy the Quick Start, <a href="https://docs.aws.amazon.com/awsaccoun
 <h2 id="_software_licenses">Software licenses</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start deploys a cluster-ready infrastructure for Bitbucket. This requires a Bitbucket Data Center license. See the <a href="https://www.atlassian.com/software/bitbucket/pricing?tab=self-managed">Atlassian pricing page</a> for licensing information.</p>
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/licenses.adoc</code></strong></em></p>
 </div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>This Quick Start deploys a cluster-ready infrastructure for Bitbucket. This requires a Bitbucket Data Center license. See the <a href="https://www.atlassian.com/software/bitbucket/pricing?tab=self-managed">Atlassian pricing page</a> for licensing information.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_architecture">Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/architecture.adoc</code></strong></em></p>
+</div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>Deploying this Quick Start for a new <a href="https://aws.amazon.com/quickstart/architecture/Atlassian-standard-infrastructure/">Atlassian Standard Infrastructure (ASI)</a> with default parameters builds the following Bitbucket environment in the AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
@@ -1040,7 +1126,10 @@ After you deploy the Quick Start, <a href="https://docs.aws.amazon.com/awsaccoun
 <div class="paragraph">
 <p>Amazon Aurora is supported on Bitbucket Data Center 6.7 and later.</p>
 </div>
-</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect1">
@@ -1055,8 +1144,20 @@ and <a href="https://aws.amazon.com/training/" target="_blank" rel="noopener">AW
 deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start assumes familiarity with managing Atlassian Bitbucket. Refer to the latest Atlassian documentation on <a href="https://confluence.atlassian.com/bitbucketserver/bitbucket-data-center-872143591.html">Bitbucket</a> for more information.</p>
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/specialized_knowledge.adoc</code></strong></em></p>
 </div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>This Quick Start assumes familiarity with managing Atlassian Bitbucket. Refer to the latest Atlassian documentation on <a href="https://confluence.atlassian.com/bitbucketserver/bitbucket-data-center-872143591.html">Bitbucket</a> for more information.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
 <h3 id="_aws_account">AWS account</h3>
@@ -1075,8 +1176,12 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 <div class="sect3">
 <h4 id="_resource_quotas">Resource quotas</h4>
 <div class="paragraph">
-<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might request quota increases to avoid exceeding the default limits for any resources that are shared across multiple deployments. The <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, see <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
+<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, see <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
 </div>
+<div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/service_limits.adoc</code></strong></em></p>
+</div>
+<div class="preview_mode">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1118,8 +1223,13 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </tbody>
 </table>
 </div>
+</div>
 <div class="sect3">
 <h4 id="_supported_regions">Supported Regions</h4>
+<div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/regions.adoc</code></strong></em></p>
+</div>
+<div id="preview_mode">
 <div class="ulist">
 <ul>
 <li>
@@ -1208,6 +1318,7 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </tr>
 </table>
 </div>
+</div>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -1226,10 +1337,32 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 <div class="paragraph">
 <p>Before launching the Quick Start, you must sign in to the AWS Management Console with IAM permissions for the resources that the templates deploy. The <em>AdministratorAccess</em> managed policy within IAM provides sufficient permissions, although your organization may choose to use a custom policy with more restrictions. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html" target="_blank" rel="noopener">AWS managed policies for job functions</a>.</p>
 </div>
+<div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/pre-reqs.adoc</code></strong></em></p>
+</div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+</tr>
+</thead>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_deployment_options">Deployment options</h4>
 <div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deployment_options.adoc</code></strong></em></p>
+</div>
+<table class="tableblock frame-all grid-all stretch preview_mode">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>This Quick Start includes two AWS CloudFormation templates. The first template builds the Atlassian Standard Infrastructure (ASI), which is a virtual private cloud (VPC) that contains the components required by all Atlassian applications, and then provisions Bitbucket into this ASI. The second template provisions Bitbucket in an existing ASI.</p>
 </div>
 <div class="paragraph">
@@ -1247,7 +1380,10 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 </div>
 <div class="paragraph">
 <p>The Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and Bitbucket settings, as discussed later in this guide.</p>
-</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -1255,6 +1391,10 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 <div class="sect1">
 <h2 id="_deployment_steps">Deployment steps</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deploy_steps.adoc</code></strong></em></p>
+</div>
+<div class="preview_mode">
 <div class="sect2">
 <h3 id="_launching_from_a_cloned_quick_start_recommended_for_production">Launching from a cloned Quick Start (recommended for production)</h3>
 <div class="paragraph">
@@ -1354,20 +1494,17 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 </li>
 </ol>
 </div>
-<div class="paragraph">
-<p>In the following tables, parameters are listed by category and described separately for the deployment options. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Unless you are customizing the Quick Start templates for your own deployment projects, keep the default settings for the parameters <strong>Quick Start S3 bucket name</strong>, <strong>Quick Start S3 bucket Region</strong>, and <strong>Quick Start S3 key prefix</strong>. Changing these settings automatically updates code references to point to a new Quick Start location. For more information, see the <a href="https://aws-quickstart.github.io/option1.html" target="_blank" rel="noopener">AWS Quick Start Contributor’s Guide</a>.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>+
+In the following tables, parameters are listed by category and described separately for the deployment options. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
+</div>
+<div class="paragraph">
+<p>+
+NOTE: Unless you are customizing the Quick Start templates for your own deployment projects, keep the default settings for the parameters <strong>Quick Start S3 bucket name</strong>, <strong>Quick Start S3 bucket Region</strong>, and <strong>Quick Start S3 key prefix</strong>. Changing these settings automatically updates code references to point to a new Quick Start location. For more information, see the <a href="https://aws-quickstart.github.io/option1.html" target="_blank" rel="noopener">AWS Quick Start Contributor’s Guide</a>.</p>
+</div>
+<div class="paragraph">
+<p>+</p>
 </div>
 </div>
 <div class="sect2">
@@ -1390,7 +1527,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version *
 (<code>BitbucketVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.6.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.6.5</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at <a href="http://go.atlassian.com/bbs-releases" class="bare">http://go.atlassian.com/bbs-releases</a></p></td>
 </tr>
 </tbody>
@@ -1834,7 +1971,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version *
 (<code>BitbucketVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.6.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>7.6.5</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at <a href="http://go.atlassian.com/bbs-releases" class="bare">http://go.atlassian.com/bbs-releases</a></p></td>
 </tr>
 </tbody>
@@ -2293,30 +2430,75 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>+
+. On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.
+. On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.
+. Choose <strong>Create stack</strong> to deploy the stack.
+. Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Bitbucket deployment is ready.
+. To view the created resources, see the values displayed in the <strong>Outputs</strong> tab for the stack.</p>
+</div>
+<div class="paragraph">
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/additional_info.adoc</code></strong></em></p>
+</div>
+<div class="preview_mode">
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_deploy_with_control_tower">Deploy with Control Tower</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can deploy Bitbucket in a customized AWS Control Tower environment to help you set up a secure, multi-account AWS environment using AWS best practices. For details, see <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/" target="_blank" rel="noopener">Customizations for AWS Control Tower</a>.</p>
+</div>
+<div class="paragraph">
+<p>The root directory of the Bitbucket Quick Start repo includes a <code>ct</code> folder with a <code>manifest.yaml</code> file to assist you with the AWS Control Tower deployment. This file has been customized for the Bitbucket Data Center Quick Start.</p>
+</div>
+<div class="paragraph">
+<p>In the following sections, you will review and update the settings in this file and then upload it to the S3 bucket that is used for the deployment.</p>
+</div>
+<div class="sect2">
+<h3 id="_review_the_manifest_yaml_file">Review the manifest.yaml file</h3>
 <div class="olist arabic">
-<ol class="arabic" start="5">
+<ol class="arabic">
 <li>
-<p>On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.</p>
+<p>Navigate to the root directory of the Bitbucket Quick Start, and open the <code>manifest.yaml</code> file, located in the <code>ct</code> folder.</p>
 </li>
 <li>
-<p>On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.</p>
+<p>Confirm that the <code>region</code> attribute references the Region where AWS Control Tower is deployed. The default Region is us-east-1. You will update the <code>regions</code> attribute (located in the <strong>resources</strong> section) in a later step.</p>
 </li>
 <li>
-<p>Choose <strong>Create stack</strong> to deploy the stack.</p>
+<p>Confirm that the <code>resource_file</code> attribute points to the public S3 bucket for the Bitbucket Data Center Quick Start. Using a public S3 bucket ensures a consistent code base across the different deployment options.</p>
+<div class="paragraph">
+<p>If you prefer to deploy from your own S3 bucket, update the path as needed.</p>
+</div>
 </li>
 <li>
-<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the Bitbucket Data Center deployment is ready.</p>
+<p>Review each of the <code>parameters</code> attributes and update them as needed to match the requirements of your deployment.</p>
 </li>
 <li>
-<p>Use the values displayed in the <strong>Outputs</strong> tab for the stack, as shown in <a href="#cfn_outputs">Bitbucket Data Center outputs after successful deployment</a>, to view the created resources.</p>
+<p>Confirm that the <code>deployment_targets</code> attribute is configured for either your target accounts or organizational units (OUs).</p>
+</li>
+<li>
+<p>For the <code>regions</code> attribute, add the Region where you plan to deploy the Bitbucket Quick Start. The default Region is us-east-1.</p>
 </li>
 </ol>
 </div>
-<div id="cfn_outputs" class="imageblock">
-<div class="content">
-<a class="image" href="images/cfn_outputs.png"><img src="images/cfn_outputs.png" alt="cfn_outputs" width="100%" height="100%"></a>
 </div>
-<div class="title">Figure 3. Bitbucket Data Center outputs after successful deployment</div>
+<div class="sect2">
+<h3 id="_upload_the_manifest_yaml_file">Upload the manifest.yaml file</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Compress the <code>manifest.yaml</code> file and name it <code>custom-control-tower-configuration.zip</code>.</p>
+</li>
+<li>
+<p>Upload the <code>custom-control-tower-configuration.zip</code> file to the S3 bucket that was created for the AWS Control Tower deployment (<code>custom-control-tower-configuration-&lt;accountnumber&gt;-&lt;region&gt;</code>).</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The file upload initiates the customized pipeline that deploys the Quick Start to your target accounts.</p>
 </div>
 </div>
 </div>
@@ -2350,7 +2532,7 @@ If you get an <a href="https://confluence.atlassian.com/kb/network-and-connectiv
 <div class="content">
 <img src="images/qs-bb-config-step2-licensing.png" alt="qs bb config step2 licensing" width="640">
 </div>
-<div class="title">Figure 4. Licensing and settings</div>
+<div class="title">Figure 3. Licensing and settings</div>
 </div>
 </li>
 <li>
@@ -2359,7 +2541,7 @@ If you get an <a href="https://confluence.atlassian.com/kb/network-and-connectiv
 <div class="content">
 <img src="images/qs-bb-config-step3-adminsetup.png" alt="qs bb config step3 adminsetup" width="640">
 </div>
-<div class="title">Figure 5. Administrator account setup</div>
+<div class="title">Figure 4. Administrator account setup</div>
 </div>
 </li>
 <li>
@@ -2368,16 +2550,16 @@ If you get an <a href="https://confluence.atlassian.com/kb/network-and-connectiv
 <div class="content">
 <img src="images/qs-bb-config-step4-login.png" alt="qs bb config step4 login" width="640">
 </div>
-<div class="title">Figure 6. Log in</div>
+<div class="title">Figure 5. Log in</div>
 </div>
 </li>
 <li>
-<p>Choose <span class="image"><img src="images/icon-gear.png" alt="icon gear"></span> <strong>&gt; Clustering</strong>. You should see the <a href="#clustering1">Figure 7</a> page, which shows that your cluster has one node.</p>
+<p>Choose <span class="image"><img src="images/icon-gear.png" alt="icon gear"></span> <strong>&gt; Clustering</strong>. You should see the <a href="#clustering1">Figure 6</a> page, which shows that your cluster has one node.</p>
 <div id="clustering1" class="imageblock">
 <div class="content">
 <img src="images/qs-bb-config-step5-sndc.png" alt="qs bb config step5 sndc" width="640">
 </div>
-<div class="title">Figure 7. Clustering (one node)</div>
+<div class="title">Figure 6. Clustering (one node)</div>
 </div>
 </li>
 </ol>
@@ -2410,7 +2592,7 @@ If you get an <a href="https://confluence.atlassian.com/kb/network-and-connectiv
 <div class="content">
 <img src="images/qs-bb-config-step6-clustered.png" alt="qs bb config step6 clustered" width="640">
 </div>
-<div class="title">Figure 8. Clustering (multiple nodes)</div>
+<div class="title">Figure 7. Clustering (multiple nodes)</div>
 </div>
 </li>
 </ol>
@@ -2427,99 +2609,10 @@ You can also migrate Bitbucket data from an existing deployment to this one. For
 </tr>
 </table>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_deploying_with_control_tower">Deploying with Control Tower</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>Bitbucket Data Center can be deployed in a Control Tower environment. To accomplish this, we make use of <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customizations for AWS Control Tower</a> solution. A folder labeled "ct" has been provided in the repository for this Quick Start to aid in the deployment.</p>
+<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/faq_troubleshooting.adoc</code></strong></em></p>
 </div>
-<div class="paragraph">
-<p>After the <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customization for AWS Control Tower</a> solution has been deployed, use the contents of the "ct" folder (located in the root of the GitHub repositoy) to customize your deployment.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>└── ct
-   ├── custom-control-tower-configuration
-   │   └── manifest.yaml
-   └── custom-control-tower-configuration.zip</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The manifest.yaml file has been customized for the Bitbucket Data Center Quick Start.</p>
-</div>
-<div class="sect2">
-<h3 id="_review_the_manifest_file">Review the manifest file.</h3>
-<div class="paragraph">
-<p>Open and review the <strong>manifest.yaml</strong> file</p>
-</div>
-<div class="paragraph">
-<p><strong>region:</strong> Ensure the <em>region</em> attribute references the region where the Customization for AWS Control Tower has been deployed. (The default region is "us-east-1")</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-There is a second <em>region</em> attribute located under the <em>resources</em> section, that attribute is used to define the region where the Quick Start will be deployed.
-</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_review_the_resources_section">Review the <em>resources</em> section</h4>
-<div class="paragraph">
-<p><strong>resource_file:</strong> The <em>resource_file</em> attribute points to the public S3 bucket for the Bitbucket Data Center Quick Start, if you are deploying from your own s3 bucket, update this reference appropriately.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-There are other methods for deploying Bitbucket Data Center using Customization for AWS Control Tower, we have chosen to make use of the public s3 repository to ensure a consistent code base across the different deployment options. Visit the <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customizations for AWS Control Tower</a> solution page for additional information.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p><strong>parameters:</strong> Update The <em>parameters</em> attribute to suit your deployment.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Carefuly review and update these attributes, to ensure the deployment is successful.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p><strong>deployment_targets:</strong> Ensure your <em>deployment_targets</em> is configured for either your target account(s) or target OU(s)</p>
-</div>
-<div class="paragraph">
-<p><strong>region:</strong> Enter the <em>region</em> where you wish to deploy the Bitbucket Quick Start. (The default region is "us-east-1")</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_upload_the_manifest_file">Upload the manifest file</h3>
-<div class="paragraph">
-<p>Compress the "manifest.yaml" file and name it <strong>custom-control-tower-configuration.zip</strong>
-Upload the <strong>custom-control-tower-configuration.zip</strong> to the s3 bucket that was created by the Customization for AWS Control Tower solution. (custom-control-tower-configuration-<em>accountnumber</em>-<em>region</em>)
-The file upload will trigger the customized pipeline that will deploy the Quick Start to your target accounts.</p>
-</div>
-<div class="paragraph">
-<p>Visit the <a href="https://aws.amazon.com/solutions/implementations/customizations-for-aws-control-tower/?did=sl_card&amp;trk=sl_card">Customizations for AWS Control Tower</a> solution page for additional information.</p>
-</div>
+<div class="preview_mode">
 </div>
 </div>
 </div>
@@ -2552,6 +2645,7 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 </div>
 <div class="paragraph">
 <p><strong>A.</strong> Launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information about AWS CloudFormation quotas, see the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html">AWS documentation</a>.</p>
+</div>
 </div>
 </div>
 </div>
