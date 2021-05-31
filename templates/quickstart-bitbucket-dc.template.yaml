@@ -718,7 +718,7 @@ Resources:
                 - es.amazonaws.com
             Action: ['sts:AssumeRole']
       ManagedPolicyArns:
-        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore'
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
         - !Sub "arn:${AWS::Partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
 
       Path: /
@@ -727,33 +727,65 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Effect: Allow
-                Action:
-                  - 'autoscaling:DescribeTags'
-                  - 'autoscaling:CreateOrUpdateTags'
-                  - 'ec2:AttachVolume'
-                  - 'ec2:CopySnapshot'
-                  - 'ec2:CreateSnapshot'
-                  - 'ec2:CreateTags'
-                  - 'ec2:CreateVolume'
-                  - 'ec2:DeleteSnapshot'
-                  - 'ec2:DescribeInstances'
-                  - 'ec2:DescribeSnapshots'
-                  - 'ec2:DescribeTags'
-                  - 'ec2:DescribeVolumes'
-                  - 'ec2:DetachVolume'
-                  - 'rds:AddTagsToResource'
-                  - 'rds:CopyDBSnapshot'
-                  - 'rds:CreateDBSnapshot'
-                  - 'rds:DeleteDBSnapshot'
-                  - 'rds:DescribeDBInstances'
-                  - 'rds:DescribeDBSnapshots'
-                  - 'rds:PromoteReadReplica'
-                  - 'rds:ModifyDBInstance'
-                  - 'rds:RestoreDBInstanceFromDBSnapshot'
-                  - 'iam:PassRole'
-                  - 'es:*'
-                Resource: ['*']
+              - Action:
+                  - ec2:DetachVolume
+                  - ec2:AttachVolume
+                  - ec2:CreateTags
+                  - ec2:CreateSnapshot
+                  - ec2:CreateVolume
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:instance/*"
+                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:volume/*"
+                Effect: Allow
+              - Action:
+                  - ec2:DescribeInstances
+                  - es:DeletePackage
+                  - es:ListElasticsearchInstanceTypeDetails
+                  - es:ListDomainsForPackage
+                  - ec2:DescribeSnapshots
+                  - es:DeleteElasticsearchServiceRole
+                  - es:AcceptInboundCrossClusterSearchConnection
+                  - ec2:DescribeVolumes
+                  - es:DeleteInboundCrossClusterSearchConnection
+                  - es:DescribeOutboundCrossClusterSearchConnections
+                  - es:DeleteOutboundCrossClusterSearchConnection
+                  - es:DescribeReservedElasticsearchInstanceOfferings
+                  - ec2:DescribeTags
+                  - es:CreateElasticsearchServiceRole
+                  - autoscaling:DescribeTags
+                  - es:UpdatePackage
+                  - es:RejectInboundCrossClusterSearchConnection
+                  - es:GetPackageVersionHistory
+                  - es:PurchaseReservedElasticsearchInstanceOffering
+                  - es:DescribeInboundCrossClusterSearchConnections
+                  - es:DescribeReservedElasticsearchInstances
+                  - es:ListDomainNames
+                  - es:CreatePackage
+                  - es:DescribePackages
+                  - es:ListElasticsearchInstanceTypes
+                  - es:ListElasticsearchVersions
+                  - es:DescribeElasticsearchInstanceTypeLimits
+                Resource: "*"
+                Effect: Allow
+              - Action:
+                  - rds:AddTagsToResource
+                  - es:*
+                  - iam:PassRole
+                  - rds:DescribeDBSnapshots
+                  - rds:CreateDBSnapshot
+                  - rds:RestoreDBInstanceFromDBSnapshot
+                  - autoscaling:CreateOrUpdateTags
+                  - rds:CopyDBSnapshot
+                  - rds:DescribeDBInstances
+                  - rds:ModifyDBInstance
+                  - rds:DeleteDBSnapshot
+                  - rds:PromoteReadReplica
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*"
+                  - !Sub "arn:${AWS::Partition}:es:*:${AWS::AccountId}:domain/*"
+                  - !Sub "arn:${AWS::Partition}:autoscaling:*:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/*"
+                  - !Sub "arn:${AWS::Partition}:rds:*:${AWS::AccountId}:snapshot:*"
+                Effect: Allow
               - !If
                 - ESBucketNameSet
                 - Effect: Allow
@@ -787,11 +819,15 @@ Resources:
             Statement:
               - Action:
                   - 'autoscaling:DescribeTags'
-                  - 'autoscaling:CreateOrUpdateTags'
                   - 'ec2:DescribeInstances'
                   - 'ec2:DescribeTags'
                 Effect: Allow
                 Resource: ['*']
+              - Action:
+                  - 'autoscaling:CreateOrUpdateTags'
+                Effect: Allow
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:autoscaling:*:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/*"
   BitbucketFileServerInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -1355,6 +1391,7 @@ Resources:
       MultiAZ: !If [StandbyMode, !Ref "AWS::NoValue", !Ref DBMultiAZ]
       SourceDBInstanceIdentifier: !If [StandbyMode, !Ref DBMaster, !Ref "AWS::NoValue"]
       StorageType: !If [DBProvisionedIops, io1, gp2]
+      PubliclyAccessible: false
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName} Bitbucket PostgreSQL Database"
@@ -1510,7 +1547,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       GroupId: !Ref SecurityGroup
-      IpProtocol: '-1'
+      IpProtocol: "-1"
       FromPort: -1
       ToPort: -1
       SourceSecurityGroupId: !Ref SecurityGroup
