@@ -1,0 +1,100 @@
+
+.Bitbucket setup
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Version *
+(`BitbucketVersion`)|`7.6.5`|Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases
+|===
+.Cluster nodes
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Enable CloudWatch integration
+(`CloudWatchIntegration`)|`Metrics and Logs`|Enables CloudWatch metrics with or without log gathering. If cost is an issue, you can disable this altogether.|Bitbucket cluster node instance type
+(`ClusterNodeInstanceType`)|`c5.xlarge`|Instance type for the cluster application nodes. See https://confluence.atlassian.com/x/GpdKLg for guidance|Maximum number of cluster nodes
+(`ClusterNodeMax`)|`2`|Maximum number of nodes in the cluster.|Minimum number of cluster nodes
+(`ClusterNodeMin`)|`1`|Set to 1 for new deployment. Can be updated post launch.|Cluster node instance volume size
+(`ClusterNodeVolumeSize`)|`50`|Size of cluster node root volume in Gb|Deployment Automation Git Repository URL
+(`DeploymentAutomationRepository`)|`https://bitbucket.org/atlassian/dc-deployments-automation.git`|The deployment automation repository to use for per-node initialization. Leave this as default unless you have customizations.|Deployment Automation Branch
+(`DeploymentAutomationBranch`)|`master`|The deployment automation repository branch to pull from.|Ansible playbook to invoke during instance initialization
+(`DeploymentAutomationPlaybook`)|`aws_bitbucket_dc_node.yml`|The Ansible playbook to invoke to initialize the application node on first start.|Custom command-line parameters for Ansible
+(`DeploymentAutomationCustomParams`)|`**__Blank string__**`|Additional command-line options for the `ansible-playbook` command. See https://bitbucket.org/atlassian/dc-deployments-automation/src/master/README.md for more information about overriding parameters. (Optional)|SSH key name to use with the repository
+(`DeploymentAutomationKeyName`)|`**__Blank string__**`|Named Key Pair name to use with this repository. The key should be imported into the SSM parameter store. (Optional)
+|===
+.File server
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|File server instance type
+(`FileServerInstanceType`)|`m4.xlarge`|Instance type for the file server hosting the Bitbucket shared home directory. See https://confluence.atlassian.com/x/GpdKLg for guidance|Home directory size
+(`HomeSize`)|`100`|Home directory storage size, in gigabytes (GB) (100 - 16384)|Home directory volume type
+(`HomeVolumeType`)|`Provisioned IOPS`|Bitbucket home storage type.|Home directory IOPS
+(`HomeIops`)|`1000`|Home directory IOPS (100 - 20000, only used with Provisioned IOPS). Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 50; for example, a volume with 5000 IOPS must be at least 100 GiB
+|===
+.Database
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|The database engine to deploy with
+(`DBEngine`)|`PostgreSQL`|Database Engine to use. PostgreSQL or Amazon Aurora PostgreSQL|The database engine version to use
+(`DBEngineVersion`)|`12`|The database engine version to use; we'll install a suitable minor version for your chosen engine. Make sure that the Bitbucket version you're installing supports the database engine selected.|Database instance class
+(`DBInstanceClass`)|`db.m4.large`|RDS instance type (only r4 and r5 families are supported for Aurora).|RDS Provisioned IOPS
+(`DBIops`)|`1000`|Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not valid for Aurora|Master password *
+(`DBMasterUserPassword`)|`**__Requires input__**`|Password for the master ('postgres') account. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 of the following symbols: ! # $ { * : [ = , ] - _ + % &|Enable RDS Multi-AZ deployment
+(`DBMultiAZ`)|`true`|Whether to provision a multi-AZ RDS instance.|Bitbucket database password *
+(`DBPassword`)|`**__Requires input__**`|Database password used by BitBucket. Must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 of the following symbols: ! # $ { * : [ = , ] - _ @ + % &|Database storage
+(`DBStorage`)|`100`|Database allocated storage size, in gigabytes (GB). If you choose Provisioned IOPS, storage should be between 100 and 6144. Not used for Aurora.|Database storage type
+(`DBStorageType`)|`General Purpose (SSD)`|Database storage type
+|===
+.Bastion host provisioning
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Deploy Bastion host
+(`BastionHostRequired`)|`true`|Whether to provision a Bastion host instance. If 'true', then you need to provide an EC2 Key Pair (otherwise, you won't be able to use the Bastion host to access BitBucket instances).|SSH Key Pair Name
+(`KeyPairName`)|`**__Blank string__**`|Public/private EC2 Key Pairs to allow you to securely access the Bastion host
+|===
+.Elasticsearch
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Elasticsearch master user password *
+(`ElasticSearchPassword`)|`**__Requires input__**`|Password for the elasticsearch master user, the username will be 'bitbucket'. If no password is specified, Bitbucket will authenticate with the elasticsearch cluster using IAM request signing (not recommended).|Elasticsearch instance type
+(`ElasticsearchInstanceType`)|`m4.xlarge.elasticsearch`|EC2 instance type for the Amazon Elasticsearch service to run on.|Elasticsearch disk space per node (GB)
+(`ElasticsearchNodeVolumeSize`)|`100`|The EBS volume size (in GB) of each Elasticsearch node.
+|===
+.Networking
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Trusted IP range *
+(`AccessCIDR`)|`**__Requires input__**`|CIDR block allowed to access the Atlassian product. This should be set to a trusted IP range; if you want to give public access use '0.0.0.0/0'.|Make instance internet facing
+(`InternetFacingLoadBalancer`)|`true`|Controls whether the load balancer should be visible to the internet (true) or only within the VPC (false).|Existing DNS name
+(`CustomDnsName`)|`**__Blank string__**`|Use custom existing DNS name for your Data Center instance. Please note: you must own the domain and configure it to point at the load balancer.|SSL Certificate ARN
+(`SSLCertificateARN`)|`**__Blank string__**`|Amazon Resource Name (ARN) of your SSL certificate. If you want to use your own certificate that you generated outside of Amazon, you need to first import it to AWS Certificate Manager. After a successful import, you'll receive the ARN. If you want to create a certificate with AWS Certificate Manager (ACM certificate), you will receive the ARN after it's successfully created.|IP address block for the VPC
+(`VPCCIDR`)|`10.0.0.0/16`|CIDR Block for the VPC|Availability Zones
+(`AvailabilityZones`)|`**__Requires input__**`|List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.|AZ1 private IP address block
+(`PrivateSubnet1CIDR`)|`10.0.0.0/19`|CIDR block for private subnet 1 located in Availability Zone 1.|AZ2 private IP address block
+(`PrivateSubnet2CIDR`)|`10.0.32.0/19`|CIDR block for private subnet 2 located in Availability Zone 2.|AZ1 public IP address block
+(`PublicSubnet1CIDR`)|`10.0.128.0/20`|CIDR Block for the public DMZ subnet 1 located in Availability Zone 1|AZ2 public IP address block
+(`PublicSubnet2CIDR`)|`10.0.144.0/20`|CIDR Block for the public DMZ subnet 2 located in Availability Zone 2
+|===
+.Advanced (Optional)
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Bitbucket properties
+(`BitbucketProperties`)|`**__Blank string__**`|A space-separated list of bitbucket properties in the form 'key1=value1 key2=value2 ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg|JVM Heap Size Override
+(`JvmHeapOverride`)|`**__Blank string__**`|Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g|Additional JVM options
+(`JvmSupportOpts`)|`**__Blank string__**`|Pass in any additional JVM options to tune the Bitbucket instance|Create S3 bucket for Elasticsearch snapshots
+(`CreateBucket`)|`true`|Set to true to create the S3 bucket within this stack, must be used in conjunction with ESBucketName.|Bitbucket primary database
+(`DBMaster`)|`**__Blank string__**`|Database ARN of the RDS instance to replicate. Setting this parameter will bring up Bitbucket as a Disaster recovery standby, with an RDS read replica database. Not valid for Aurora.|Database snapshot ID to restore
+(`DBSnapshotId`)|`**__Blank string__**`|RDS snapshot ID of an existing backup to restore. Must be used in conjunction with HomeVolumeSnapshotId. Leave blank for a new instance. Not valid for Aurora.|Elasticsearch snapshot S3 bucket name
+(`ESBucketName`)|`**__Blank string__**`|Name of a new, or existing, S3 bucket configured for Elasticsearch snapshots.|Home volume snapshot ID to restore
+(`HomeVolumeSnapshotId`)|`**__Blank string__**`|EBS snapshot ID of an existing backup to restore as the home directory volume. Must be used in conjunction with DBSnapshotId. Leave blank for a new instance.|Delete Home on termination
+(`HomeDeleteOnTermination`)|`true`|Delete Bitbucket home directory volume when the file server instance is terminated.  You must back up your data before terminating your file server instance if this option is set to 'true'|License Key for Bitbucket (if you have one)
+(`BitbucketLicenseKey`)|`**__Blank string__**`|Provide a license key for Bitbucket Data Center if you have one.|Password for the administrator account
+(`BitbucketAdminPassword`)|`**__Requires input__**`|(Optional) Password for the Bitbucket administrator ('admin') account.|HTTP/HTTPS URL to download the Bitbucket Dataset
+(`BitbucketDatasetURL`)|`**__Blank string__**`|Provide the HTTP/HTTPS URL for the dataset to restore.
+|===
+.AWS Quick Start Configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Quick Start S3 Bucket Name
+(`QSS3BucketName`)|`aws-quickstart`|S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 Key Prefix
+(`QSS3KeyPrefix`)|`quickstart-atlassian-bitbucket/`|S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).|ASI Exported Prefix
+(`ExportPrefix`)|`ATL-`|Each Atlassian Standard Infrastructure (ASI) uses a unique identifier. If you have multiple ASIs within the same AWS region, use this field to specify where to deploy Bitbucket.
+|===
