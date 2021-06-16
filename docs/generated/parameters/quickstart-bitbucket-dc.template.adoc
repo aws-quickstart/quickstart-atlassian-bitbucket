@@ -3,7 +3,7 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Version *
-(`BitbucketVersion`)|`7.6.5`|Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases
+(`BitbucketVersion`)|`7.6.7`|Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases
 |===
 .Cluster nodes
 [width="100%",cols="16%,11%,73%",options="header",]
