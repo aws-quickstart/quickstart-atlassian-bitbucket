@@ -728,65 +728,66 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Action:
-                  - ec2:DetachVolume
-                  - ec2:AttachVolume
-                  - ec2:CreateTags
-                  - ec2:CreateSnapshot
-                  - ec2:CreateVolume
-                Resource:
-                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:instance/*"
-                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:volume/*"
-                Effect: Allow
-              - Action:
-                  - ec2:DescribeInstances
-                  - ec2:DescribeSnapshots
-                  - ec2:DescribeVolumes
-                  - ec2:DescribeTags
-                  - es:DeletePackage
-                  - es:ListElasticsearchInstanceTypeDetails
-                  - es:ListDomainsForPackage
-                  - es:DeleteElasticsearchServiceRole
-                  - es:AcceptInboundCrossClusterSearchConnection
-                  - es:DeleteInboundCrossClusterSearchConnection
-                  - es:DescribeOutboundCrossClusterSearchConnections
-                  - es:DeleteOutboundCrossClusterSearchConnection
-                  - es:DescribeReservedElasticsearchInstanceOfferings
-                  - es:CreateElasticsearchServiceRole
-                  - es:UpdatePackage
-                  - es:RejectInboundCrossClusterSearchConnection
-                  - es:GetPackageVersionHistory
-                  - es:PurchaseReservedElasticsearchInstanceOffering
-                  - es:DescribeInboundCrossClusterSearchConnections
-                  - es:DescribeReservedElasticsearchInstances
-                  - es:ListDomainNames
-                  - es:CreatePackage
-                  - es:DescribePackages
-                  - es:ListElasticsearchInstanceTypes
-                  - es:ListElasticsearchVersions
-                  - es:DescribeElasticsearchInstanceTypeLimits
-                  - autoscaling:DescribeTags
-                Resource: "*"
-                Effect: Allow
-              - Action:
-                  - rds:AddTagsToResource
-                  - rds:DescribeDBSnapshots
-                  - rds:CreateDBSnapshot
-                  - rds:RestoreDBInstanceFromDBSnapshot
-                  - rds:CopyDBSnapshot
-                  - rds:DescribeDBInstances
-                  - rds:ModifyDBInstance
-                  - rds:DeleteDBSnapshot
-                  - rds:PromoteReadReplica
-                  - iam:PassRole
-                  - autoscaling:CreateOrUpdateTags
-                  - es:*
-                Resource:
-                  - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*"
-                  - !Sub "arn:${AWS::Partition}:es:*:${AWS::AccountId}:domain/*"
-                  - !Sub "arn:${AWS::Partition}:autoscaling:*:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/*"
-                  - !Sub "arn:${AWS::Partition}:rds:*:${AWS::AccountId}:snapshot:*"
-                Effect: Allow
+            - Action:
+              - rds:AddTagsToResource
+              - ec2:DetachVolume
+              - ec2:AttachVolume
+              - rds:DescribeDBSnapshots
+              - rds:CopyDBSnapshot
+              - ec2:CreateTags
+              - rds:DeleteDBSnapshot
+              - ec2:CreateVolume
+              - rds:PromoteReadReplica
+              - rds:CreateDBSnapshot
+              - rds:RestoreDBInstanceFromDBSnapshot
+              - autoscaling:CreateOrUpdateTags
+              - ec2:CreateSnapshot
+              - rds:DescribeDBInstances
+              - rds:ModifyDBInstance
+              Resource:
+              - arn:aws:rds:*:887764444972:snapshot:*
+              - arn:aws:ec2:*:887764444972:instance/*
+              - arn:aws:ec2:*:887764444972:volume/*
+              - arn:aws:autoscaling:*:887764444972:autoScalingGroup:*:autoScalingGroupName/*
+              Effect: Allow
+            - Action:
+              - es:DeletePackage
+              - ec2:DescribeInstances
+              - es:ListElasticsearchInstanceTypeDetails
+              - es:ListDomainsForPackage
+              - es:DeleteElasticsearchServiceRole
+              - ec2:DescribeSnapshots
+              - es:AcceptInboundCrossClusterSearchConnection
+              - ec2:DescribeVolumes
+              - es:DeleteInboundCrossClusterSearchConnection
+              - es:DescribeOutboundCrossClusterSearchConnections
+              - es:DeleteOutboundCrossClusterSearchConnection
+              - es:DescribeReservedElasticsearchInstanceOfferings
+              - es:CreateElasticsearchServiceRole
+              - ec2:DescribeTags
+              - es:UpdatePackage
+              - es:RejectInboundCrossClusterSearchConnection
+              - autoscaling:DescribeTags
+              - es:GetPackageVersionHistory
+              - es:PurchaseReservedElasticsearchInstanceOffering
+              - es:DescribeInboundCrossClusterSearchConnections
+              - es:DescribeReservedElasticsearchInstances
+              - es:ListDomainNames
+              - es:CreatePackage
+              - es:DescribePackages
+              - es:ListElasticsearchInstanceTypes
+              - es:ListElasticsearchVersions
+              - es:DescribeElasticsearchInstanceTypeLimits
+              Resource: "*"
+              Effect: Allow
+            - Action: iam:PassRole
+              Resource: arn:aws:iam::887764444972:role/*
+              Effect: Allow
+            - Action: es:*
+              Resource:
+              - arn:aws:es:*:887764444972:pipeline/*
+              - arn:aws:es:*:887764444972:domain/*
+              Effect: Allow
               - !If
                 - ESBucketNameSet
                 - Effect: Allow
