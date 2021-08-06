@@ -728,66 +728,66 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-            - Action:
-              - rds:AddTagsToResource
-              - ec2:DetachVolume
-              - ec2:AttachVolume
-              - rds:DescribeDBSnapshots
-              - rds:CopyDBSnapshot
-              - ec2:CreateTags
-              - rds:DeleteDBSnapshot
-              - ec2:CreateVolume
-              - rds:PromoteReadReplica
-              - rds:CreateDBSnapshot
-              - rds:RestoreDBInstanceFromDBSnapshot
-              - autoscaling:CreateOrUpdateTags
-              - ec2:CreateSnapshot
-              - rds:DescribeDBInstances
-              - rds:ModifyDBInstance
-              Resource:
-              - arn:aws:rds:*:887764444972:snapshot:*
-              - arn:aws:ec2:*:887764444972:instance/*
-              - arn:aws:ec2:*:887764444972:volume/*
-              - arn:aws:autoscaling:*:887764444972:autoScalingGroup:*:autoScalingGroupName/*
-              Effect: Allow
-            - Action:
-              - es:DeletePackage
-              - ec2:DescribeInstances
-              - es:ListElasticsearchInstanceTypeDetails
-              - es:ListDomainsForPackage
-              - es:DeleteElasticsearchServiceRole
-              - ec2:DescribeSnapshots
-              - es:AcceptInboundCrossClusterSearchConnection
-              - ec2:DescribeVolumes
-              - es:DeleteInboundCrossClusterSearchConnection
-              - es:DescribeOutboundCrossClusterSearchConnections
-              - es:DeleteOutboundCrossClusterSearchConnection
-              - es:DescribeReservedElasticsearchInstanceOfferings
-              - es:CreateElasticsearchServiceRole
-              - ec2:DescribeTags
-              - es:UpdatePackage
-              - es:RejectInboundCrossClusterSearchConnection
-              - autoscaling:DescribeTags
-              - es:GetPackageVersionHistory
-              - es:PurchaseReservedElasticsearchInstanceOffering
-              - es:DescribeInboundCrossClusterSearchConnections
-              - es:DescribeReservedElasticsearchInstances
-              - es:ListDomainNames
-              - es:CreatePackage
-              - es:DescribePackages
-              - es:ListElasticsearchInstanceTypes
-              - es:ListElasticsearchVersions
-              - es:DescribeElasticsearchInstanceTypeLimits
-              Resource: "*"
-              Effect: Allow
-            - Action: iam:PassRole
-              Resource: arn:aws:iam::887764444972:role/*
-              Effect: Allow
-            - Action: es:*
-              Resource:
-              - arn:aws:es:*:887764444972:pipeline/*
-              - arn:aws:es:*:887764444972:domain/*
-              Effect: Allow
+              - Action:
+                  - rds:AddTagsToResource
+                  - ec2:DetachVolume
+                  - ec2:AttachVolume
+                  - rds:DescribeDBSnapshots
+                  - rds:CopyDBSnapshot
+                  - ec2:CreateTags
+                  - rds:DeleteDBSnapshot
+                  - ec2:CreateVolume
+                  - rds:PromoteReadReplica
+                  - rds:CreateDBSnapshot
+                  - rds:RestoreDBInstanceFromDBSnapshot
+                  - autoscaling:CreateOrUpdateTags
+                  - ec2:CreateSnapshot
+                  - rds:DescribeDBInstances
+                  - rds:ModifyDBInstance
+                Resource:
+                  - arn:aws:rds:*:887764444972:snapshot:*
+                  - arn:aws:ec2:*:887764444972:instance/*
+                  - arn:aws:ec2:*:887764444972:volume/*
+                  - arn:aws:autoscaling:*:887764444972:autoScalingGroup:*:autoScalingGroupName/*
+                Effect: Allow
+              - Action:
+                  - es:DeletePackage
+                  - ec2:DescribeInstances
+                  - es:ListElasticsearchInstanceTypeDetails
+                  - es:ListDomainsForPackage
+                  - es:DeleteElasticsearchServiceRole
+                  - ec2:DescribeSnapshots
+                  - es:AcceptInboundCrossClusterSearchConnection
+                  - ec2:DescribeVolumes
+                  - es:DeleteInboundCrossClusterSearchConnection
+                  - es:DescribeOutboundCrossClusterSearchConnections
+                  - es:DeleteOutboundCrossClusterSearchConnection
+                  - es:DescribeReservedElasticsearchInstanceOfferings
+                  - es:CreateElasticsearchServiceRole
+                  - ec2:DescribeTags
+                  - es:UpdatePackage
+                  - es:RejectInboundCrossClusterSearchConnection
+                  - autoscaling:DescribeTags
+                  - es:GetPackageVersionHistory
+                  - es:PurchaseReservedElasticsearchInstanceOffering
+                  - es:DescribeInboundCrossClusterSearchConnections
+                  - es:DescribeReservedElasticsearchInstances
+                  - es:ListDomainNames
+                  - es:CreatePackage
+                  - es:DescribePackages
+                  - es:ListElasticsearchInstanceTypes
+                  - es:ListElasticsearchVersions
+                  - es:DescribeElasticsearchInstanceTypeLimits
+                Resource: "*"
+                Effect: Allow
+              - Action: iam:PassRole
+                Resource: arn:aws:iam::887764444972:role/*
+                Effect: Allow
+              - Action: es:*
+                Resource:
+                  - arn:aws:es:*:887764444972:pipeline/*
+                  - arn:aws:es:*:887764444972:domain/*
+                Effect: Allow
               - !If
                 - ESBucketNameSet
                 - Effect: Allow
