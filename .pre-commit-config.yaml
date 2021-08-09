@@ -3,4 +3,4 @@ repos:
   rev: v0.53.0  # The version of cfn-lint to use
   hooks:
     - id: cfn-python-lint
-      files: templates/.*\.(json|yml|yaml)$
+      # files: templates/.*\.(json|yml|yaml)$
