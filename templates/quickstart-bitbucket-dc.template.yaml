@@ -745,10 +745,10 @@ Resources:
                   - rds:DescribeDBInstances
                   - rds:ModifyDBInstance
                 Resource:
-                  - arn:aws:rds:*:887764444972:snapshot:*
-                  - arn:aws:ec2:*:887764444972:instance/*
-                  - arn:aws:ec2:*:887764444972:volume/*
-                  - arn:aws:autoscaling:*:887764444972:autoScalingGroup:*:autoScalingGroupName/*
+                  - !Sub "arn:${AWS::Partition}:rds:*:${AWS::AccountId}:snapshot:*"
+                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:instance/*"
+                  - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:volume/*"
+                  - !Sub "arn:${AWS::Partition}:autoscaling:*:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/*"
                 Effect: Allow
               - Action:
                   - es:DeletePackage
@@ -781,12 +781,12 @@ Resources:
                 Resource: "*"
                 Effect: Allow
               - Action: iam:PassRole
-                Resource: arn:aws:iam::887764444972:role/*
+                Resource: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*"
                 Effect: Allow
               - Action: es:*
                 Resource:
-                  - arn:aws:es:*:887764444972:pipeline/*
-                  - arn:aws:es:*:887764444972:domain/*
+                  - !Sub "arn:${AWS::Partition}:es:*:${AWS::AccountId}:pipeline/*"
+                  - !Sub "arn:${AWS::Partition}:es:*:${AWS::AccountId}:domain/*"
                 Effect: Allow
               - !If
                 - ESBucketNameSet
