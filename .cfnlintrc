@@ -1,5 +1,5 @@
 templates:
-  - /*
+  - templates/*
 ignore_checks:
   - E2504
     # The check cannot handle this situation:
@@ -11,3 +11,5 @@ ignore_checks:
     # E3012: Property Resources/EFSCname/Properties/TTL should be of type Long
   - E1001
     # E1001: Top level template section tests is not valid.
+  - E9101
+    # E9101: Checks that text is welcoming and inclusive as per Amazon Open Source Code of Conduct https://aws.github.io/code-of-conduct
