@@ -13,3 +13,7 @@ ignore_checks:
     # E1001: Top level template section tests is not valid.
   - E9101
     # E9101: Checks that text is welcoming and inclusive as per Amazon Open Source Code of Conduct https://aws.github.io/code-of-conduct
+  - EIAMPolicyWildcardResource
+    # EIAMPolicyWildcardResource: Making sure wildcard resources are only used where no other option exists
+  - ERDSDBInstancePubliclyAccessible
+    # ERDSDBInstancePubliclyAccessible AWS::RDS::DBInstance must have PubliclyAccessible configured False
