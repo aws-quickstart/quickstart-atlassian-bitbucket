@@ -2,7 +2,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "Atlassian Bitbucket Data Center in new VPC License: Apache 2.0 (qs-1qup6r9tq)"
 Metadata:
- QSLint:
+  QSLint:
     Exclusions: [E9101, EIAMPolicyWildcardResource, ERDSDBInstancePubliclyAccessible]
   QuickStartDocumentation:
     EntrypointName: "Launch into a new VPC"
