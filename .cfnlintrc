@@ -17,3 +17,8 @@ ignore_checks:
     # EIAMPolicyWildcardResource: Making sure wildcard resources are only used where no other option exists
   - ERDSDBInstancePubliclyAccessible
     # ERDSDBInstancePubliclyAccessible AWS::RDS::DBInstance must have PubliclyAccessible configured False
+  - W9006
+    # W9006: Parameter Group name contains spelling error(s)
+    # W9006: Parameter Group name is not sentence case
+    # W9006: Parameter is not sentence case
+    # W9006: Parameter Label is not sentence case
