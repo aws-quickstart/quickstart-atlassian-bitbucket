@@ -2,6 +2,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "Atlassian Bitbucket Data Center in new VPC License: Apache 2.0 (qs-1qup6r9tq)"
 Metadata:
+ QSLint:
+    Exclusions: [E9101, EIAMPolicyWildcardResource, ERDSDBInstancePubliclyAccessible]
   QuickStartDocumentation:
     EntrypointName: "Launch into a new VPC"
   AWS::CloudFormation::Interface:
@@ -580,8 +582,8 @@ Parameters:
     Description: Whether to provision a Bastion host instance. If 'true', then you need to provide an EC2 Key Pair (otherwise, you won't be able to use the Bastion host to access BitBucket instances).
     Type: String
   KeyPairName:
-    ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: Public/private EC2 Key Pairs to allow you to securely access the Bastion host.
+    ConstraintDescription: Must be the name of an existing EC2 Key Pair. Note the supplied value must not include the file extension.
+    Description: Public/private EC2 Key Pairs (without file extension) to allow you to securely access the Bastion host.
     Type: String
     Default: ''
   CustomDnsName:
