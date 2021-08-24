@@ -200,13 +200,13 @@ Metadata:
 Parameters:
   BitbucketProperties:
     Default: ''
-    Description: A space-separated list of bitbucket properties in the form 'key1=value1 key2=value2 ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg
+    Description: A space-separated list of bitbucket properties in the form 'key1=value1 key2=value2 ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg.
     Type: String
   BitbucketVersion:
     Default: "7.6.7"
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
-    Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases'
+    Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases.'
     Type: String
   BitbucketLicenseKey:
     Default: ''
@@ -226,11 +226,11 @@ Parameters:
     Type: String
   JvmHeapOverride:
     Default: ''
-    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g
+    Description: Override the default amount of memory to allocate to the JVM for your instance type - set size in meg or gig e.g. 1024m or 1g.
     Type: String
   JvmSupportOpts:
     Default: ''
-    Description: Pass in any additional JVM options to tune the Bitbucket instance
+    Description: Pass in any additional JVM options to tune the Bitbucket instance.
     Type: String
   AccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
@@ -333,7 +333,7 @@ Parameters:
       - z1d.6xlarge
       - z1d.12xlarge
     ConstraintDescription: Must be an EC2 instance type from the selection list
-    Description: 'Instance type for the cluster application nodes. See https://confluence.atlassian.com/x/GpdKLg for guidance'
+    Description: 'Instance type for the cluster application nodes. See https://confluence.atlassian.com/x/GpdKLg for guidance.'
     Type: String
   ClusterNodeMax:
     Description: Maximum number of nodes in the cluster.
@@ -345,7 +345,7 @@ Parameters:
     Type: Number
   ClusterNodeVolumeSize:
     Default: 50
-    Description: Size of cluster node root volume in Gb
+    Description: Size of cluster node root volume in Gb.
     Type: Number
   CreateBucket:
     Default: "true"
@@ -381,7 +381,7 @@ Parameters:
     ConstraintDescription: "Must be 'Off', 'Metrics Only', or 'Metrics and Logs'"
   DBEngine:
     Default: 'PostgreSQL'
-    Description: 'Database Engine to use. PostgreSQL or Amazon Aurora PostgreSQL'
+    Description: 'Database Engine to use. PostgreSQL or Amazon Aurora PostgreSQL.'
     AllowedValues:
       - 'Amazon Aurora PostgreSQL'
       - 'PostgreSQL'
@@ -430,7 +430,7 @@ Parameters:
   DBIops:
     Default: 1000
     ConstraintDescription: Must be in the range 1000 - 30000.
-    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not valid for Aurora'
+    Description: 'Must be in the range of 1000 - 30000 and a multiple of 1000. This value is only used with Provisioned IOPS. Note: The ratio of IOPS per allocated-storage must be between 3.00 and 10.00. Not valid for Aurora.'
     MinValue: 1000
     MaxValue: 30000
     Type: Number
@@ -481,7 +481,7 @@ Parameters:
       - General Purpose (SSD)
       - Provisioned IOPS
     ConstraintDescription: Must be 'General Purpose (SSD)' or 'Provisioned IOPS'.
-    Description: Database storage type
+    Description: Database storage type.
     Type: String
   ElasticSearchPassword:
     Description: "Password for the elasticsearch master user, the username will be 'bitbucket'. If no password is specified, Bitbucket will authenticate with the elasticsearch cluster using IAM request signing (not recommended)."
@@ -533,24 +533,24 @@ Parameters:
       - m4.16xlarge
       - x1.32xlarge
     ConstraintDescription: Must be an EC2 instance type in the C4, M4, or X1 family, 'xlarge' or larger.
-    Description: Instance type for the file server hosting the Bitbucket shared home directory. See https://confluence.atlassian.com/x/GpdKLg for guidance
+    Description: Instance type for the file server hosting the Bitbucket shared home directory. See https://confluence.atlassian.com/x/GpdKLg for guidance.
     Type: String
   HomeDeleteOnTermination:
     Default: "true"
     AllowedValues: ["true", "false"]
     ConstraintDescription: Must be 'true' or 'false'.
-    Description: Delete Bitbucket home directory volume when the file server instance is terminated.  You must back up your data before terminating your file server instance if this option is set to 'true'
+    Description: Delete Bitbucket home directory volume when the file server instance is terminated.  You must back up your data before terminating your file server instance if this option is set to 'true'.
     Type: String
   HomeIops:
     Default: 1000
-    Description: 'Home directory IOPS (100 - 20000, only used with Provisioned IOPS). Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 50; for example, a volume with 5000 IOPS must be at least 100 GiB'
+    Description: 'Home directory IOPS (100 - 20000, only used with Provisioned IOPS). Note: The ratio of IOPS provisioned to the volume size requested can be a maximum of 50; for example, a volume with 5000 IOPS must be at least 100 GiB.'
     Type: Number
     MinValue: 100
     MaxValue: 20000
     ConstraintDescription: Must be in the range 100 - 20000.
   HomeSize:
     Default: 100
-    Description: Home directory storage size, in gigabytes (GB) (100 - 16384)
+    Description: Home directory storage size, in gigabytes (GB) (100 - 16384).
     ConstraintDescription: Must be in the range 100 - 16384.
     MinValue: 100
     MaxValue: 16384
@@ -581,7 +581,7 @@ Parameters:
     Type: String
   KeyPairName:
     ConstraintDescription: Must be the name of an existing EC2 Key Pair.
-    Description: Public/private EC2 Key Pairs to allow you to securely access the Bastion host
+    Description: Public/private EC2 Key Pairs to allow you to securely access the Bastion host.
     Type: String
     Default: ''
   CustomDnsName:
@@ -630,17 +630,17 @@ Parameters:
   PublicSubnet1CIDR:
     Default: 10.0.128.0/20
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: CIDR Block for the public DMZ subnet 1 located in Availability Zone 1
+    Description: CIDR Block for the public DMZ subnet 1 located in Availability Zone 1.
     Type: String
   PublicSubnet2CIDR:
     Default: 10.0.144.0/20
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: CIDR Block for the public DMZ subnet 2 located in Availability Zone 2
+    Description: CIDR Block for the public DMZ subnet 2 located in Availability Zone 2.
     Type: String
   VPCCIDR:
     Default: 10.0.0.0/16
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    Description: CIDR Block for the VPC
+    Description: CIDR Block for the VPC.
     Type: String
 
 Conditions:
