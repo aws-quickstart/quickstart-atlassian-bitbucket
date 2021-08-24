@@ -729,137 +729,137 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Action:
-                  - rds:AddTagsToResource
-                  - ec2:DetachVolume
-                  - ec2:AttachVolume
-                  - rds:DescribeDBSnapshots
-                  - rds:CopyDBSnapshot
-                  - ec2:CreateTags
-                  - rds:DeleteDBSnapshot
-                  - ec2:CreateVolume
-                  - rds:PromoteReadReplica
-                  - rds:CreateDBSnapshot
-                  - rds:RestoreDBInstanceFromDBSnapshot
                   - autoscaling:CreateOrUpdateTags
+                  - ec2:AttachVolume
                   - ec2:CreateSnapshot
+                  - ec2:CreateTags
+                  - ec2:CreateVolume
+                  - ec2:DetachVolume
+                  - rds:AddTagsToResource
+                  - rds:CopyDBSnapshot
+                  - rds:CreateDBSnapshot
+                  - rds:DeleteDBSnapshot
                   - rds:DescribeDBInstances
+                  - rds:DescribeDBSnapshots
                   - rds:ModifyDBInstance
+                  - rds:PromoteReadReplica
+                  - rds:RestoreDBInstanceFromDBSnapshot
                 Resource:
-                  - !Sub "arn:${AWS::Partition}:rds:*:${AWS::AccountId}:snapshot:*"
+                  - !Sub "arn:${AWS::Partition}:autoscaling:*:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/*"
                   - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:instance/*"
                   - !Sub "arn:${AWS::Partition}:ec2:*:${AWS::AccountId}:volume/*"
-                  - !Sub "arn:${AWS::Partition}:autoscaling:*:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/*"
+                  - !Sub "arn:${AWS::Partition}:rds:*:${AWS::AccountId}:snapshot:*"
                 Effect: Allow
               - Action:
-                  - es:DeletePackage
-                  - ec2:DescribeInstances
-                  - es:ListElasticsearchInstanceTypeDetails
-                  - es:ListDomainsForPackage
-                  - es:DeleteElasticsearchServiceRole
-                  - ec2:DescribeSnapshots
-                  - es:AcceptInboundCrossClusterSearchConnection
-                  - ec2:DescribeVolumes
-                  - es:DeleteInboundCrossClusterSearchConnection
-                  - es:DescribeOutboundCrossClusterSearchConnections
-                  - es:DeleteOutboundCrossClusterSearchConnection
-                  - es:DescribeReservedElasticsearchInstanceOfferings
-                  - es:CreateElasticsearchServiceRole
-                  - ec2:DescribeTags
-                  - es:UpdatePackage
-                  - es:RejectInboundCrossClusterSearchConnection
                   - autoscaling:DescribeTags
-                  - es:GetPackageVersionHistory
-                  - es:PurchaseReservedElasticsearchInstanceOffering
-                  - es:DescribeInboundCrossClusterSearchConnections
-                  - es:DescribeReservedElasticsearchInstances
-                  - es:ListDomainNames
+                  - ec2:DescribeInstances
+                  - ec2:DescribeSnapshots
+                  - ec2:DescribeTags
+                  - ec2:DescribeVolumes
+                  - es:AcceptInboundCrossClusterSearchConnection
+                  - es:CreateElasticsearchServiceRole
                   - es:CreatePackage
+                  - es:DeleteElasticsearchServiceRole
+                  - es:DeleteInboundCrossClusterSearchConnection
+                  - es:DeleteOutboundCrossClusterSearchConnection
+                  - es:DeletePackage
+                  - es:DescribeElasticsearchInstanceTypeLimits
+                  - es:DescribeInboundCrossClusterSearchConnections
+                  - es:DescribeOutboundCrossClusterSearchConnections
                   - es:DescribePackages
+                  - es:DescribeReservedElasticsearchInstanceOfferings
+                  - es:DescribeReservedElasticsearchInstances
+                  - es:GetPackageVersionHistory
+                  - es:ListDomainNames
+                  - es:ListDomainsForPackage
+                  - es:ListElasticsearchInstanceTypeDetails
                   - es:ListElasticsearchInstanceTypes
                   - es:ListElasticsearchVersions
-                  - es:DescribeElasticsearchInstanceTypeLimits
+                  - es:PurchaseReservedElasticsearchInstanceOffering
+                  - es:RejectInboundCrossClusterSearchConnection
+                  - es:UpdatePackage
                 Resource: "*"
                 Effect: Allow
               - Action: iam:PassRole
                 Resource: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*"
                 Effect: Allow
               - Action:
-                  - es:ListInstanceTypes
-                  - es:ListDomainNames
-                  - es:UpdatePackage
-                  - es:DescribeElasticsearchDomainConfig
-                  - es:CreatePackage
-                  - es:DescribeDomainConfig
-                  - es:IngestDataPrepperPipeline
-                  - es:ESHttpGet
-                  - es:DescribeInstanceTypeLimits
-                  - es:ListDataPrepperPipelines
-                  - es:DeleteElasticsearchServiceRole
-                  - es:ListVersions
-                  - es:DeleteDomain
-                  - es:ListElasticsearchInstanceTypeDetails
-                  - es:GetUpgradeStatus
-                  - es:UpgradeElasticsearchDomain
-                  - es:DescribeReservedElasticsearchInstanceOfferings
-                  - es:DescribeElasticsearchDomains
-                  - es:ESHttpPut
-                  - es:CancelElasticsearchServiceSoftwareUpdate
-                  - es:DescribeReservedElasticsearchInstances
-                  - es:DescribeOutboundConnections
-                  - es:ESHttpPatch
-                  - es:DeleteInboundConnection
-                  - es:DeleteInboundCrossClusterSearchConnection
-                  - es:UpdateElasticsearchDomainConfig
-                  - es:PurchaseReservedInstanceOffering
-                  - es:CreateServiceRole
-                  - es:DescribeReservedInstances
-                  - es:AddTags
-                  - es:DeleteElasticsearchDomain
-                  - es:DescribePackages
-                  - es:DescribeElasticsearchInstanceTypeLimits
-                  - es:GetCompatibleVersions
+                  - es:AcceptInboundConnection
                   - es:AcceptInboundCrossClusterSearchConnection
-                  - es:ListElasticsearchInstanceTypes
-                  - es:DescribeOutboundCrossClusterSearchConnections
-                  - es:DescribeDomain
-                  - es:ListTags
+                  - es:AddTags
+                  - es:AssociatePackage
+                  - es:CancelElasticsearchServiceSoftwareUpdate
+                  - es:CreateDataPrepperPipeline
+                  - es:CreateDomain
+                  - es:CreateElasticsearchDomain
                   - es:CreateElasticsearchServiceRole
-                  - es:DeleteDataPrepperPipeline
-                  - es:GetUpgradeHistory
-                  - es:DescribeReservedInstanceOfferings
-                  - es:ESHttpPost
                   - es:CreateOutboundConnection
                   - es:CreateOutboundCrossClusterSearchConnection
-                  - es:DissociatePackage
-                  - es:ESHttpHead
-                  - es:CreateDataPrepperPipeline
-                  - es:DescribeDataPrepperPipeline
-                  - es:ListDomainsForPackage
-                  - es:ESHttpDelete
-                  - es:DeletePackage
-                  - es:CreateDomain
+                  - es:CreatePackage
+                  - es:CreateServiceRole
+                  - es:DeleteDataPrepperPipeline
+                  - es:DeleteDomain
+                  - es:DeleteElasticsearchDomain
+                  - es:DeleteElasticsearchServiceRole
+                  - es:DeleteInboundConnection
+                  - es:DeleteInboundCrossClusterSearchConnection
                   - es:DeleteOutboundConnection
-                  - es:CreateElasticsearchDomain
-                  - es:DescribeInboundCrossClusterSearchConnections
-                  - es:DescribeInboundConnections
-                  - es:ListPackagesForDomain
-                  - es:PurchaseReservedElasticsearchInstanceOffering
-                  - es:GetPackageVersionHistory
                   - es:DeleteOutboundCrossClusterSearchConnection
+                  - es:DeletePackage
+                  - es:DescribeDataPrepperPipeline
+                  - es:DescribeDomain
+                  - es:DescribeDomainConfig
+                  - es:DescribeDomains
+                  - es:DescribeElasticsearchDomain
+                  - es:DescribeElasticsearchDomainConfig
+                  - es:DescribeElasticsearchDomains
+                  - es:DescribeElasticsearchInstanceTypeLimits
+                  - es:DescribeInboundConnections
+                  - es:DescribeInboundCrossClusterSearchConnections
+                  - es:DescribeInstanceTypeLimits
+                  - es:DescribeOutboundConnections
+                  - es:DescribeOutboundCrossClusterSearchConnections
+                  - es:DescribePackages
+                  - es:DescribeReservedElasticsearchInstanceOfferings
+                  - es:DescribeReservedElasticsearchInstances
+                  - es:DescribeReservedInstanceOfferings
+                  - es:DescribeReservedInstances
+                  - es:DissociatePackage
+                  - es:ESCrossClusterGet
+                  - es:ESHttpDelete
+                  - es:ESHttpGet
+                  - es:ESHttpHead
+                  - es:ESHttpPatch
+                  - es:ESHttpPost
+                  - es:ESHttpPut
                   - es:GetCompatibleElasticsearchVersions
-                  - es:AcceptInboundConnection
-                  - es:UpdateDataPrepperPipeline
+                  - es:GetCompatibleVersions
+                  - es:GetPackageVersionHistory
+                  - es:GetUpgradeHistory
+                  - es:GetUpgradeStatus
+                  - es:IngestDataPrepperPipeline
+                  - es:ListDataPrepperPipelines
+                  - es:ListDomainNames
+                  - es:ListDomainsForPackage
+                  - es:ListElasticsearchInstanceTypeDetails
+                  - es:ListElasticsearchInstanceTypes
+                  - es:ListElasticsearchVersions
+                  - es:ListInstanceTypeDetails
+                  - es:ListInstanceTypes
+                  - es:ListPackagesForDomain
+                  - es:ListTags
+                  - es:ListVersions
+                  - es:PurchaseReservedElasticsearchInstanceOffering
+                  - es:PurchaseReservedInstanceOffering
                   - es:RejectInboundConnection
                   - es:RejectInboundCrossClusterSearchConnection
-                  - es:ESCrossClusterGet
-                  - es:UpdateDomainConfig
-                  - es:StartElasticsearchServiceSoftwareUpdate
-                  - es:DescribeDomains
-                  - es:ListInstanceTypeDetails
                   - es:RemoveTags
-                  - es:ListElasticsearchVersions
-                  - es:AssociatePackage
-                  - es:DescribeElasticsearchDomain
+                  - es:StartElasticsearchServiceSoftwareUpdate
+                  - es:UpdateDataPrepperPipeline
+                  - es:UpdateDomainConfig
+                  - es:UpdateElasticsearchDomainConfig
+                  - es:UpdatePackage
+                  - es:UpgradeElasticsearchDomain
                 Resource:
                   - !Sub "arn:${AWS::Partition}:es:*:${AWS::AccountId}:pipeline/*"
                   - !Sub "arn:${AWS::Partition}:es:*:${AWS::AccountId}:domain/*"
@@ -1157,82 +1157,82 @@ Resources:
             Principal:
               AWS: !GetAtt BitbucketClusterNodeRole.Arn
             Action:
-              - es:ListDomainsForPackage
-              - es:DescribeReservedElasticsearchInstances
-              - es:IngestDataPrepperPipeline
-              - es:DescribeInboundCrossClusterSearchConnections
-              - es:AcceptInboundCrossClusterSearchConnection
-              - es:CreateDomain
-              - es:DescribeReservedInstanceOfferings
-              - es:StartElasticsearchServiceSoftwareUpdate
-              - es:ListPackagesForDomain
-              - es:CreateDataPrepperPipeline
-              - es:UpdatePackage
-              - es:DescribeDataPrepperPipeline
-              - es:ESHttpPut
-              - es:RejectInboundConnection
-              - es:DescribeReservedInstances
-              - es:DeleteInboundCrossClusterSearchConnection
-              - es:GetCompatibleElasticsearchVersions
-              - es:PurchaseReservedInstanceOffering
               - es:AcceptInboundConnection
+              - es:AcceptInboundCrossClusterSearchConnection
+              - es:AddTags
+              - es:AssociatePackage
+              - es:CancelElasticsearchServiceSoftwareUpdate
+              - es:CreateDataPrepperPipeline
+              - es:CreateDomain
+              - es:CreateElasticsearchDomain
+              - es:CreateElasticsearchServiceRole
+              - es:CreateOutboundConnection
+              - es:CreateOutboundCrossClusterSearchConnection
+              - es:CreatePackage
+              - es:CreateServiceRole
+              - es:DeleteDataPrepperPipeline
+              - es:DeleteDomain
+              - es:DeleteElasticsearchDomain
+              - es:DeleteElasticsearchServiceRole
+              - es:DeleteInboundConnection
+              - es:DeleteInboundCrossClusterSearchConnection
+              - es:DeleteOutboundConnection
+              - es:DeleteOutboundCrossClusterSearchConnection
+              - es:DeletePackage
+              - es:DescribeDataPrepperPipeline
+              - es:DescribeDomain
+              - es:DescribeDomainConfig
+              - es:DescribeDomains
+              - es:DescribeElasticsearchDomain
               - es:DescribeElasticsearchDomainConfig
+              - es:DescribeElasticsearchDomains
+              - es:DescribeElasticsearchInstanceTypeLimits
+              - es:DescribeInboundConnections
+              - es:DescribeInboundCrossClusterSearchConnections
+              - es:DescribeInstanceTypeLimits
+              - es:DescribeOutboundConnections
+              - es:DescribeOutboundCrossClusterSearchConnections
+              - es:DescribePackages
+              - es:DescribeReservedElasticsearchInstanceOfferings
+              - es:DescribeReservedElasticsearchInstances
+              - es:DescribeReservedInstanceOfferings
+              - es:DescribeReservedInstances
+              - es:DissociatePackage
+              - es:ESCrossClusterGet
+              - es:ESHttpDelete
+              - es:ESHttpGet
+              - es:ESHttpHead
+              - es:ESHttpPatch
+              - es:ESHttpPost
+              - es:ESHttpPut
+              - es:GetCompatibleElasticsearchVersions
+              - es:GetCompatibleVersions
+              - es:GetPackageVersionHistory
               - es:GetUpgradeHistory
               - es:GetUpgradeStatus
-              - es:GetPackageVersionHistory
-              - es:DescribeInstanceTypeLimits
-              - es:ESHttpPost
-              - es:CreateOutboundCrossClusterSearchConnection
-              - es:ESHttpPatch
-              - es:DescribeOutboundConnections
-              - es:DeleteElasticsearchServiceRole
-              - es:DescribeDomains
-              - es:ListElasticsearchInstanceTypeDetails
-              - es:CreateElasticsearchDomain
-              - es:ListInstanceTypeDetails
-              - es:ESCrossClusterGet
-              - es:CreateElasticsearchServiceRole
-              - es:UpdateDataPrepperPipeline
-              - es:DeleteDataPrepperPipeline
-              - es:RemoveTags
-              - es:PurchaseReservedElasticsearchInstanceOffering
-              - es:DescribeReservedElasticsearchInstanceOfferings
-              - es:DescribeOutboundCrossClusterSearchConnections
-              - es:ESHttpHead
-              - es:ListElasticsearchVersions
-              - es:DescribeDomainConfig
-              - es:ESHttpDelete
-              - es:DescribeInboundConnections
-              - es:ListInstanceTypes
-              - es:UpdateElasticsearchDomainConfig
-              - es:CancelElasticsearchServiceSoftwareUpdate
-              - es:GetCompatibleVersions
-              - es:CreateOutboundConnection
-              - es:UpgradeElasticsearchDomain
-              - es:DescribeElasticsearchDomain
-              - es:CreateServiceRole
-              - es:ListElasticsearchInstanceTypes
-              - es:DeleteElasticsearchDomain
-              - es:DeleteInboundConnection
-              - es:DescribeDomain
-              - es:CreatePackage
-              - es:AssociatePackage
-              - es:AddTags
-              - es:DeleteDomain
-              - es:ListVersions
-              - es:DissociatePackage
-              - es:DescribePackages
-              - es:DescribeElasticsearchDomains
-              - es:DeleteOutboundCrossClusterSearchConnection
-              - es:RejectInboundCrossClusterSearchConnection
-              - es:UpdateDomainConfig
-              - es:DeletePackage
-              - es:DescribeElasticsearchInstanceTypeLimits
-              - es:ListDomainNames
+              - es:IngestDataPrepperPipeline
               - es:ListDataPrepperPipelines
-              - es:ESHttpGet
-              - es:DeleteOutboundConnection
+              - es:ListDomainNames
+              - es:ListDomainsForPackage
+              - es:ListElasticsearchInstanceTypeDetails
+              - es:ListElasticsearchInstanceTypes
+              - es:ListElasticsearchVersions
+              - es:ListInstanceTypeDetails
+              - es:ListInstanceTypes
+              - es:ListPackagesForDomain
               - es:ListTags
+              - es:ListVersions
+              - es:PurchaseReservedElasticsearchInstanceOffering
+              - es:PurchaseReservedInstanceOffering
+              - es:RejectInboundConnection
+              - es:RejectInboundCrossClusterSearchConnection
+              - es:RemoveTags
+              - es:StartElasticsearchServiceSoftwareUpdate
+              - es:UpdateDataPrepperPipeline
+              - es:UpdateDomainConfig
+              - es:UpdateElasticsearchDomainConfig
+              - es:UpdatePackage
+              - es:UpgradeElasticsearchDomain
             Resource: "*"
       Tags:
         - Key: Name
@@ -1264,12 +1264,12 @@ Resources:
             Principal:
               AWS: "*"
             Action:
+              - es:ESHttpDelete
+              - es:ESHttpGet
+              - es:ESHttpHead
+              - es:ESHttpPatch
               - es:ESHttpPost
               - es:ESHttpPut
-              - es:ESHttpPatch
-              - es:ESHttpGet
-              - es:ESHttpDelete
-              - es:ESHttpHead
             Resource: "*"
       AdvancedSecurityOptions:
         Enabled: true
@@ -1315,56 +1315,56 @@ Resources:
               AWS:
                 - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root"
             Action:
-              - kms:DisconnectCustomKeyStore
-              - kms:ReplicateKey
-              - kms:CreateAlias
-              - kms:Sign
-              - kms:GetKeyPolicy
-              - kms:ReEncryptTo
-              - kms:DisableKeyRotation
-              - kms:ScheduleKeyDeletion
-              - kms:ListKeys
-              - kms:SynchronizeMultiRegionKey
-              - kms:ImportKeyMaterial
-              - kms:RevokeGrant
-              - kms:CreateCustomKeyStore
-              - kms:EnableKey
-              - kms:DeleteImportedKeyMaterial
-              - kms:Verify
-              - kms:DeleteCustomKeyStore
-              - kms:TagResource
-              - kms:RetireGrant
-              - kms:ListRetirableGrants
-              - kms:DisableKey
-              - kms:GenerateDataKey
-              - kms:DeleteAlias
-              - kms:UntagResource
               - kms:CancelKeyDeletion
-              - kms:ReEncryptFrom
-              - kms:UpdateCustomKeyStore
-              - kms:ListResourceTags
-              - kms:DescribeCustomKeyStores
-              - kms:GetKeyRotationStatus
-              - kms:Encrypt
+              - kms:ConnectCustomKeyStore
+              - kms:CreateAlias
+              - kms:CreateCustomKeyStore
+              - kms:CreateGrant
               - kms:CreateKey
-              - kms:GenerateDataKeyPair
               - kms:Decrypt
-              - kms:UpdateAlias
-              - kms:GetPublicKey
-              - kms:ListKeyPolicies
+              - kms:DeleteAlias
+              - kms:DeleteCustomKeyStore
+              - kms:DeleteImportedKeyMaterial
+              - kms:DescribeCustomKeyStores
+              - kms:DescribeKey
+              - kms:DisableKey
+              - kms:DisableKeyRotation
+              - kms:DisconnectCustomKeyStore
+              - kms:EnableKey
+              - kms:EnableKeyRotation
+              - kms:Encrypt
+              - kms:GenerateDataKey
+              - kms:GenerateDataKeyPair
+              - kms:GenerateDataKeyPairWithoutPlaintext
               - kms:GenerateDataKeyWithoutPlaintext
               - kms:GenerateRandom
-              - kms:ConnectCustomKeyStore
-              - kms:GenerateDataKeyPairWithoutPlaintext
-              - kms:ListGrants
-              - kms:PutKeyPolicy
-              - kms:EnableKeyRotation
-              - kms:UpdatePrimaryRegion
-              - kms:DescribeKey
-              - kms:ListAliases
-              - kms:CreateGrant
+              - kms:GetKeyPolicy
+              - kms:GetKeyRotationStatus
               - kms:GetParametersForImport
+              - kms:GetPublicKey
+              - kms:ImportKeyMaterial
+              - kms:ListAliases
+              - kms:ListGrants
+              - kms:ListKeyPolicies
+              - kms:ListKeys
+              - kms:ListResourceTags
+              - kms:ListRetirableGrants
+              - kms:PutKeyPolicy
+              - kms:ReEncryptFrom
+              - kms:ReEncryptTo
+              - kms:ReplicateKey
+              - kms:RetireGrant
+              - kms:RevokeGrant
+              - kms:ScheduleKeyDeletion
+              - kms:Sign
+              - kms:SynchronizeMultiRegionKey
+              - kms:TagResource
+              - kms:UntagResource
+              - kms:UpdateAlias
+              - kms:UpdateCustomKeyStore
               - kms:UpdateKeyDescription
+              - kms:UpdatePrimaryRegion
+              - kms:Verify
             Resource: '*'
       Tags:
         - Key: Name
