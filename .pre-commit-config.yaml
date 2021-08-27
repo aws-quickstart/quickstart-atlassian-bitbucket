@@ -1,0 +1,6 @@
+repos:
+- repo: https://github.com/aws-quickstart/qs-cfn-lint-rules
+  rev: v1.0.dev0
+  hooks:
+  - id: qs-cfn-lint
+    files: .*\.(json|yml|yaml)$
