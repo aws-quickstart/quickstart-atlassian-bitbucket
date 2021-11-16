@@ -187,7 +187,7 @@ Parameters:
     Description: A space-separated list of bitbucket properties in the form 'key1=value1 key2=value2 ...' Find documentation at https://confluence.atlassian.com/x/m5ZKLg.
     Type: String
   BitbucketVersion:
-    Default: "7.6.7"
+    Default: "7.17.1"
     AllowedPattern: '([^1234]\.\d+\.\d+(-?.*))'
     ConstraintDescription: 'Must be a valid Bitbucket version number. For example: 5.0.0 or higher'
     Description: 'Version of Bitbucket to install. Please use version 5.0.0 or higher. Find valid versions at http://go.atlassian.com/bbs-releases.'
@@ -941,10 +941,10 @@ Resources:
           PropagateAtLaunch: true
         # NOTE: The leading COMMIT/TIMESTAMP are used to locate the position to update; see scripts/update-tags.py
         - Key: "atl:quickstart:commit-id"
-          Value: "COMMIT: 42c34d27a469d9fe06cb494ee8b10ae208e51814"
+          Value: "COMMIT: 1ef456bc9a19061b3895f0b3a9ddc8892dca5f8c"
           PropagateAtLaunch: true
         - Key: "atl:quickstart:timestamp"
-          Value: "TIMESTAMP: 2021-06-07T23:50:53Z"
+          Value: "TIMESTAMP: 2021-11-16T03:36:11Z"
           PropagateAtLaunch: true
   ClusterNodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
