@@ -1,4 +1,4 @@
-:quickstart-project-name: quickstart-atlassian-jira
+:quickstart-project-name: quickstart-atlassian-bitbucket
 :partner-product-name: Bitbucket Data Center
 :partner-product-short-name: Bitbucket
 :partner-company-name: Atlassian
