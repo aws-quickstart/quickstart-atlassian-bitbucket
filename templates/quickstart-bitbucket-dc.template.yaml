@@ -920,6 +920,10 @@ Resources:
       Roles: [!Ref BitbucketClusterNodeRole]
   ClusterNodeGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
+    CreationPolicy:
+      ResourceSignal:
+        Count: !Ref ClusterNodeMin
+        Timeout: PT15M
     Properties:
       DesiredCapacity: !If [StandbyMode, '0', !Ref ClusterNodeMin]
       LaunchConfigurationName: !Ref ClusterNodeLaunchConfig
