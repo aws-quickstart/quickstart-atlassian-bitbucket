@@ -12,12 +12,12 @@ tests:
     template: 'templates/quickstart-bitbucket-dc.template.yaml'
     parameters:
       DBMultiAZ: 'false'
-      DBMasterUserPassword: $[taskcat_genpass_8S]
+      DBMasterUserPassword: 'f925dO1ry_'
       CidrBlock: '0.0.0.0/0'
-      BitbucketAdminPassword: ""
+      BitbucketAdminPassword: ''
       DBIops: '1000'
-      DBPassword: $[taskcat_genpass_8S]
-      ElasticSearchPassword: $[taskcat_genpass_8S]
+      DBPassword: 'f925dO1ry_'
+      ElasticSearchPassword: 'f925dO1ry_'
       ClusterNodeInstanceType: 't3.medium'
       DBInstanceClass: 'db.t3.medium'
       QSS3BucketName: $[taskcat_autobucket]
