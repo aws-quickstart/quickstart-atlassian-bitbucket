@@ -1,0 +1,25 @@
+project:
+  name: quickstart-atlassian-bitbucket
+  owner: quickstart-eng@amazon.com
+  package_lambda: false
+  s3_regional_buckets: true
+  auth:
+    us-east-1: tests
+  regions:
+  - us-east-1
+tests:
+  bitbucket:
+    template: 'templates/quickstart-bitbucket-dc.template.yaml'
+    parameters:
+      DBMultiAZ: 'false'
+      DBMasterUserPassword: 'f925dO1ry_'
+      CidrBlock: '0.0.0.0/0'
+      BitbucketAdminPassword: ''
+      DBIops: '1000'
+      DBPassword: 'f925dO1ry_'
+      ElasticSearchPassword: 'f925dO1ry_'
+      ClusterNodeInstanceType: 't3.medium'
+      DBInstanceClass: 'db.t3.medium'
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3KeyPrefix: 'quickstart-atlassian-bitbucket/'
+      BastionHostRequired: 'false'
