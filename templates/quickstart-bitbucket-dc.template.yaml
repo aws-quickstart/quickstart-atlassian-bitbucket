@@ -1153,7 +1153,7 @@ Resources:
         EBSEnabled: true
         VolumeSize: !Ref ElasticsearchNodeVolumeSize
         VolumeType: gp2
-      ElasticsearchVersion: "6.8"
+      ElasticsearchVersion: "7.10"
       ElasticsearchClusterConfig:
         InstanceType: !Ref ElasticsearchInstanceType
       AccessPolicies:
