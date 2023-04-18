@@ -1291,9 +1291,17 @@ Resources:
           Value: !Ref "AWS::StackId"
   ElasticsearchServiceRole:
     Condition: UseFineGrainedAccessControlES
-    Type: AWS::IAM::ServiceLinkedRole
+    Type: AWS::IAM::Role
     Properties:
-      AWSServiceName: "es.amazonaws.com"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - "es.amazonaws.com"
   ElasticsearchSecure:
     Condition: UseFineGrainedAccessControlES
     DependsOn:
