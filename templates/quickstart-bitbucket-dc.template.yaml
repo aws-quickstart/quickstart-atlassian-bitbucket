@@ -1432,6 +1432,8 @@ Resources:
     Condition: CreateESBucket
     Properties:
       BucketName: !Ref ESBucketName
+      VersioningConfiguration:
+        Status: Enabled
       Tags:
         - Key: Cluster
           Value: !Ref "AWS::StackName"
